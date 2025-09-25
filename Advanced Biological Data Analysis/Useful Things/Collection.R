@@ -21,13 +21,13 @@ require(mgcv)
 #Data
 data("ToothGrowth")
 df <- ToothGrowth
-leaf <- read.csv("leaf.csv")
-LMA <- read_excel("Data/LMA.xlsx")
-mesocosm_data <- read.csv("Data/mesocosm_data.csv")
+leaf <- read.csv("Useful Things/leaf.csv")
+LMA <- read_excel("Useful Things/LMA.xlsx")
+mesocosm_data <- read.csv("Useful Things/mesocosm_data.csv")
 data("mtcars")
 dfm <- mtcars
-nobel <- read.csv("Data/nobel_prize_data.csv")
-leaves <- read.csv("Data/traits_analysis.csv")
+nobel <- read.csv("Useful Things/nobel_prize_data.csv")
+leaves <- read.csv("Useful Things/traits_analysis.csv")
 
 
 #Tidyverse basics ----
@@ -54,7 +54,7 @@ nobel %>% filter(continent == "Africa") #filter only data for Africa from the da
 (trees.subset <- LMA %>%  
     filter(TID %in% c('Alder', 'Rowan', 'Birch', "Oak")) %>% #filter by tree species 
     group_by(TID, age, lma_final) %>% 
-    tally() %>% mutate(TID = recode(TID, "Alder" = "A. glutinosa",
+    count() %>% mutate(TID = recode(TID, "Alder" = "A. glutinosa",
                                     "Birch" = "B. pendula",
                                     "Oak" = "Q. robur",
                                     "Rowan" = "S. aucuparia"))) #count how many samples are in each group
