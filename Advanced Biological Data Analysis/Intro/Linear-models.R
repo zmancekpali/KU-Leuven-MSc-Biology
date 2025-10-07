@@ -6,20 +6,22 @@
 ##%#########################################################################%##
 
 #WD
-setwd(setwd("/Users/zojamancekpali/Desktop/KU Leuven/Advanced Biological Data Analysis/Linear Models"))
+setwd("/Users/zojamancekpali/Desktop/KU Leuven/Advanced Biological Data Analysis/Linear Models")
 getwd()
 
 #packages
 library(car)
 library(tidyr)
+library(dplyr)
+library(ggplot2)
 library(multcomp)
 library(effects) 
 library(emmeans)
 library(openxlsx)
 
 #data
-metabolism <- read_xlsx("Linear Models/metabolism.xlsx")
-yield <- read_xlsx("Linear Models/yields.xlsx")
+metabolism <- read.xlsx("metabolism.xlsx")
+yield <- read.xlsx("yields.xlsx")
 
 #EXERCISE 1: resting metabolic rate ----
 head(metabolism)
@@ -104,7 +106,8 @@ predict(model1, list("bodyweight" = 80)) # 1381.194 calories
   head(yield)
   str(yield) #three numeric variables
   
-  boxplot(yield)
+  boxplot(yield)#you can see that there are three individual soil categories, but we want to see if soil type
+  #affects crop yields so we need to transform the dataset:
 
   yield_long <- yield %>%
     pivot_longer(cols = c(clay, loam, sand),
