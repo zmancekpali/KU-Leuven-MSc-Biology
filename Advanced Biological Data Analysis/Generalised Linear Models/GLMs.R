@@ -10,7 +10,7 @@ setwd("/Users/zojamancekpali/Desktop/KU Leuven/Advanced Biological Data Analysis
 getwd()
 
 #packages
-library(car)
+library(car) 
 library(tidyverse)
 library(rockchalk)
 library(lmtest)
