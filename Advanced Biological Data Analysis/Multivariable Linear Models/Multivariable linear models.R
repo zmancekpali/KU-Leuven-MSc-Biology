@@ -16,6 +16,7 @@ library(lmtest)
 library(effects)
 library(afex)
 library(MuMIn)
+library(lattice)
 library(emmeans)
 library(openxlsx)
 
@@ -48,6 +49,8 @@ str(seed)
 #Include variables flowers, seed.weight and seed.number. We are mostly interested 
 #in the relationships between seed number and the other variables. Get a first 
 #impression of these relationships from the graphs.
+
+plot(seed[,6:8])
 
 plot(seed.number ~ flowers, data = seed)
 plot(seed.number ~ seed.weight, data = seed)
@@ -97,7 +100,7 @@ summary(model4)
 #than the additive model
 
 png("effects_plot_interaction_1.png", width = 1200, height = 600, res = 120)
-plot(allEffects(model4))
+plot(allEffects(model4), multiline=T, confint=list(style="auto"))
 dev.off()
 #each small panel corresponds to a particular value of seed.weight, and within 
 #each panel you see how seed number changes as the number of flowers increases.
@@ -166,7 +169,19 @@ model.sel(models_list)
   
   #linearity and collinearity
   residualPlots(model4) #looks ok
-  vif(model4, type = 'predictor') #GVIF not > 5; no collinearity
+  vif(model4) #GVIF > 5; collinearity!
+  
+    #need to center:
+    model4c <- residualCenter(model4)
+    
+    vif(model4c)
+    summary(model4c)
+    summary(model4) #compared to the initial interaction model, 
+      #the main effect of seed.weight now has a significant effect
+    
+    #in case of collineatirity, we should interpret the p-values of the model with residual centering
+    Anova(model4c, type="III") #all significant
+    
   
   #outliers:
   outlierTest(model4) #no residuals with p < 0.05
@@ -193,6 +208,13 @@ model.sel(models_list)
   #The interaction model (model4) provides the best statistical fit (lowest AICc, highest R² ≈ 76%).
   #All regression assumptions were met — the model is statistically sound and interpretable.
 
+  #The number of flowers produced over the season is a strong determinant of how 
+  #many seeds will be produced, and there is also a significant main effect of 
+  #the seed weight on the number of seeds. However, there is a trade-off between 
+  #the number and weight of the seeds. Hence, you can see that the relationship 
+  #between flower number and seed number is only apparent for light seeds and not for heavy ones.
+  
+  
 #Exercise 2: eels ------
 #In a study by Maes et al. (2005), the authors investigated the relationship 
 #between bioaccumulation of heavy metals, genetic variation and fitness in the 
@@ -220,12 +242,27 @@ eel <- eel %>% mutate(RIVER = as.factor(RIVER),
                      microsat = MULTILOCUS_HETEROZYGOSITY_MICROSAT) #renaming is
                      #not necessary but makes it easier
 
+eel <- mutate_if(eel, is.character, as.factor) #can also do this
+
+
 #a. First and foremost, visually explore the data. Make some graphs that you think make sense 
 #to get a better idea of the relationships between the three variables that we're interested in.
 boxplot(hm_conc ~ river, data = eel)
-plot(hm_conc ~ allozyme, data = eel)
-boxplot(allozyme ~ river, data = eel)
+plot(hm_conc ~ allozyme, data = eel, col = river, cex = 1, pch = 16)
+boxplot(allozyme ~ river, col = river, data = eel)
 
+par(mfrow=c(1,3))
+plot(hm_conc ~ allozyme, data = subset(eel, eel$river ==  "IJZER"), col = "red", cex = 2, pch = 16)
+plot(hm_conc ~ allozyme, data = subset(eel, eel$river == "MAAS"), col = "blue", cex = 2, pch = 16)
+plot(hm_conc ~ allozyme, data = subset(eel, eel$river == "SCHELDE"), col = "green", cex = 2, pch = 16)
+
+par(mfrow=c(1,1))
+
+#or (lattice package):
+xyplot(hm_conc ~ allozyme, data = eel, group = eel$river, type = c("p", "r"), 
+       col = c(2, 3, 4), cex = 1.8, pch = 16, 
+       key = list(text = list(levels(eel$river)), space = "right", 
+                  points = list(pch = 16, cex = 1.8, col = c(2, 3, 4)))) #this is WAY better
 
 #b. Build a linear model only including the main effects of river and allozyme heterozygosity. Check
 #the Anova table to see if there are overall effects of your predictors and draw effect plots.
@@ -241,6 +278,10 @@ summary(model5)
 #the model itself is significant (p < 0.05) and explains 17.05% of the variation within data
 Anova(model5, type = "III")
 #both heterozygosity and river affect [hm]
+
+contrast(emmeans(model5, ~river), method = "pairwise", adjust = "tukey")
+#sig differences between IJZER - MAAS (negative) & MAAS - SCHELD (positive)
+#no difference b/w IJZER - SCHELDE (negative effect)
 
 png("effects_plot_additive_2.png", width = 1200, height = 600, res = 120)
 plot(allEffects(model5))
@@ -267,6 +308,11 @@ Anova(model6, type = "III")
   #allozyme: Significant main effect — heterozygosity affects heavy metal concentration overall
   #river: Not significant — no overall difference between rivers after accounting for heterozygosity
   #allozyme*river :Not significant — the effect of heterozygosity does not differ between rivers
+
+contrast(emtrends(model6, "river", var = "allozyme"), method = "pairwise", adjust = "tukey")
+#no significant differences b/w the rivers
+
+plot(allEffects(mod = model6), multiline = T, ci.style = "band") 
 
 png("effects_plot_interaction_2.png", width = 1200, height = 600, res = 120)
 plot(allEffects(model6))
@@ -301,11 +347,16 @@ model.sel(models_list2)
   
   #homogeneity of variances
   spreadLevelPlot(model5) #looks normal-ish
-  ncvTest(model5) #p-value > 0.05, variances homogeneous; assummption not violated
+  ncvTest(model5) #p-value > 0.05, variances homogeneous; assumption not violated
   
-  #linearity and collinearity
+  spreadLevelPlot(model5, xlab = "log(fitted values)", 
+                  ylab = "log(absolute studentized residuals)") # graphical test, 
+                                          #there should be no strong correlation
+  ncvTest(lm(model5, data = eel)) # variances don't deviate from homogeneity, but it's close
+  
+  
+  #linearity 
   residualPlots(model5) #looks ok for the continuous predictor (allozyme)
-  vif(model4, type = 'predictor') #GVIF not > 5; no collinearity
   
   #outliers:
   outlierTest(model5) #no residuals with p < 0.05
@@ -333,6 +384,10 @@ model.sel(models_list2)
   #The model is robust and valid (no assumptions violated), although it only explains 
     #~21% of the variation within the data
   
+  #We conclude that heterozygosity negatively affects the heavy metal accumulation in minnows.
+  #We also detected overall differences in heavy metal concentration between the different 
+  #river systems, but there is no significant interaction (????). In other words, the effect of 
+  #heterozygosity on heavy metal accumulation is the same for all river systems.
   
 #Exercise 3: minnows -------
 # For this dataset, the researchers measured the body length (in mm) of (male) minnows (Phoxinus 
@@ -360,8 +415,11 @@ minnow <- minnow %>% mutate(STRESS = as.factor(STRESS),
 str(minnow)
 
 #a. As usual, start with some visual explorations.
-boxplot(body_length ~ contaminant, data = minnow)
-boxplot(body_length ~ stress, data = minnow)
+par(mfrow=c(1,2))
+plot(body_length ~ stress, data = minnow)
+plot(body_length ~ contaminant, data =minnow)
+par(mfrow=c(1,1))
+
 
 #b. Now build a linear model with both predictors. Include only main effects.
 #Check if there is an overall effect of your variables and make effect plots. 
@@ -435,7 +493,7 @@ model.sel(models_list3)
 
 #e.Do some posthoc analysis. Specifically, check if there are differences between
 #the contamination treatments within each stress treatment.
-contrast(emmeans(model8, ~contaminant), method = 'pairwise', adjust = 'Tukey') #posthoc comparisons
+contrast(emmeans(model8, ~contaminant|stress), method = 'pairwise', adjust = 'Tukey') #posthoc comparisons
 #Minnows under chrome are ~22 mm longer than those under lead, significant
 #Minnows under chrome are ~27 mm longer than those under manganese, significant
 #Minnows under lead are ~49 mm longer than those under manganese, highly significant
@@ -466,6 +524,11 @@ contrast(emmeans(model8, ~contaminant | stress), method = 'pairwise', adjust = '
   #under chrome, minnows are 19.8mm shorter than under manganese, significant
   #under lead, minnows are 26.8 mm shorter than under manganese, significant
     #under sound: lead < chrome < manganese 
+
+#So:
+  #Manganese causes the greatest growth suppression,
+  #Lead causes a moderate reduction,
+  #Chrome (baseline) fish are largest overall.
 
   
 #f.Test assumptions for the best model
@@ -516,3 +579,12 @@ contrast(emmeans(model8, ~contaminant | stress), method = 'pairwise', adjust = '
 #the interaction with stress means manganese fish respond differently under varying 
 #stress conditions—possibly showing compensatory or selective survival effects depending 
 #on environment.
+  
+  # We conclude that contamination type and type of stress have significant effects 
+  # on the adult body length in minnows. On top of that, there is a significant interaction: the effects
+  # of contamination treatment is different between the stress treatments (or the other
+  # way around). Visually, it seems like there is a negative synergy: if there is already
+  # a strong negative effect of one of the treatments (especially STRESS), then the negative effect of the
+  # other treatment (contamination) is smaller.
+  
+  

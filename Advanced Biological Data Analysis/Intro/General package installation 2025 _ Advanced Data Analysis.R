@@ -56,6 +56,7 @@ install.packages("xml2")
 install.packages("xtable")
 install.packages("lattice")
 install.packages("robustbase")
+install.packages("glmulti")
 
 #as the newest version of the "car" package gives some problems that are not yet solves, download a former version:
 remotes::install_version("car", version = "3.1-2", repos = "https://cloud.r-project.org")
