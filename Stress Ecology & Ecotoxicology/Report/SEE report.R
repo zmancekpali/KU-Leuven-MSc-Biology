@@ -43,7 +43,7 @@ plot(EC48h, broken = TRUE, xlab = "Concentration", ylab = "Immobility")
 
 #Dose-response curve
 daph_1 <- data.frame(conc = exp(seq(log(min(daph$conc[daph$conc>0])),
-                                    log(max(daph$conc)), length=100)))
+                                    log(max(daph$conc)), length = 100)))
 daph_1$fit <- predict(EC48h, daph_1)
 
 EC50 <- 0.364
@@ -209,7 +209,7 @@ ggplot(emm_df, aes(x = temp_f, y = emmean, fill = zinc_f)) +
   geom_boxplot(position = position_dodge()) +
   scale_fill_brewer(palette = "Paired", direction = 1, name = "nZnO treatment", 
                     labels = c(expression("No nZnO"), bquote(EC[50*","*48]*" nZnO"))) +
-  labs(x = "Acclimated temperature", y = "CTmax (°C)", fill="ZnO") +
+  labs(x = "Acclimated temperature", y = "CTmax (°C)", fill = "ZnO") +
   theme_classic())
 ggsave("Report/chronic_boxplot2.png", chronic_boxplot2, units = "cm", width = 20, height = 15)
 
