@@ -37,7 +37,7 @@ daph %>%
 
 summary(EC48h) #gives lower + upper limits, EC50, and slope
 
-ED(EC48h, c(50),interval='delta') #this gives the 95% confidence interval
+ED(EC48h, c(50),interval = 'delta') #this gives the 95% confidence interval
 
 plot(EC48h, broken = TRUE, xlab = "Concentration", ylab = "Immobility")
 
@@ -69,7 +69,7 @@ conc_breaks <- c(0.1, 0.2, 0.4, 0.8, 1.6)
     scale_x_log10(breaks = conc_breaks,
                   labels = conc_breaks) +    
     scale_colour_manual(values = c("Observed data" = "cornflowerblue", "Dose-response model fit" = "blue2")) +
-    labs(x = expression("ZnO concentration (mg·L"^-1*")"),
+    labs(x = expression("nZnO concentration (mg·L"^-1*")"),
          y = expression("Immobility of "*italic("Daphnia magna")*" (%)"),
          color = NULL) +
     theme_classic() +
@@ -205,11 +205,11 @@ ggplot(emm_df, aes(x = temp_f, y = emmean, fill = zinc_f)) +
   theme_classic()
 
 #Visualisation
-(chronic_boxplot2 <- ggplot(chronic, aes(x=temp_f, y=ctmax, fill=zinc_f)) +
-  geom_boxplot(position=position_dodge()) +
+(chronic_boxplot2 <- ggplot(chronic, aes(x = temp_f, y = ctmax, fill = zinc_f)) +
+  geom_boxplot(position = position_dodge()) +
   scale_fill_brewer(palette = "Paired", direction = 1, name = "nZnO treatment", 
                     labels = c(expression("No nZnO"), bquote(EC[50*","*48]*" nZnO"))) +
-  labs(x="Temperature", y="CTmax (°C)", fill="ZnO") +
+  labs(x = "Acclimated temperature", y = "CTmax (°C)", fill="ZnO") +
   theme_classic())
 ggsave("Report/chronic_boxplot2.png", chronic_boxplot2, units = "cm", width = 20, height = 15)
 
@@ -246,19 +246,27 @@ summary(model)
 
 model2 <- lmer(ctmax ~ hemo + (1|group), data = chronic)
 summary(model2)
-AICc(model, model2)
-anova(model2, model)
+
+model3 <- lmer(ctmax ~ hemo + (1|group) + (1|size), data = chronic)
+summary(model3)
+
+AICc(model, model2, model3)
+anova(model3, model2)
 
 cor.test(chronic$hemo, chronic$ctmax)
+cor.test(chronic$hemo, chronic$size)
+
 
 ctmax_hemo_lm_add <- lm(ctmax ~ hemo + temp_f + zinc_f, data = chronic)
 ctmax_hemo_lm_int <- lm(ctmax ~ hemo * temp_f * zinc_f, data = chronic)
 model_ctmax_hemo_add <- lmer(ctmax ~ hemo + temp_f + zinc_f + (1 | group), data = chronic, REML = FALSE)
 model_ctmax_hemo_int <- lmer(ctmax ~ hemo * temp_f * zinc_f + (1 | group), data = chronic, REML = FALSE)
+model_ctmax_hemo_add1 <- lmer(ctmax ~ hemo + temp_f + zinc_f + (1 | group) + (1|size), data = chronic, REML = FALSE)
+model_ctmax_hemo_int1 <- lmer(ctmax ~ hemo * temp_f * zinc_f + (1 | group) + (1|size), data = chronic, REML = FALSE)
 
-AICc(ctmax_hemo_lm_add, ctmax_hemo_lm_int, model_ctmax_hemo_add, model_ctmax_hemo_int) #mixed full model is better
-anova(model_ctmax_hemo_add, model_ctmax_hemo_int, ctmax_hemo_lm_add, ctmax_hemo_lm_int)
-anova(model_ctmax_hemo_add, model_ctmax_hemo_int)
+AICc(ctmax_hemo_lm_add, ctmax_hemo_lm_int, model_ctmax_hemo_add, model_ctmax_hemo_int, model_ctmax_hemo_add1, model_ctmax_hemo_int1) #mixed full model is better
+anova(model_ctmax_hemo_add, model_ctmax_hemo_int, ctmax_hemo_lm_add, ctmax_hemo_lm_int, model_ctmax_hemo_add1, model_ctmax_hemo_int1)
+anova(model_ctmax_hemo_int1, model_ctmax_hemo_add)
 
 
 summary(model_ctmax_hemo_add) #significant effect of temperature, no effect of hemo
