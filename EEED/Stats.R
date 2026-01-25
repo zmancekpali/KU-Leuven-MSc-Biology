@@ -1,6 +1,23 @@
 setwd("/Users/zojamancekpali/Desktop/KU Leuven/EEED")
 getwd()
 
+#packages
+library(mgcv)
+library(ggplot2)
+library(car)
+library(rockchalk)
+library(lmtest)
+library(effects)
+library(MuMIn)
+library(afex)
+library(emmeans)
+library(gridExtra)
+library(dplyr)
+library(nlme)
+library(robustbase)
+library(openxlsx)
+library(mgcv)
+
 #data
 bugs <- read.csv("Heverlee - Kleine poel - 2018A.csv")
 
@@ -16,22 +33,77 @@ bugs <- bugs %>% rename(individual = Individual,
                  mutate(fitness = case_when(status == "M" ~ 1, status == "U" ~ 0)) %>% 
                  mutate(mean_w = 52/292) %>% 
                  mutate(rw = fitness/mean_w)
+par(mfrow = c(1,2))
+plot1 <- ggplot(bugs, aes(x = bodysize_z, y = rw)) +
+  geom_jitter(width = 0.05, height = 0.05, alpha = 0.6) +
+  geom_smooth(method = "lm", se = TRUE, color = "black", linewidth = 1) +
+  labs(x = "Standardized body size (z)",
+    y = "Relative fitness") +
+  theme_classic(base_size = 14)
 
-#packages
-library(mgcv)
-library(ggplot2)
-library(car)
-library(rockchalk)
-library(lmtest)
-library(effects)
-library(MuMIn)
-library(afex)
-library(emmeans)
-library(dplyr)
-library(nlme)
-library(robustbase)
-library(openxlsx)
-library(mgcv)
+quad_bs <- lm(rw ~ poly(bodysize_z, 2, raw = T), data = bugs_na)
+summary(quad_bs) #bodysize_z = 6.0901 (p-value = 0.0302)*
+beta_bs <- coef(quad_bs)["poly(bodysize_z, 2, raw = T)1"]
+gamma_bs <- 2 * coef(quad_bs)["poly(bodysize_z, 2, raw = T)2"]
+
+newdat <- data.frame(
+  bodysize_z = seq(min(bugs$bodysize_z, na.rm = TRUE),
+                  max(bugs$bodysize_z, na.rm = TRUE),
+                  length.out = 200))
+
+newdat$wr_hat <- predict(quad_bs, newdat)
+
+ggplot(bugs, aes(x = bodysize_z, y = rw)) +
+  geom_jitter(width = 0.05, height = 0.05, alpha = 0.6) +
+  geom_line(data = newdat, aes(x = bodysize_z, y = wr_hat), linewidth = 1) +
+  labs(
+    x = "Standardized body size (z)",
+    y = "Relative fitness") +
+  annotate("text",
+           x = -2.5,
+           y = 5,
+           hjust = 0, vjust = 1,
+           label = paste0("β = ", round(beta_bs, 3),
+                          ",  γ = ", round(gamma_bs, 3))) +
+  theme_classic(base_size = 14)
+
+ggplot(bugs, aes(x = bodysize_z, y = rw)) +
+  geom_jitter(width = 0.05, height = 0.05, alpha = 0.6) +
+  geom_line(data = newdat, aes(x = bodysize_z, y = wr_hat), linewidth = 1) +
+  labs(
+    x = "Standardized body size (z)",
+    y = "Relative fitness") +
+  annotate("text",
+           x = -2.5,
+           y = 5,
+           hjust = 0, vjust = 1,
+           label = paste0("β = ", round(beta_bs, 3),
+                          ",  γ = ", round(gamma_bs, 3))) +
+  theme_classic(base_size = 14)
+
+
+plot2 <- ggplot(bugs, aes(x = bodysize_z, y = fitness)) +
+  geom_jitter(width = 0.05, height = 0.05, alpha = 0.6) +
+  geom_smooth(method = "lm", se = TRUE, color = "black", linewidth = 1) +
+  labs(x = "Standardized body size (z)",
+       y = "Fitness") +
+  theme_classic(base_size = 14)
+grid.arrange(plot1, plot2, ncol = 2)
+
+gam_model <- gam(rw ~ s(bodysize), data = bugs, family = gaussian())
+plot(gam_model)
+
+gam_model1 <- gam(rw ~ s(antennae), data = bugs, family = gaussian())
+plot(gam_model1)
+
+
+ggplot(bugs, aes(x = antennae_z, y = rw)) +
+  geom_jitter(width = 0.05, height = 0.05, alpha = 0.6) +
+  geom_smooth(method = "lm", se = TRUE, color = "black", linewidth = 1) +
+  labs(x = "Standardized antenna length (z)",
+       y = "Relative fitness") +
+  theme_classic(base_size = 14)
+
 
 #Univariate
 fit1 <- lm(rw ~ antennae_z, , data = bugs)
@@ -72,19 +144,22 @@ plot(allEffects(quad_al))
 
 AICc(quad_bs, quad_al)
 
-AICc(model_bs, model_an, quad_al, quad_bs)
+quad_both <- lm(rw ~ poly(antennae_z, 2, raw = TRUE) + poly(bodysize_z, 2, raw = TRUE), data = bugs_na)
+summary(quad_both)
 
+AICc(model_bs, model_an, quad_al, quad_bs, quad_both)
+plot(allEffects(quad_both), raw = TRUE)
 
 ###Multivariate
 fit1 <- lm(rw ~ antennae_z + bodysize_z, data = bugs)
 fit2 <- lm(rw ~ antennae_z * bodysize_z, data = bugs)
-fit3 <- lm(rw ~ poly(antennae_z, 2, raw = T) + poly(bodysize_z, 2, raw = T) + antennae_z:bodysize_z, data = bugs)
+fit3 <- lm(rw ~ poly(antennae_z, 2, raw = T) * poly(bodysize_z, 2, raw = T), data = bugs)
 
 #multi glm
 fit4 <- glm(fitness ~ antennae_z + bodysize_z, family = binomial(link=logit), data = bugs)
 fit5 <- glm(fitness~ antennae_z * bodysize_z, family = binomial(link=logit), data = bugs)
-fit6 <- glm(fitness~ poly(antennae_z, 2, raw = T) + poly(bodysize_z, 2, raw = T),family = binomial(link=logit), data = bugs)
-fit7 <- glm(fitness~ poly(antennae_z, 2, raw = T) + poly(bodysize_z, 2, raw = T) + antennae_z:bodysize_z,family = binomial(link=logit), data = bugs)
+fit6 <- glm(fitness~ poly(antennae_z, 2, raw = T) + poly(bodysize_z, 2, raw = T), family = binomial(link = logit), data = bugs)
+fit7 <- glm(fitness~ poly(antennae_z, 2, raw = T) + poly(bodysize_z, 2, raw = T) + antennae_z:bodysize_z, family = binomial(link = logit), data = bugs)
 AICc(fit4,fit5,fit6,fit7)
 # df     AICc
 # fit4  3 122.9682
@@ -172,7 +247,6 @@ ggplot() + geom_ribbon(data = estimates_covariatemodel, aes(x = bodysize, ymin =
   geom_point(data = bugs_na, aes(x = bodysize, y = fitness))
 
 #### predictions antennae
-
 predict_range <- data.frame(antennae = seq(min(bugs_na$antennae), max(bugs_na$antennae), length.out = 50),
                             bodysize = mean(bugs_na$antennae))
 estimates_covariatemodel <- cbind(predict_range,
@@ -195,5 +269,33 @@ estimates_covariatemodel <- cbind(estimates_covariatemodel,
 
 ggplot() + geom_ribbon(data = estimates_covariatemodel, aes(x = antennae, ymin = lower_ci, ymax = upper_ci), alpha = 0.5) +
   geom_line(data = estimates_covariatemodel, aes(x = antennae, y = estimate_covariatemodel)) +
-  geom_point(data = bugs_na, aes(x = antennae, y = fitness))
+  geom_point(data = bugs_na, aes(x = antennae, y = fitness)) +
+  theme_classic()
 
+ggplot() +
+  geom_ribbon(
+    data = estimate_covariatemodel,
+    aes(x = antennae,
+        ymin = lower_ci,
+        ymax = upper_ci),
+    alpha = 0.2) +
+  geom_line(
+    data = estimates_covariatemodel,
+    aes(x = antennae,
+        y = estimate_covariatemodel),
+    linewidth = 1) +
+  geom_jitter(
+    data = bugs_na,
+    aes(x = antennae,
+        y = fitness),
+    width  = 0.003,
+    height = 0.02,
+    alpha  = 0.4,
+    size   = 1) +
+  scale_y_continuous(
+    name = "Predicted probability of pairing",
+    limits = c(0, 1),
+    expand = expansion(mult = c(0, 0.02))) + 
+  scale_x_continuous(name = "Antenna length") +
+  theme_classic(base_size = 14) +
+  ggtitle("Nonlinear selection on antenna length (GAM with bootstrap 95% CI)")
