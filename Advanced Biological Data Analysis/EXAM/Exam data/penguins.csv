@@ -1,0 +1,156 @@
+bird_id,age,breeding_status,moult_start_days
+2802,15.0,Non-breeder,19
+2802,17.0,Successful breeder,29
+3698,13.0,Failed breeder,22
+3698,14.0,Successful breeder,21
+3698,15.0,Successful breeder,15
+4012,13.0,Successful breeder,20
+4202,11.0,Successful breeder,19
+4202,12.0,Failed breeder,12
+4292,11.0,Non-breeder,12
+4324,11.0,Failed breeder,15
+4324,12.0,Failed breeder,8
+4493,11.0,Non-breeder,22
+4831,9.0,Non-breeder,25
+4831,10.0,Non-breeder,17
+4831,11.0,Successful breeder,24
+4877,10.0,Failed breeder,20
+4877,11.0,Failed breeder,10
+4887,9.0,Successful breeder,14
+4940,10.0,Non-breeder,21
+4982,11.0,Failed breeder,11
+5138,11.0,Successful breeder,26
+5139,9.0,Failed breeder,0
+5139,11.0,Successful breeder,19
+5150,11.0,Failed breeder,4
+5195,9.0,Failed breeder,15
+5195,10.0,Successful breeder,19
+6268,9.0,Successful breeder,22
+6326,9.0,Successful breeder,23
+6326,10.0,Successful breeder,19
+6661,6.0,Successful breeder,16
+6661,7.0,Successful breeder,19
+29809,10.0,Non-breeder,20
+32019,8.0,Successful breeder,19
+32159,9.0,Failed breeder,9
+32189,8.0,Failed breeder,22
+32189,9.0,Non-breeder,16
+32189,10.0,Successful breeder,21
+32204,9.0,Successful breeder,23
+43318,17.0,Successful breeder,23
+43907,17.0,Failed breeder,15
+44953,16.0,Successful breeder,21
+46249,14.0,Failed breeder,33
+46279,14.0,Successful breeder,29
+46279,15.0,Failed breeder,8
+46311,14.0,Successful breeder,34
+46311,15.0,Successful breeder,34
+46408,14.0,Failed breeder,14
+46408,15.0,Successful breeder,25
+46478,16.0,Failed breeder,26
+46514,14.0,Failed breeder,27
+46514,15.0,Non-breeder,15
+46514,16.0,Non-breeder,9
+46645,14.0,Successful breeder,35
+46645,15.0,Non-breeder,9
+46645,16.0,Successful breeder,11
+47226,13.0,Failed breeder,14
+47953,13.0,Successful breeder,30
+47953,14.0,Non-breeder,11
+47953,15.0,Non-breeder,10
+48431,12.0,Successful breeder,20
+48431,13.0,Successful breeder,15
+48840,12.0,Successful breeder,38
+48840,13.0,Successful breeder,28
+48840,14.0,Successful breeder,31
+49234,11.0,Successful breeder,29
+49234,12.0,Non-breeder,11
+49455,11.0,Successful breeder,19
+49455,12.0,Successful breeder,15
+49842,12.0,Failed breeder,12
+49842,13.0,Failed breeder,30
+49990,10.0,Successful breeder,25
+50171,10.0,Successful breeder,43
+50171,11.0,Successful breeder,24
+50229,10.0,Successful breeder,27
+50395,12.0,Failed breeder,19
+50416,11.0,Successful breeder,25
+50416,12.0,Successful breeder,28
+50625,11.0,Successful breeder,19
+50625,12.0,Successful breeder,14
+50945,9.0,Failed breeder,19
+50945,10.0,Successful breeder,30
+50945,11.0,Failed breeder,30
+51053,10.0,Failed breeder,16
+51055,9.0,Successful breeder,28
+51069,9.0,Successful breeder,11
+51069,10.0,Non-breeder,8
+51069,11.0,Successful breeder,22
+62029,9.0,Successful breeder,19
+62029,10.0,Non-breeder,11
+62155,9.0,Failed breeder,40
+62155,10.0,Non-breeder,11
+62335,9.0,Failed breeder,16
+62853,5.0,Non-breeder,18
+62853,6.0,Failed breeder,4
+63012,5.0,Failed breeder,14
+63012,6.0,Non-breeder,20
+63028,7.0,Successful breeder,7
+63054,5.0,Non-breeder,19
+63108,6.0,Non-breeder,7
+63108,7.0,Successful breeder,14
+63137,5.0,Non-breeder,4
+63137,7.0,Successful breeder,19
+63197,7.0,Successful breeder,6
+63363,6.0,Successful breeder,17
+63378,6.0,Non-breeder,19
+63378,7.0,Successful breeder,17
+69258,7.0,Successful breeder,24
+69757,7.0,Failed breeder,21
+69757,8.0,Non-breeder,13
+69785,8.0,Failed breeder,0
+69785,9.0,Successful breeder,24
+69936,8.0,Successful breeder,25
+69936,9.0,Successful breeder,11
+70164,7.0,Failed breeder,5
+70164,8.0,Non-breeder,7
+70164,9.0,Successful breeder,14
+70213,7.0,Non-breeder,10
+70213,8.0,Successful breeder,41
+70439,6.0,Successful breeder,19
+70449,6.0,Successful breeder,26
+70449,7.0,Non-breeder,5
+70449,8.0,Failed breeder,13
+70600,6.0,Successful breeder,23
+70676,6.0,Failed breeder,14
+70676,7.0,Non-breeder,5
+70676,8.0,Failed breeder,22
+70708,6.0,Successful breeder,12
+70914,6.0,Successful breeder,28
+70940,7.0,Non-breeder,13
+70994,6.0,Successful breeder,22
+71053,6.0,Failed breeder,18
+71053,7.0,Non-breeder,7
+71053,8.0,Failed breeder,3
+71164,7.0,Successful breeder,26
+71164,8.0,Non-breeder,7
+71373,5.0,Successful breeder,28
+71373,6.0,Successful breeder,15
+71475,5.0,Failed breeder,1
+71475,6.0,Non-breeder,12
+71475,7.0,Successful breeder,10
+71632,7.0,Successful breeder,22
+71689,5.0,Successful breeder,21
+71695,5.0,Successful breeder,15
+71816,6.0,Successful breeder,20
+71816,7.0,Failed breeder,10
+71817,5.0,Failed breeder,16
+71817,6.0,Successful breeder,17
+71817,7.0,Non-breeder,0
+71865,7.0,Successful breeder,23
+72023,6.0,Non-breeder,17
+72023,7.0,Successful breeder,11
+72034,5.0,Successful breeder,14
+72291,4.0,Non-breeder,19
+72291,5.0,Successful breeder,9
+72457,6.0,Failed breeder,27

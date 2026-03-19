@@ -3779,3 +3779,121 @@ set_sum_contrasts() # use effect coding for all fitted models
     #LMM (repeated measures per individual)
     #GLMM (counts with random site)
   #Robust linear model - heavy outliers/influential observations
+      
+      
+#Past questions ----
+  # Honeybee Queen Pheromones
+      bees <- read.csv("data/queenpheromone_long.csv")
+      bees_wide <- read.csv("data/queenpheromone_wide.csv")
+      head(bees_wide)
+      
+      unique(bees_wide$treatment)
+      unique(bees$treatment)
+      
+      bees_wide$treatment <- relevel(bees_wide$treatment, ref = "control")
+
+      model <- glm(colonysize ~ as.factor(treatment) + (1|colony), data = bees_wide, family = poisson)
+      
+      
+      #spaghetti plot
+      library(lattice)
+      
+      xyplot(size_oocyte ~ treatment | caste, groups = ID, data = data,
+             type = c("p", "l"),
+             auto.key = FALSE,
+             xlab = "Treatment",
+             ylab = "Largest oocyte size")
+      
+      library(ggplot2)
+      
+      ggplot(data, aes(x = treatment, y = size_oocyte, group = ID)) +
+        geom_line(alpha = 0.5) +
+        geom_point(size = 2) +
+        facet_wrap(~caste) +
+        theme_classic() +
+        labs(x = "Treatment", y = "Largest oocyte size")
+      
+      #for both, each line is one colony/sib-group paid, the slope is within-ID effects of phermonone vs control; 
+      #separately for queens and workers
+      
+      
+      #models
+      library(lme4)
+      
+      model_add <- lmer(size_oocyte ~ treatment + caste + (1|ID), data = data, REML = FALSE)
+      model_int <- lmer(size_oocyte ~ treatment * caste + (1|ID), data = data, REML = FALSE)
+      
+      #effect plots
+      library(emmeans)
+      best <- if (AIC(model_int) < AIC(model_add)) model_int else model_add
+      emm <- emmeans(best, ~ treatment * caste)
+      plot(emm, comparison = TRUE)
+      
+      #post hoc tests
+      anova(model_add, model_int) #does interaction improve fit
+      m_caste <- lmer(size_oocyte ~ caste + (1|ID), data = data, REML = FALSE) #reduced model
+      m_treat <- lmer(size_oocyte ~ treatment + (1|ID), data = data, REML = FALSE) #reduced model
+      
+      anova(model_add, m_caste)
+      anova(model_add, m_treat)
+      
+      anova(best)
+      
+      emm_tc <- emmeans(best, ~ treatment|caste)
+      pairs(emm_tc, adjust = "Tukey")
+      
+      
+      #assumptions
+      res <- resid(best)
+      hist(res)
+      qqnorm(res)
+      qqline(res)
+      shapiro.test(res)
+        
+      library(DHARMa)
+      sim <- simulateResiduals(best)
+      plot(sim)
+      testDispersion(sim)
+      
+      
+#leaf PCA practice
+  leaf <- read.csv("data/Leafshape.csv")
+  head(leaf)
+  Species <- leaf$Species
+  leaf_data <- leaf[, 2:6] #only the desired variables selected
+
+  leaf_pca <- princomp(leaf_data, cor = FALSE)  
+  plot(leaf_pca$scores, pch = 16, col = as.factor(Species))
+  legend(0, 0.4, c("Species A", "Species B"), pch = 16, col = c("black", "red"))
+  
+  summary(leaf_pca)  
+  screeplot(leaf_pca, type = "lines") #2 is enough
+  
+  loadings(leaf_pca)
+  biplot(leaf_pca)
+
+  leaf_pca1 <- prcomp(leaf_data, scale. = TRUE)
+  q <- autoplot(leaf_pca1, data = leaf, color = "Species", loadings = TRUE,
+                loadings.color = "blue", loadings.label = TRUE)
+  ggplotly(q)
+  
+  
+#herbs NMDS practice
+  herbs <- read.csv("data/Herbivore_specialisation.csv", header = TRUE)
+  head(herbs)
+
+  herb_comm <- herbs[5:11] #columns 5 - 11 (only abundance values)
+  
+  library(vegan)
+  nmds <- metaMDS(comm = herb_comm, distance = "bray", trace = FALSE, autotransform = FALSE)
+  plot(nmds)    
+  nmds_xy <- data.frame(nmds$points)  
+  nmds_xy$habitat <- herbs$Habitat
+  nmds_xy$daynight <- herbs$DayNight
+  
+  ggplot(nmds_xy, aes(MDS1, MDS2, color = habitat)) +
+    geom_point() +
+    theme_classic()
+
+  nmds$stress  #acceptable
+  
