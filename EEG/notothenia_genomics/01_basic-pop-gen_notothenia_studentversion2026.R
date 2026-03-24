@@ -1,4 +1,4 @@
-setwd("/Users/zojamancekpali/Desktop/KU Leuven/EEG")
+setwd("/Users/zoja/Desktop/KU Leuven/EEG")
 getwd()
 #### Script for basic data analysis
 #### of Notothenia coriiceps ddRAD genotypes
@@ -77,12 +77,12 @@ ncor@all.names
 
 ## calculate some basic summary statistics
 ncor_smry <- summary(ncor)
-ncor_smry$n.by.pop
-ncor_smry$loc.n.all
-ncor_smry$pop.n.all
-ncor_smry$NA.perc
-ncor_smry$Hobs
-ncor_smry$Hexp
+ncor_smry$n.by.pop #number of indivifuals per pop
+ncor_smry$loc.n.all #number of alleles per locus (2)
+ncor_smry$pop.n.all #number of SNPs per pop
+ncor_smry$NA.perc #Percentage of missing data
+ncor_smry$Hobs #Observed heterozygosity per locus
+ncor_smry$Hexp #Expected heterozygosity per locus
 
 ## investigate the number of alleles in more detail
 barplot(ncor_smry$loc.n.all, ylab = "Number of alleles",
@@ -92,33 +92,41 @@ barplot(ncor_smry$loc.n.all, ylab = "Number of alleles",
 plot(ncor_smry$Hexp, ncor_smry$Hobs,
      main = "Observed vs expected heterozygosity")
 abline(0, 1, col = "red")
+#Red line: observed = expected heterozygosity
+#Here, less heterozygosity than expected (maybe inbreeding, assortative mating, ...)
+
 
 ## investigate missing data in more detail
 info_table(ncor, type = "missing", plot = T, plotlab = F)
+#NTA = a lot of missing data
+#NKGI = litte missing data
 
 ## filter on missing data
 ncor # 
-ncor <- missingno(ncor, type = "loci", cutoff = '??')
-# 
-ncor <- missingno(ncor, type = "geno", cutoff = '??')
-# 
+ncor <- missingno(ncor, type = "loci", cutoff = 0.30) #retain only data with at most 30% missing data
+#1859 loci with missing data removed
+ncor <- missingno(ncor, type = "geno", cutoff = 0.30)
+#25 genotypes removed
 ncor # how many individuals and loci are remaining after filtering?
+#105 individuals, 869 loci, 1738 alleles
 
 ## check missing data again
-info_table(ncor, type = "missing", plot = T, plotlab = F)
+info_table(ncor, type = "missing", plot = T, plotlab = F) #Much better, but NTA as a whole removed
 ncor_smry <- summary(ncor)
-ncor_smry$NA.perc
+ncor_smry$NA.perc #6.649131% missing data now (better)
 
 ## filter also on minor allele frequency
-ncor <- informloci(ncor, cutoff = 0, MAF = '??', quiet = F)
+ncor <- informloci(ncor, cutoff = 0, MAF = 0.05, quiet = F)
+#Only retaining the loci with at least 0.05 variation
 
 ## assess the filtered data set again
-ncor # 
+ncor #105 individuals, 833 loci, 1666 alleles
 ncor_smry <- summary(ncor)
 ncor_smry$NA.perc
 plot(ncor_smry$Hexp, ncor_smry$Hobs,
      main = "Observed vs expected heterozygosity")
 abline(0, 1, col = "red")
+#much more expected -> more aligned with HW
 
 ## add metadata for the filtered data set
 metadata <- read.csv("notothenia_genomics/metadata.csv", header = T, sep = ",", dec = ".")
@@ -143,52 +151,54 @@ rm(inc, popmap, ncor_smry)
 #### STEP 2: calculate FST and GST
 #####
 ## overall F statistics
-ncor_fst_overall <- wc(ncor)
-ncor_fst_overall
+(ncor_fst_overall <- wc(ncor)) #FST = 0.007759513; #FIS = 0.1615496 (relatively low inbreeding coefficient)
+#FST - very low genetic differentiation between the subopulations (gene flow relatively free between them)
 
 ## per locus
 plot.default(sort(ncor_fst_overall$per.loc[, 1]), main = 'Fst')
 plot.default(sort(ncor_fst_overall$per.loc[, 2]), main = 'Fis')
 
 ## calculate pairwise FST after Weir & Cockerham
-ncor_fst_wc_pw <- genet.dist(ncor, method = "??") # this may run for some time
-ncor_fst_wc_pw
+(ncor_fst_wc_pw <- genet.dist(ncor, method = "WC84")) # this may run for some time
+ncor_fst_wc_pw 
+max(ncor_fst_wc_pw) #maximum genetic differentiation: NKGI & STA
 
 ## calculate pairwise GST after Hedrick
-ncor_gst_pw <- pairwise_Gst_Hedrick(ncor) # ignore the warnings
-ncor_gst_pw
+(ncor_gst_pw <- pairwise_Gst_Hedrick(ncor)) # ignore the warnings
+ncor_gst_pw  
+max(ncor_gst_pw) #maximum genetic differentiation: DI & STA (and followed closly by NKGI and STA)
 
 ## plot as heatmap
-heatmap(as.matrix(ncor_fst_wc_pw), Rowv = NA, Colv = NA, symm = T)
-heatmap(as.matrix(ncor_gst_pw), Rowv = NA, Colv = NA, symm = T)
+heatmap(as.matrix(ncor_fst_wc_pw), Rowv = NA, Colv = NA, symm = T) #STA and NKGI appear most different
+heatmap(as.matrix(ncor_gst_pw), Rowv = NA, Colv = NA, symm = T) #STA and DI appear most different; but also STA and NKGI
 
 ## plot as MDS
 ncor_fst_wc_pw_d <- dist(ncor_fst_wc_pw)
 ncor_fst_mds <- isoMDS(ncor_fst_wc_pw_d)
-ncor_fst_mds$stress
+ncor_fst_mds$stress #0.001735748 = low stress
 ncor_fst_mds
 plot(ncor_fst_mds$points[, 1], ncor_fst_mds$points[, 2],
      col = funky(length(levels(ncor$pop))), pch = 16, cex = 1.2,
      xlim = c(-0.04, 0.08), ylim = c(-0.03, 0.03))
 text(ncor_fst_mds$points[, 1], ncor_fst_mds$points[, 2], pos = c(4, 3, 1, 2, 4, 4, 1),
-     labels = attr(ncor_fst_wc_pw, "Labels"), cex = 1.2)
+     labels = attr(ncor_fst_wc_pw, "Labels"), cex = 1.2) #STA is clearly very different from the others
 
 ## same for GST
 ncor_gst_pw_d <- dist(ncor_gst_pw)
 ncor_gst_mds <- isoMDS(ncor_gst_pw_d)
-ncor_gst_mds$stress
+ncor_gst_mds$stress #0.006532055 = also low stress
 ncor_gst_mds
 plot(ncor_gst_mds$points[, 1], ncor_gst_mds$points[, 2],
      col = funky(length(levels(ncor$pop))), pch = 16, cex = 1.2,
-     xlim = c(-0.04, 0.08), ylim = c(-0.03, 0.03))
+     xlim = c(-0.03, 0.09), ylim = c(-0.03, 0.03))
 text(ncor_gst_mds$points[, 1], ncor_gst_mds$points[, 2], pos = c(4, 3, 1, 2, 4, 4, 1),
-       labels = attr(ncor_gst_pw, "Labels"), cex = 1.2)
+       labels = attr(ncor_gst_pw, "Labels"), cex = 1.2) #STA is again very different
 
 ## amova
 ncor_dist  <- dist(ncor)
 ncor_stra  <- strata(ncor)
 set.seed(20210401)
-ncor_amova <- pegas::amova(ncor_dist ~ group/pop, data = ncor_stra, nperm = '??')
+(ncor_amova <- pegas::amova(ncor_dist ~ group/pop, data = ncor_stra, nperm = 1000))
 ncor_amova
 
 ## clean up
@@ -211,34 +221,34 @@ summary(ncor_pcacomp)
 #plot the axes 1 and 2:
 
 s.class(ncor_pcacomp$x[,c(1,2)], xax= 1, yax=2, fac=ncor$pop,
-        label=levels(ncor$pop), col=funky(length(levels(ncor$pop))))
+        label=levels(ncor$pop), col=funky(length(levels(ncor$pop)))) #STA slightly removed
 
 s.class(ncor_pcacomp$x[,c(3,4)], xax= 1, yax=2, fac=ncor$pop,
-        label=levels(ncor$pop), col=funky(length(levels(ncor$pop))))
+        label=levels(ncor$pop), col=funky(length(levels(ncor$pop)))) #all overlapped
 
 ## run a dapc
 ncor_dapc <- dapc(ncor, n.da = 4, n.pca = 80)
 
 ## plot axes 1 and 2
-scatter(ncor_dapc, col=funky(length(levels(ncor$pop))))
+scatter(ncor_dapc, col=funky(length(levels(ncor$pop)))) #STA very different
 
 ## plot axes 3 and 4
-scatter(ncor_dapc, xax=3, yax=4, col=funky(length(levels(ncor$pop))))
+scatter(ncor_dapc, xax=3, yax=4, col=funky(length(levels(ncor$pop)))) #here STA right in the middle
 
 ## predict re-assignment
 pred1 <- predict.dapc(ncor_dapc)
 barplot(t(100 * round(pred1$posterior, 2)), col = funky(length(levels(ncor$pop))), ylab = "% assignment")
 
 ## run a cross-validation (command may run for some time)
-ncor_xval <- xvalDapc(ncor_matrix, ncor$pop, n.pca.max = 80, training.set = '??',
-                      result = "groupMean", scale = F, n.rep = '??', 
+ncor_xval <- xvalDapc(ncor_matrix, ncor$pop, n.pca.max = 80, training.set = 0.9,
+                      result = "groupMean", scale = F, n.rep = 10, 
                       n.pca = c(seq(5, by = 5, to = 80)), xval.plot = T)
-ncor_xval
+ncor_xval #used first 5 PCs (variance = 0.195)
 
 ## re-run dapc with optimized results
-ncor_dapc <- dapc(ncor, n.da = '??', n.pca = '??')
-scatter(ncor_dapc, col=funky(length(levels(ncor$pop))))
-scatter(ncor_dapc, xax=3, yax=4, col=funky(length(levels(ncor$pop))))
+ncor_dapc <- dapc(ncor, n.da = 5, n.pca = 70)
+scatter(ncor_dapc, col=funky(length(levels(ncor$pop)))) #sta different
+scatter(ncor_dapc, xax=3, yax=4, col=funky(length(levels(ncor$pop)))) #all overlain
 pred1 <- predict.dapc(ncor_dapc)
 barplot(t(100 * round(pred1$posterior, 2)), col = funky(length(levels(ncor$pop))), ylab = "% assignment")
 
@@ -277,7 +287,7 @@ plot(ncor_pcadapt, option = "scores", i = 3, j = 4,
 
 ## re-run pcadapt with optimal K
 set.seed(20210401)
-ncor_pcadapt <- pcadapt(ncor_pcadapt_matrix, K = '??', min.maf = 0.05)
+ncor_pcadapt <- pcadapt(ncor_pcadapt_matrix, K = 3, min.maf = 0.05)
 
 ## examine
 summary(ncor_pcadapt)
@@ -285,10 +295,11 @@ summary(ncor_pcadapt)
 ## replace NAs in pvalues with 1
 ncor_pcadapt$pvalues[is.na(ncor_pcadapt$pvalues)] <- 1
 ncor_pcadapt$pvalues
-length(ncor_pcadapt$pvalues)
+length(ncor_pcadapt$pvalues) #833
 
 ## plot loci
 manhattan_plot(ncor_pcadapt, chr.info = NULL, snp.info = locNames(ncor), plt.pkg = 'plotly')
+plot(ncor_pcadapt, option = "manhattan")
 
 ## same with ggplot
 manhattan_plot(ncor_pcadapt, chr.info = NULL, plt.pkg = 'ggplot') +
@@ -302,20 +313,26 @@ manhattan_plot(ncor_pcadapt, chr.info = NULL, plt.pkg = 'ggplot') +
 
 ## investigate statistics in more detail
 qq_plot(ncor_pcadapt)
+plot(ncor_pcadapt, option = "qqplot")
 hist(ncor_pcadapt$pvalues, xlab = "p-values", main = NULL, breaks = 50,
      col = "orange")
 
 ## correct p values for multiple testing
 qval <- qvalue(ncor_pcadapt$pvalues)$qvalues
 qval
-length(qval)
+length(qval) #833
 
 
 ## identify outliers at a 0.05 threshold
 ncor_outliers <- which(qval < 0.05)
-length(ncor_outliers)
-ncor_outliers <- locNames(ncor)[ncor_outliers]
+length(ncor_outliers) #17 (with k = 3) -> 17 significant values
+(ncor_outliers <- locNames(ncor)[ncor_outliers])
 ncor_outliers
+
+ncor_outliers <- which(qval < 0.05)
+snp_pc <- get.pc(ncor_pcadapt, ncor_outliers) #gives each SNP and the PC its most associated with 
+(snp.pc.grouped <- group_by(snp_pc, PC)) #groups PCs
+(snp.grouped.summary <- dplyr::count(snp.pc.grouped)) #tidyverse conflicts with ()masks
 
 ## clean up
 rm(ncor_df, ncor_pcadapt, ncor_outliers, ncor_pcadapt_matrix, qval)
