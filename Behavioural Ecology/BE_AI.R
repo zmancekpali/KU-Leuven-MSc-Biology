@@ -4,31 +4,12 @@
 setwd("~/Desktop/KU Leuven/Behavioural Ecology")
 getwd()
 
-#Packages
-pkgs <- c("tidyverse", "lme4", "lmerTest", "rptR", "survival", "survminer",
-          "emmeans", "effectsize", "ggplot2", "patchwork", "factoextra",
-          "performance", "DHARMa", "car", "broom.mixed")
-
-install.packages(setdiff(pkgs, rownames(installed.packages())),
-                 repos = "https://cloud.r-project.org")
-
-library(tidyverse)      
-library(lme4)           
-library(lmerTest)       
-library(rptR)           
-library(survival)       
-library(survminer)      
-library(emmeans)        
-library(effectsize)     
-library(patchwork)      
-library(factoextra)
+#Packages ----
+library(tidyverse)
+library(patchwork)    
+library(ggbeeswarm)
+library(ggpubr) 
 library(gridExtra)
-library(performance)    
-library(DHARMa)   
-library(ggpubr)
-library(car)           
-library(broom.mixed)    
-
 
 #Data & wrangling ----
 crickets <- read.csv("cricket_autotomy_raw_dataset_v2.csv",
@@ -38,7 +19,7 @@ head(crickets)
 str(crickets)
 
 crickets_long <- read.csv("cricket_autotomy_long.csv",
-                           na = c("", "NA", "NaN"))
+                           na = c("", "NA", "NaN")) #changed to long format
 head(crickets_long)
 
 crickets_long <- crickets_long %>% rename(ID = individual_ID,
@@ -59,9 +40,7 @@ crickets_long <- crickets_long %>% rename(ID = individual_ID,
                                           freezing_n = OFT_freezing_bouts_n,
                                           resume_latency = PCRT_latency_resume_s,
                                           total_freeze_time = PCRT_total_freeze_duration_s,
-                                          shelter_latency = PCRT_shelter_seeking_latency_s)
-
-head(crickets_long)
+                                          shelter_latency = PCRT_shelter_seeking_latency_s) #renaming for ease
 
 crickets_long <- crickets_long %>%
   mutate(ID = factor(ID),
@@ -90,65 +69,40 @@ crickets_analysis <- crickets %>%
     )
   )
 
-#Plots ----
-# =============================================================================
-# CRICKET AUTOTOMY — COMPREHENSIVE ggplot2 FIGURES
-# Assumes your long-format dataframe is called crickets_long
-# and your wide-format dataframe is called crickets (or df)
-# =============================================================================
-
-library(tidyverse)
-library(patchwork)    # combine plots
-library(ggbeeswarm)   # beeswarm jitter
-library(gghalves)     # half violin / half boxplot
-library(viridis)      # colour scales
-
-# install any missing ones first:
-# install.packages(c("ggbeeswarm", "gghalves", "viridis", "patchwork"))
-
-# ── Consistent colour palette across all plots ────────────────────────────────
-pal_personality <- c(Shy        = "yellow2",
+#Colours + palettes ----
+pal_personality <- c(Shy = "yellow2",
                      Intermediate = "orange",
-                     Bold       = "red3")
+                     Bold = "red3")
 
-pal_regime      <- c(sham     = "lightblue3",
-                     autotomy = "red")
+pal_regime <- c(sham = "lightblue3",
+                autotomy = "red")
 
-pal_timepoint   <- c(pre  = "#888780",
-                     post = "#C04828")
+pal_timepoint <- c(pre = "#888780",
+                   post = "#C04828")
 
-# ── Shared theme ──────────────────────────────────────────────────────────────
 theme_cricket <- function() {
   theme_classic() +
     theme(
-      plot.title      = element_text(face = "bold", size = 12),
-      plot.subtitle   = element_text(size = 9, colour = "grey40"),
-      axis.title      = element_text(size = 10),
+      plot.title = element_text(face = "bold", size = 12),
+      plot.subtitle = element_text(size = 9, colour = "grey40"),
+      axis.title = element_text(size = 10),
       legend.position = "bottom",
       strip.background = element_rect(fill = "grey95", colour = NA),
-      strip.text      = element_text(face = "bold", size = 9)
+      strip.text = element_text(face = "bold", size = 9)
     )
 }
-
-
-# =============================================================================
-# 1. DISTRIBUTIONS
-# =============================================================================
-
-# ── 1a. Histogram: pre-trial boldness PC1 by personality category ─────────────
+#Plots ----
+#Distributions (1): 
 (p1a <- crickets_long %>%
-  filter(timepoint == "pre", trial == 1) %>%   # one row per individual
+  filter(timepoint == "pre", trial == 1) %>%   
   ggplot(aes(x = PC1_pre, fill = personality)) +
   geom_histogram(bins = 20, colour = "white", linewidth = 0.3, alpha = 0.85) +
   scale_fill_manual(values = pal_personality, name = "Personality") +
-  labs(
-       x        = "Boldness PC1 score",
-       y        = "Count") +
+  labs(x = "Boldness PC1 score", y = "Count") +
   theme_cricket())
 ggsave("histogramPC1.png", p1a,
        width = 10, height = 10, dpi = 300, bg = "white")
 
-# ── 1b. Density plot: PC1 pre vs post, coloured by timepoint ─────────────────
 (p1b <- crickets_long %>%
   filter(trial == 1) %>%
   pivot_longer(cols = c(PC1_pre, PC1_post),
@@ -160,14 +114,11 @@ ggsave("histogramPC1.png", p1a,
   geom_density(alpha = 0.45, linewidth = 0.8) +
   scale_fill_manual(values   = pal_timepoint, name = "Timepoint") +
   scale_colour_manual(values = pal_timepoint, name = "Timepoint") +
-  labs(
-       x     = "Boldness PC1 score",
-       y     = "Density") +
+  labs(x = "Boldness PC1 score", y = "Density") +
   theme_cricket())
 ggsave("histogramPC1_2.png", p1b,
        width = 10, height = 10, dpi = 300, bg = "white")
 
-# ── 1c. Density plot faceted by regime ───────────────────────────────────────
 (p1c <- crickets_long %>%
   filter(trial == 1) %>%
   pivot_longer(cols = c(PC1_pre, PC1_post),
@@ -180,25 +131,19 @@ ggsave("histogramPC1_2.png", p1b,
   facet_wrap(~ regime, labeller = labeller(regime = c(sham = "Sham", autotomy = "Autotomy"))) +
   scale_fill_manual(values   = pal_timepoint, name = "Timepoint") +
   scale_colour_manual(values = pal_timepoint, name = "Timepoint") +
-  labs(
-       x     = "Boldness PC1",
-       y     = "Density") +
+  labs(x = "Boldness PC1", y = "Density") +
   theme_cricket())
 ggsave("histogramPC1_3.png", p1c,
        width = 10, height = 10, dpi = 300, bg = "white")
 
 (pc1_grid <- p1a / p1b /p1c +
     plot_annotation(
-      theme    = theme(plot.title    = element_text(face = "bold", size = 14),
+      theme = theme(plot.title = element_text(face = "bold", size = 14),
                        plot.subtitle = element_text(size = 10, colour = "grey40"))))
 ggsave("PC1grid.png", pc1_grid,
        width = 10, height = 15, dpi = 300, bg = "white")
 
-# =============================================================================
-# 2. BOXPLOTS & VIOLIN PLOTS
-# =============================================================================
-
-# ── 2a. Boxplot: delta boldness by regime ─────────────────────────────────────
+#Boxplots (2)
 (p2a <- crickets_long %>%
   filter(trial == 1, timepoint == "pre") %>%
   ggplot(aes(x = regime, y = d_boldness, fill = regime)) +
@@ -207,13 +152,10 @@ ggsave("PC1grid.png", pc1_grid,
                alpha = 0.8, colour = "grey30") +
   scale_fill_manual(values = pal_regime, name = "Regime") +
   scale_x_discrete(labels = c(sham = "Sham", autotomy = "Autotomy")) +
-  labs(
-       x        = "Regime",
-       y        = "Δ Boldness (PC1 post − pre)") +
+  labs(x = "Regime", y = "Δ Boldness (PC1 post − pre)") +
   theme_cricket() +
   theme(legend.position = "none"))
 
-# ── 2b. Violin + boxplot: delta boldness by regime × personality ──────────────
 (p2b <- crickets_long %>%
   filter(trial == 1, timepoint == "pre") %>%
   ggplot(aes(x = personality, y = d_boldness, fill = regime)) +
@@ -222,12 +164,9 @@ ggsave("PC1grid.png", pc1_grid,
   scale_fill_manual(values = pal_regime,
                     labels = c(sham = "Sham", autotomy = "Autotomy"),
                     name   = "Regime") +
-  labs(x        = "Personality category",
-       y        = "Δ Boldness (post − pre)") +
+  labs(x = "Personality category", y = "Δ Boldness (post − pre)") +
   theme_cricket())
 
-# ── 2c. Half-violin + half-boxplot ("raincloud"): OFT distance by personality ─
-# This requires gghalves
 (p2c <- crickets_long %>%
   filter(timepoint == "pre") %>%
   ggplot(aes(x = personality, y = total_distance,
@@ -236,9 +175,7 @@ ggsave("PC1grid.png", pc1_grid,
   geom_jitter(width = 0.05, alpha = 0.3, size = 1.2) +
   scale_fill_manual(values   = pal_personality) +
   scale_colour_manual(values = pal_personality) +
-  labs(
-       x        = "Personality category",
-       y        = "Total distance moved (cm)") +
+  labs(x = "Personality category", y = "Total distance moved (cm)") +
   theme_cricket() +
   theme(legend.position = "none"))
 
@@ -247,11 +184,7 @@ p2_grid <- grid.arrange(p2a, p2b, p2c, nrow = 1)
 ggsave("boldness_grid.png", p2_grid,
        width = 20, height = 10, dpi = 300, bg = "white")
 
-# =============================================================================
-# 3. SCATTER PLOTS & REGRESSION
-# =============================================================================
-
-# ── 3a. Boldness PC1 pre vs delta boldness (H2 interaction) ──────────────────
+#Scatterplots (3)
 (p3a <- crickets_long %>%
   filter(trial == 1, timepoint == "pre") %>%
   ggplot(aes(x = PC1_pre, y = d_boldness,
@@ -261,16 +194,13 @@ ggsave("boldness_grid.png", p2_grid,
   geom_smooth(method = "lm", se = TRUE, alpha = 0.15, linewidth = 1.2) +
   scale_colour_manual(values = pal_regime,
                       labels = c(sham = "Sham", autotomy = "Autotomy"),
-                      name   = "Regime") +
-  scale_fill_manual(values   = pal_regime,
-                    labels   = c(sham = "Sham", autotomy = "Autotomy"),
-                    name     = "Regime") +
-  labs(
-       x        = "Pre-trial boldness (PC1)",
-       y        = "Δ Boldness (post − pre)") +
+                      name = "Regime") +
+  scale_fill_manual(values = pal_regime,
+                    labels = c(sham = "Sham", autotomy = "Autotomy"),
+                    name = "Regime") +
+  labs(x = "Pre-trial boldness (PC1)", y = "Δ Boldness (post − pre)") +
   theme_cricket())
 
-# ── 3b. Faceted scatter: same plot but facet by personality category ──────────
 (p3b <- crickets_long %>%
   filter(trial == 1, timepoint == "pre") %>%
   ggplot(aes(x = PC1_pre, y = d_boldness,
@@ -281,19 +211,13 @@ ggsave("boldness_grid.png", p2_grid,
   facet_wrap(~ personality) +
   scale_colour_manual(values = pal_regime,
                       labels = c(sham = "Sham", autotomy = "Autotomy"),
-                      name   = "Regime") +
-  scale_fill_manual(values   = pal_regime,
-                    labels   = c(sham = "Sham", autotomy = "Autotomy"),
-                    name     = "Regime") +
-  labs(
-       x     = "Pre-trial boldness (PC1)",
-       y     = "Δ Boldness") +
+                      name = "Regime") +
+  scale_fill_manual(values = pal_regime,
+                    labels = c(sham = "Sham", autotomy = "Autotomy"),
+                    name = "Regime") +
+  labs(x = "Pre-trial boldness (PC1)", y = "Δ Boldness") +
   theme_cricket())
-ggsave("p3b.png", p3b,
-       width = 15, height = 10, dpi = 300, bg = "white")
 
-
-# ── 3c. Body mass vs PC1 pre (covariate check) ───────────────────────────────
 (p3c <- crickets_long %>%
   filter(trial == 1, timepoint == "pre") %>%
   ggplot(aes(x = mass, y = PC1_pre, colour = personality)) +
@@ -302,9 +226,7 @@ ggsave("p3b.png", p3b,
               fill = "grey80", linewidth = 1, inherit.aes = FALSE,
               aes(x = mass, y = PC1_pre)) +
   scale_colour_manual(values = pal_personality, name = "Personality") +
-  labs(
-       x        = "Body mass (g)",
-       y        = "Pre-trial boldness (PC1)") +
+  labs(x = "Body mass (g)", y = "Pre-trial boldness (PC1)") +
   theme_cricket())
 
 p3_grid <- grid.arrange(p3a, p3c, nrow = 1)
@@ -312,26 +234,21 @@ ggsave("boldness_grid2.png", p3_grid,
        width = 20, height = 10, dpi = 300, bg = "white")
 
 
-# =============================================================================
-# 4. BAR CHARTS
-# =============================================================================
-
-# ── 4a. Autotomy rate by personality (with 95% CI) ───────────────────────────
+#Bar charts (4)
 (p4a <- crickets_long %>%
     filter(trial == 1,
            timepoint == "pre",
-           regime    == "autotomy",
+           regime == "autotomy",
            !is.na(a_occured)) %>%
     mutate(autotomised_num = as.integer(a_occured == "True")) %>%
     group_by(personality) %>%
     summarise(
-      n      = n(),
-      rate   = mean(autotomised_num, na.rm = TRUE),
-      se     = sqrt(rate * (1 - rate) / n),
-      ci_lo  = pmax(0, rate - 1.96 * se),
-      ci_hi  = pmin(1, rate + 1.96 * se),
-      .groups = "drop"
-    ) %>%
+      n = n(),
+      rate = mean(autotomised_num, na.rm = TRUE),
+      se = sqrt(rate * (1 - rate) / n),
+      ci_lo = pmax(0, rate - 1.96 * se),
+      ci_hi = pmin(1, rate + 1.96 * se),
+      .groups = "drop") %>%
     ggplot(aes(x = personality, y = rate, fill = personality)) +
     geom_col(width = 0.55, colour = "white", alpha = 0.9) +
     geom_errorbar(aes(ymin = ci_lo, ymax = ci_hi),
@@ -339,22 +256,18 @@ ggsave("boldness_grid2.png", p3_grid,
     scale_fill_manual(values = pal_personality) +
     scale_y_continuous(labels = scales::percent_format(),
                        limits = c(0, 1.1)) +
-    labs(
-         x        = "Personality category",
-         y        = "Proportion autotomised") +
+    labs(x = "Personality category", y = "Proportion autotomised") +
     theme_cricket() +
     theme(legend.position = "none"))
 
-# ── 4b. Mean delta boldness by regime × personality (error bars = SE) ─────────
 (p4b <- crickets_long %>%
   filter(trial == 1, timepoint == "pre") %>%
   group_by(regime, personality) %>%
   summarise(
-    n      = n(),
+    n = n(),
     mean_d = mean(d_boldness, na.rm = TRUE),
-    se_d   = sd(d_boldness,   na.rm = TRUE) / sqrt(n),
-    .groups = "drop"
-  ) %>%
+    se_d = sd(d_boldness,   na.rm = TRUE) / sqrt(n),
+    .groups = "drop") %>%
   ggplot(aes(x = personality, y = mean_d,
              fill = regime, colour = regime)) +
   geom_hline(yintercept = 0, linetype = "dashed", colour = "grey50") +
@@ -363,15 +276,13 @@ ggsave("boldness_grid2.png", p3_grid,
   geom_errorbar(aes(ymin = mean_d - se_d, ymax = mean_d + se_d),
                 position = position_dodge(0.7), width = 0.2,
                 linewidth = 0.8) +
-  scale_fill_manual(values   = pal_regime,
-                    labels   = c(sham = "Sham", autotomy = "Autotomy"),
-                    name     = "Regime") +
+  scale_fill_manual(values = pal_regime,
+                    labels = c(sham = "Sham", autotomy = "Autotomy"),
+                    name = "Regime") +
   scale_colour_manual(values = pal_regime,
                       labels = c(sham = "Sham", autotomy = "Autotomy"),
                       name   = "Regime") +
-  labs(
-       x        = "Personality category",
-       y        = "Mean Δ Boldness") +
+  labs(x = "Personality category", y = "Mean Δ Boldness") +
   theme_cricket())
 
 p4_grid <- grid.arrange(p4a, p4b, nrow = 1)
@@ -379,16 +290,12 @@ ggsave("autotomy_gridx.png", p4_grid,
        width = 20, height = 10, dpi = 300, bg = "white")
 
 
-# =============================================================================
-# 5. SLOPE / BEFORE–AFTER PLOTS
-# =============================================================================
-
-# ── 5a. Individual spaghetti plot: PC1 pre → post, coloured by regime ─────────
+#Scatters (5)
 (p5a <- crickets_long %>%
   filter(trial == 1) %>%
   select(ID, regime, personality, PC1_pre, PC1_post) %>%
   distinct() %>%
-  pivot_longer(cols      = c(PC1_pre, PC1_post),
+  pivot_longer(cols = c(PC1_pre, PC1_post),
                names_to  = "time",
                values_to = "PC1") %>%
   mutate(time = factor(recode(time, PC1_pre = "Pre", PC1_post = "Post"),
@@ -403,12 +310,9 @@ ggsave("autotomy_gridx.png", p4_grid,
   scale_colour_manual(values = pal_regime,
                       labels = c(sham = "Sham", autotomy = "Autotomy"),
                       name   = "Regime") +
-  labs(
-       x        = "Timepoint",
-       y        = "Boldness PC1") +
+  labs(x = "Timepoint", y = "Boldness PC1") +
   theme_cricket())
 
-# ── 5b. Slope plot by personality group mean only (cleaner version) ───────────
 (p5b <- crickets_long %>%
   filter(trial == 1) %>%
   select(ID, regime, personality, PC1_pre, PC1_post) %>%
@@ -429,9 +333,7 @@ ggsave("autotomy_gridx.png", p4_grid,
   scale_linetype_manual(values = c(sham = "dashed", autotomy = "solid"),
                         labels = c(sham = "Sham", autotomy = "Autotomy"),
                         name   = "Regime") +
-  labs(
-       x        = "Timepoint",
-       y        = "Mean Boldness PC1") +
+  labs(x = "Timepoint", y = "Mean Boldness PC1") +
   theme_cricket())
 
 p5_grid <- grid.arrange(p5a, p5b, nrow = 1)
@@ -440,11 +342,7 @@ ggsave("boldness_grid3.png", p5_grid,
 
 
 
-# =============================================================================
-# 6. TRIAL-TO-TRIAL BEHAVIOURAL CONSISTENCY (repeatability visualised)
-# =============================================================================
-
-# ── 6a. Trial 1 vs Trial 2 scatter: OFT distance (pre only) ──────────────────
+#Repeatablity (??; 6)
 (p6a <- crickets_long %>%
   filter(timepoint == "pre") %>%
   select(ID, personality, trial, total_distance) %>%
@@ -458,12 +356,9 @@ ggsave("boldness_grid3.png", p5_grid,
   geom_abline(slope = 1, intercept = 0,
               linetype = "dashed", colour = "grey60") +
   scale_colour_manual(values = pal_personality, name = "Personality") +
-  labs(
-       x        = "Trial 1 — Total distance (cm)",
-       y        = "Trial 2 — Total distance (cm)") +
+  labs(x = "Trial 1 — Total distance (cm)", y = "Trial 2 — Total distance (cm)") +
   theme_cricket())
 
-# ── 6b. Faceted: all 3 pairwise trial comparisons for OFT distance ────────────
 trial_pairs <- crickets_long %>%
   filter(timepoint == "pre") %>%
   select(ID, personality, trial, total_distance) %>%
@@ -473,8 +368,7 @@ trial_pairs <- crickets_long %>%
 (p6b <- bind_rows(
   trial_pairs %>% mutate(pair = "T1 vs T2", x = T1, y = T2),
   trial_pairs %>% mutate(pair = "T1 vs T3", x = T1, y = T3),
-  trial_pairs %>% mutate(pair = "T2 vs T3", x = T2, y = T3)
-) %>%
+  trial_pairs %>% mutate(pair = "T2 vs T3", x = T2, y = T3)) %>%
   ggplot(aes(x = x, y = y, colour = personality)) +
   geom_point(alpha = 0.55, size = 1.8) +
   geom_smooth(method = "lm", se = FALSE, colour = "grey30",
@@ -483,22 +377,14 @@ trial_pairs <- crickets_long %>%
               linetype = "dashed", colour = "grey60") +
   facet_wrap(~ pair) +
   scale_colour_manual(values = pal_personality, name = "Personality") +
-  labs(
-       x     = "Distance (cm) — Trial A",
-       y     = "Distance (cm) — Trial B") +
+  labs(x = "Distance (cm) — Trial A", y = "Distance (cm) — Trial B") +
   theme_cricket())
 
 p6_grid <- grid.arrange(p6a, p6b, nrow = 1)
 ggsave("distance_grid.png", p6_grid,
        width = 20, height = 10, dpi = 300, bg = "white")
 
-# =============================================================================
-# 7. BEHAVIOURAL METRIC PROFILES (radar / bar profile)
-# =============================================================================
-
-# ── 7. Mean metric values by personality (pre-trial, standardised z-scores) ───
-# Standardise metrics so they are on the same scale for comparison
-
+#Behaviour profiles (7)
 (p7 <- crickets_long %>%
   filter(timepoint == "pre") %>%
   group_by(ID, personality) %>%
@@ -518,17 +404,16 @@ ggsave("distance_grid.png", p6_grid,
                values_to = "z_score") %>%
   group_by(personality, metric) %>%
   summarise(mean_z = mean(z_score, na.rm = TRUE),
-            se_z   = sd(z_score, na.rm = TRUE) / sqrt(n()),
+            se_z = sd(z_score, na.rm = TRUE) / sqrt(n()),
             .groups = "drop") %>%
   mutate(metric = recode(metric,
-                         FM_latency       = "OFT: Latency\nto first move",
-                         total_distance   = "OFT: Total\ndistance",
-                         time_central     = "OFT: Central\nzone time",
-                         freezing_n       = "OFT: Freezing\nbouts",
-                         resume_latency   = "PCRT: Latency\nto resume",
+                         FM_latency = "OFT: Latency\nto first move",
+                         total_distance = "OFT: Total\ndistance",
+                         time_central = "OFT: Central\nzone time",
+                         freezing_n = "OFT: Freezing\nbouts",
+                         resume_latency = "PCRT: Latency\nto resume",
                          total_freeze_time = "PCRT: Freeze\nduration",
-                         shelter_latency  = "PCRT: Shelter\nlatency"
-  )) %>%
+                         shelter_latency = "PCRT: Shelter\nlatency")) %>%
   ggplot(aes(x = metric, y = mean_z,
              fill = personality, colour = personality)) +
   geom_hline(yintercept = 0, linetype = "dashed", colour = "grey50") +
@@ -538,21 +423,14 @@ ggsave("distance_grid.png", p6_grid,
                 linewidth = 0.7) +
   scale_fill_manual(values   = pal_personality, name = "Personality") +
   scale_colour_manual(values = pal_personality, name = "Personality") +
-  labs(
-       x        = NULL,
-       y        = "Mean z-score") +
+  labs(x = NULL, y = "Mean z-score") +
   theme_cricket() +
   theme(axis.text.x = element_text(size = 8)))
 
 ggsave("z-score_personality.png", p7,
        width = 10, height = 7, dpi = 300, bg = "white")
 
-# =============================================================================
-# 8. AUTOTOMY LATENCY PLOTS
-# =============================================================================
-
-# ── 8a. Beeswarm + boxplot: autotomy latency by personality ──────────────────
-# ── Fix a_occured in crickets_long once, then plots will work ────────────────
+#latency to autotomise (8)
 crickets_long <- crickets_long %>%
   mutate(
     a_occured = case_when(
@@ -562,18 +440,16 @@ crickets_long <- crickets_long %>%
     ),
     a_occured = factor(a_occured, levels = c("Autotomised", "Censored"))
   )
-# ── Verify it worked ─────────────────────────────────────────────────────────
+
 (p8a <- crickets_long %>%
     filter(trial == 1,
            timepoint == "pre",
            regime == "autotomy",
            !is.na(a_latency)) %>%
     ggplot(aes(x = personality, y = a_latency, colour = personality)) +
-    # Boxplot — only on autotomised individuals so shy box is honest
     geom_boxplot(data = . %>% filter(a_occured == "Autotomised"),
                  width = 0.35, outlier.shape = NA,
                  colour = "grey40", fill = "white", alpha = 0.6) +
-    # All points with shape showing outcome
     geom_jitter(aes(shape = a_occured),
                 width = 0.12, size = 3.5, alpha = 0.85) +
     geom_hline(yintercept = 30, linetype = "dashed",
@@ -584,22 +460,19 @@ crickets_long <- crickets_long %>%
     scale_colour_manual(values = pal_personality, guide = "none") +
     scale_shape_manual(values = c("Autotomised" = 16, "Censored" = 2),
                        name   = "Outcome") +
-    labs(
-         x        = "Personality category",
-         y        = "Latency to autotomy (s)") +
+    labs(x = "Personality category", y = "Latency to autotomy (s)") +
     theme_cricket() +
     theme(legend.position = "right"))
 
-# ── 8b. Latency vs PC1 pre continuous scatter ─────────────────────────────────
 (p8b <- crickets_long %>%
     filter(trial == 1,
            timepoint == "pre",
            regime    == "autotomy",
            !is.na(a_latency)) %>%
-    ggplot(aes(x      = PC1_pre,
-               y      = a_latency,
+    ggplot(aes(x = PC1_pre,
+               y = a_latency,
                colour = personality,
-               shape  = a_occured)) +
+               shape = a_occured)) +
     geom_point(size = 3, alpha = 0.85) +
     geom_smooth(
       data = crickets_long %>%
@@ -614,8 +487,7 @@ crickets_long <- crickets_long %>%
       colour    = "grey30",
       fill      = "grey80",
       linewidth = 1,
-      inherit.aes = FALSE
-    ) +
+      inherit.aes = FALSE) +
     geom_hline(yintercept = 30, linetype = "dashed",
                colour = "grey50", linewidth = 0.5) +
     annotate("text", x = -3, y = 28.5,
@@ -634,105 +506,7 @@ ggsave("autotomy_latency_grid.png", p8_grid,
        width = 14, height = 6, dpi = 300, bg = "white")
 
 
-# =============================================================================
-# 9. COMBINED MULTI-PANEL FIGURES (publication ready)
-# =============================================================================
-
-# ── Figure A: H1 — two panel summary ─────────────────────────────────────────
-(fig_H1 <- (p4a | p8b) +
-  plot_annotation(
-    theme    = theme(plot.title    = element_text(face = "bold", size = 14),
-                     plot.subtitle = element_text(size = 10, colour = "grey40"))
-  ))
-
-ggsave("H1.png", fig_H1,
-       width = 14, height = 6, dpi = 300, bg = "white")
-
-# ── Figure B: H2 — three panel summary ───────────────────────────────────────
-(fig_H2 <- (p3a / (p5b | p2b)) +
-  plot_annotation(
-    theme    = theme(plot.title    = element_text(face = "bold", size = 14),
-                     plot.subtitle = element_text(size = 10, colour = "grey40"))))
-ggsave("H2.png", fig_H2,
-       width = 14, height = 8, dpi = 300, bg = "white")
-
-print(fig_H2)
-
-# ── Data prep — one row per individual ───────────────────────────────────────
-plot_data <- crickets_long %>%
-  filter(trial == 1) %>%
-  select(ID, regime, personality, PC1_pre, PC1_post) %>%
-  distinct() %>%
-  pivot_longer(cols      = c(PC1_pre, PC1_post),
-               names_to  = "timepoint",
-               values_to = "PC1") %>%
-  mutate(timepoint = factor(recode(timepoint,
-                                   PC1_pre  = "Pre",
-                                   PC1_post = "Post"),
-                            levels = c("Pre", "Post")),
-         regime = factor(regime,
-                         levels = c("sham", "autotomy"),
-                         labels = c("Sham", "Autotomy")))
-
-(pA <- ggplot(plot_data, aes(x = timepoint, y = PC1, group = ID)) +
-  geom_line(aes(colour = personality), alpha = 0.3, linewidth = 0.5) +
-  geom_point(aes(colour = personality), alpha = 0.4, size = 1.5) +
-  # Bold group mean line on top
-  stat_summary(aes(group = 1), fun = mean,
-               geom = "line", linewidth = 2,
-               colour = "black") +
-  stat_summary(aes(group = 1), fun = mean,
-               geom = "point", size = 4,
-               colour = "black") +
-  facet_wrap(~ regime) +
-  scale_colour_manual(values = pal_personality, name = "Personality") +
-  labs(x = NULL, y = "Boldness PC1") +
-  theme_cricket())
-
-summary_data <- plot_data %>%
-  group_by(regime, personality, timepoint) %>%
-  summarise(mean_PC1 = mean(PC1, na.rm = TRUE),
-            se       = sd(PC1, na.rm = TRUE) / sqrt(n()),
-            .groups  = "drop")
-
-(pB <- ggplot(summary_data,
-             aes(x = timepoint, y = mean_PC1,
-                 colour = personality,
-                 group  = personality)) +
-  geom_hline(yintercept = 0, linetype = "dashed", colour = "grey60") +
-  geom_errorbar(aes(ymin = mean_PC1 - se,
-                    ymax = mean_PC1 + se),
-                width = 0.12, linewidth = 0.7) +
-  geom_line(linewidth = 1.3) +
-  geom_point(size = 4) +
-  facet_wrap(~ regime) +
-  scale_colour_manual(values = pal_personality, name = "Personality") +
-  labs(x = NULL, y = "Mean Boldness PC1") +
-  theme_cricket())
-
-(pC <- ggplot(plot_data,
-             aes(x = timepoint, y = PC1, fill = personality)) +
-  geom_hline(yintercept = 0, linetype = "dashed", colour = "grey60") +
-  geom_boxplot(position = position_dodge(0.75), width = 0.6,
-               outlier.shape = 21, outlier.size = 1.5,
-               alpha = 0.8, colour = "grey30") +
-  facet_wrap(~ regime) +
-  scale_fill_manual(values = pal_personality, name = "Personality") +
-  labs(x = NULL, y = "Boldness PC1") +
-  theme_cricket())
-
-(fig_prepost <- pA | pB | pC +
-  plot_annotation(
-    theme = theme(plot.title = element_text(face = "bold", size = 14))))
-
-ggsave("fig_prepost_personality.png", fig_prepost,
-       width = 20, height = 10, dpi = 300, bg = "white")
-# =============================================================================
-# PCA LOADINGS + BEHAVIOURAL CHANGE DRIVERS
-# =============================================================================
-
-# ── Step 1: Rerun PCA to get loadings ────────────────────────────────────────
-# Build session-mean matrix (same as in the analysis script)
+#PCA loadings plots - what drives the behaviour? 
 pca_input <- crickets %>%
   transmute(
     OFT_latency_fm  = (OFT_pre_T1_latency_first_move_s +
@@ -760,12 +534,10 @@ pca_input <- crickets %>%
 
 pca_result <- prcomp(pca_input, center = TRUE, scale. = TRUE)
 
-# Flip sign if needed so bold = positive PC1
 if (pca_result$rotation["OFT_distance", 1] < 0) {
   pca_result$rotation[, 1] <- -pca_result$rotation[, 1]
-}
+} #bold = positive PC value
 
-# ── Step 2: Tidy loadings dataframe ─────────────────────────────────────────
 loadings_df <- data.frame(
   metric   = rownames(pca_result$rotation),
   loading  = pca_result$rotation[, 1],
@@ -773,22 +545,17 @@ loadings_df <- data.frame(
 ) %>%
   mutate(
     direction = ifelse(loading > 0, "Bold", "Shy"),
-    # Clean readable labels
     label = recode(metric,
-                   OFT_latency_fm  = "OFT: Latency to\nfirst move",
-                   OFT_distance    = "OFT: Total\ndistance",
+                   OFT_latency_fm = "OFT: Latency to\nfirst move",
+                   OFT_distance = "OFT: Total\ndistance",
                    OFT_centre_time = "OFT: Central\nzone time",
-                   OFT_freezing    = "OFT: Freezing\nbouts",
-                   PCRT_resume     = "PCRT: Latency\nto resume",
-                   PCRT_freeze     = "PCRT: Freeze\nduration",
-                   PCRT_shelter    = "PCRT: Shelter-seeking\nlatency"
-    ),
-    # Order by absolute loading size
-    label = fct_reorder(label, abs(loading))
-  )
+                   OFT_freezing = "OFT: Freezing\nbouts",
+                   PCRT_resume = "PCRT: Latency\nto resume",
+                   PCRT_freeze = "PCRT: Freeze\nduration",
+                   PCRT_shelter = "PCRT: Shelter-seeking\nlatency"),
+    label = fct_reorder(label, abs(loading)))
 
-#PC plots ----
-# ── Plot 1: PC1 loadings (what drives boldness) ───────────────────────────────
+#PC plots
 (p_loadings <- ggplot(loadings_df,
                      aes(x = loading, y = label, fill = direction)) +
   geom_vline(xintercept = 0, colour = "grey40", linewidth = 0.6) +
@@ -800,16 +567,11 @@ loadings_df <- data.frame(
                     name   = "Drives:") +
   scale_x_continuous(limits = c(-0.55, 0.55),
                      breaks = seq(-0.5, 0.5, 0.25)) +
-  labs(
-    x        = "PC1 loading",
-    y        = NULL
-  ) +
+  labs(x = "PC1 loading", y = NULL) +
   theme_cricket() +
   theme(legend.position = "right",
         panel.grid.major.x = element_line(colour = "grey92")))
 
-# ── Step 3: Mean metric values pre vs post, by regime ─────────────────────────
-# Compute session means for each individual × timepoint
 metric_means <- crickets_long %>%
   group_by(ID, regime, personality, timepoint) %>%
   summarise(
@@ -820,35 +582,28 @@ metric_means <- crickets_long %>%
     PCRT_resume     = mean(resume_latency,      na.rm = TRUE),
     PCRT_freeze     = mean(total_freeze_time,   na.rm = TRUE),
     PCRT_shelter    = mean(shelter_latency,     na.rm = TRUE),
-    .groups = "drop"
-  ) %>%
-  # Z-score using pre-trial means and SDs so pre and post are on same scale
+    .groups = "drop") %>%
   group_by(ID) %>%
   mutate(across(OFT_latency_fm:PCRT_shelter, scale)) %>%
   ungroup()
 
-# Long format for plotting
 metric_long <- metric_means %>%
   pivot_longer(cols      = OFT_latency_fm:PCRT_shelter,
                names_to  = "metric",
                values_to = "z_score") %>%
-  mutate(
-    label = recode(metric,
+  mutate(label = recode(metric,
                    OFT_latency_fm  = "OFT: Latency to\nfirst move",
                    OFT_distance    = "OFT: Total\ndistance",
                    OFT_centre_time = "OFT: Central\nzone time",
                    OFT_freezing    = "OFT: Freezing\nbouts",
                    PCRT_resume     = "PCRT: Latency\nto resume",
                    PCRT_freeze     = "PCRT: Freeze\nduration",
-                   PCRT_shelter    = "PCRT: Shelter-seeking\nlatency"
-    ),
+                   PCRT_shelter    = "PCRT: Shelter-seeking\nlatency"),
     timepoint = factor(timepoint, levels = c("pre", "post")),
     regime    = factor(regime,
                        levels = c("sham", "autotomy"),
-                       labels = c("Sham", "Autotomy"))
-  )
+                       labels = c("Sham", "Autotomy")))
 
-# ── Plot 2: Mean z-score per metric pre vs post, faceted by regime ─────────────
 (p_change <- metric_long %>%
   group_by(regime, label, timepoint) %>%
   summarise(mean_z = mean(z_score, na.rm = TRUE),
@@ -866,14 +621,12 @@ metric_long <- metric_means %>%
   scale_colour_manual(values = c(pre = "#888780", post = "#C04828"),
                       labels = c(pre = "Pre", post = "Post"),
                       name   = "Timepoint") +
-  labs( #what changes after autotomy?
-    x        = NULL,
-    y        = "Mean z-score") +
+  labs(x = NULL, y = "Mean z-score") + #what changes after autotomy?
   theme_cricket() +
   theme(strip.text.y.left = element_text(angle = 0, hjust = 1, size = 8),
         strip.placement   = "outside",
         panel.spacing.y   = unit(0.3, "lines")))
-# ── Plot 3: Delta per metric (post - pre) as lollipop, by regime ──────────────
+
 delta_metrics <- metric_means %>%
   select(ID, regime, personality, timepoint,
          OFT_latency_fm:PCRT_shelter) %>%
@@ -888,13 +641,12 @@ delta_metrics <- metric_means %>%
                         OFT_freezing    = "OFT: Freezing bouts",
                         PCRT_resume     = "PCRT: Latency to resume",
                         PCRT_freeze     = "PCRT: Freeze duration",
-                        PCRT_shelter    = "PCRT: Shelter-seeking latency"
-         ),
+                        PCRT_shelter    = "PCRT: Shelter-seeking latency"),
          regime = factor(regime,
                          levels = c("sham", "autotomy"),
                          labels = c("Sham", "Autotomy")))
 
-(p_delta_metrics <- delta_metrics %>%
+(p_delta_metrics <- delta_metrics %>% #change in behavioural metrics (pre/post trial)
   group_by(regime, label) %>%
   summarise(mean_d = mean(delta, na.rm = TRUE),
             se_d   = sd(delta,   na.rm = TRUE) / sqrt(n()),
@@ -910,13 +662,10 @@ delta_metrics <- metric_means %>%
   facet_wrap(~ regime) +
   scale_colour_manual(values = c(Increase = "green3", Decrease = "red2"),
                       name   = "Direction of change") +
-  labs( #change in behavioural metrics (pre/post trial)
-    x = "Mean Δ z-score (post − pre)",
-    y = NULL) + #negative z-score = becomes shyer
-  theme_cricket() +
+  labs(x = "Mean Δ z-score (post − pre)", y = NULL) + #negative z-score = becomes shyer
+  theme_cricket() + 
   theme(panel.grid.major.x = element_line(colour = "grey92")))
 
-# ── Combine all three into one figure ─────────────────────────────────────────
 (fig_drivers <- p_loadings / p_delta_metrics +
   plot_annotation(
     theme    = theme(plot.title    = element_text(face = "bold", size = 14),
@@ -925,13 +674,91 @@ ggsave("fig_boldness_drivers.png", fig_drivers,
        width = 11, height = 10, dpi = 300, bg = "white")
 
 
-#Grid ----
-# =============================================================================
-# BIG GRID — ALL OFT & PCRT METRICS, PRE vs POST, BY REGIME
-# =============================================================================
+#Grids ----
+#Pannels + more grids (H1 and H2)
+(fig_H1 <- (p4a | p8b) +
+   plot_annotation(
+     theme = theme(plot.title = element_text(face = "bold", size = 14),
+                   plot.subtitle = element_text(size = 10, colour = "grey40"))))
 
-# ── Step 1: Build a tidy long dataframe with all 8 metrics ───────────────────
-# Average the 3 trial sessions first, then compare pre vs post
+ggsave("H1.png", fig_H1,
+       width = 14, height = 6, dpi = 300, bg = "white")
+
+(fig_H2 <- (p3a / (p5b | p2b)) +
+    plot_annotation(
+      theme = theme(plot.title = element_text(face = "bold", size = 14),
+                    plot.subtitle = element_text(size = 10, colour = "grey40"))))
+ggsave("H2.png", fig_H2,
+       width = 14, height = 8, dpi = 300, bg = "white")
+
+#More grids
+plot_data <- crickets_long %>%
+  filter(trial == 1) %>%
+  select(ID, regime, personality, PC1_pre, PC1_post) %>%
+  distinct() %>%
+  pivot_longer(cols      = c(PC1_pre, PC1_post),
+               names_to  = "timepoint",
+               values_to = "PC1") %>%
+  mutate(timepoint = factor(recode(timepoint,
+                                   PC1_pre  = "Pre",
+                                   PC1_post = "Post"),
+                            levels = c("Pre", "Post")),
+         regime = factor(regime,
+                         levels = c("sham", "autotomy"),
+                         labels = c("Sham", "Autotomy")))
+
+(pA <- ggplot(plot_data, aes(x = timepoint, y = PC1, group = ID)) +
+    geom_line(aes(colour = personality), alpha = 0.3, linewidth = 0.5) +
+    geom_point(aes(colour = personality), alpha = 0.4, size = 1.5) +
+    stat_summary(aes(group = 1), fun = mean,
+                 geom = "line", linewidth = 2,
+                 colour = "black") +
+    stat_summary(aes(group = 1), fun = mean,
+                 geom = "point", size = 4,
+                 colour = "black") +
+    facet_wrap(~ regime) +
+    scale_colour_manual(values = pal_personality, name = "Personality") +
+    labs(x = NULL, y = "Boldness PC1") +
+    theme_cricket())
+
+summary_data <- plot_data %>%
+  group_by(regime, personality, timepoint) %>%
+  summarise(mean_PC1 = mean(PC1, na.rm = TRUE),
+            se       = sd(PC1, na.rm = TRUE) / sqrt(n()),
+            .groups  = "drop")
+
+(pB <- ggplot(summary_data,
+              aes(x = timepoint, y = mean_PC1,
+                  colour = personality,
+                  group  = personality)) +
+    geom_hline(yintercept = 0, linetype = "dashed", colour = "grey60") +
+    geom_errorbar(aes(ymin = mean_PC1 - se,
+                      ymax = mean_PC1 + se),
+                  width = 0.12, linewidth = 0.7) +
+    geom_line(linewidth = 1.3) +
+    geom_point(size = 4) +
+    facet_wrap(~ regime) +
+    scale_colour_manual(values = pal_personality, name = "Personality") +
+    labs(x = NULL, y = "Mean Boldness PC1") +
+    theme_cricket())
+
+(pC <- ggplot(plot_data,
+              aes(x = timepoint, y = PC1, fill = personality)) +
+    geom_hline(yintercept = 0, linetype = "dashed", colour = "grey60") +
+    geom_boxplot(position = position_dodge(0.75), width = 0.6,
+                 outlier.shape = 21, outlier.size = 1.5,
+                 alpha = 0.8, colour = "grey30") +
+    facet_wrap(~ regime) +
+    scale_fill_manual(values = pal_personality, name = "Personality") +
+    labs(x = NULL, y = "Boldness PC1") +
+    theme_cricket())
+
+(fig_prepost <- pA | pB | pC +
+    plot_annotation(
+      theme = theme(plot.title = element_text(face = "bold", size = 14))))
+
+ggsave("fig_prepost_personality.png", fig_prepost,
+       width = 20, height = 10, dpi = 300, bg = "white")
 
 metrics_grid <- crickets_long %>%
   group_by(ID, regime, personality, timepoint) %>%
@@ -944,20 +771,17 @@ metrics_grid <- crickets_long %>%
     `PCRT:\nLatency to\nresume (s)`        = mean(resume_latency,   na.rm = TRUE),
     `PCRT:\nTotal freeze\nduration (s)`    = mean(total_freeze_time,na.rm = TRUE),
     `PCRT:\nShelter-seeking\nlatency (s)`  = mean(shelter_latency,  na.rm = TRUE),
-    .groups = "drop"
-  ) %>%
+    .groups = "drop") %>%
   pivot_longer(
     cols      = `OFT:\nLatency to\nfirst move (s)`:`PCRT:\nShelter-seeking\nlatency (s)`,
     names_to  = "metric",
-    values_to = "value"
-  ) %>%
+    values_to = "value") %>%
   mutate(
     timepoint = factor(timepoint, levels = c("pre", "post"),
                        labels = c("Pre", "Post")),
     regime    = factor(regime,
                        levels = c("sham", "autotomy"),
                        labels = c("Sham", "Autotomy")),
-    # Group metrics by assay for facet ordering
     assay = ifelse(grepl("OFT", metric), "OFT", "PCRT"),
     metric = factor(metric, levels = c(
       "OFT:\nLatency to\nfirst move (s)",
@@ -967,32 +791,24 @@ metrics_grid <- crickets_long %>%
       "OFT:\nFreezing\nbouts (n)",
       "PCRT:\nLatency to\nresume (s)",
       "PCRT:\nTotal freeze\nduration (s)",
-      "PCRT:\nShelter-seeking\nlatency (s)"
-    ))
-  )
+      "PCRT:\nShelter-seeking\nlatency (s)")))
 
-# ── Step 2: Summary stats for the grid ───────────────────────────────────────
 grid_summary <- metrics_grid %>%
   group_by(regime, personality, timepoint, metric, assay) %>%
-  summarise(
-    mean_val = mean(value, na.rm = TRUE),
-    se_val   = sd(value,   na.rm = TRUE) / sqrt(n()),
-    .groups  = "drop"
-  )
+  summarise(mean_val = mean(value, na.rm = TRUE),
+    se_val = sd(value,   na.rm = TRUE) / sqrt(n()),
+    .groups = "drop")
 
-# ── Step 3: The big grid plot ─────────────────────────────────────────────────
 (fig_grid <- ggplot(grid_summary,
                    aes(x        = timepoint,
                        y        = mean_val,
                        colour   = personality,
                        group    = personality)) +
-  # Reference line showing pre-trial grand mean per metric
   geom_line(linewidth = 1.1, alpha = 0.9) +
   geom_errorbar(aes(ymin = mean_val - se_val,
                     ymax = mean_val + se_val),
                 width = 0.15, linewidth = 0.65, alpha = 0.8) +
   geom_point(size = 2.8) +
-  # Facet: rows = metrics, columns = regime
   facet_grid(metric ~ regime,
              scales = "free_y",
              switch = "y") +
@@ -1022,12 +838,7 @@ ggsave("fig_metric_grid.png", fig_grid,
 
 
 
-# =============================================================================
-# GRID OF BOXPLOTS — a) through h) — one per behavioural metric
-# Pre vs Post, coloured by regime, faceted in a grid with panel labels
-# =============================================================================
-
-# ── Step 1: Build tidy long data ─────────────────────────────────────────────
+#Boxplot grids
 boxplot_data <- crickets_long %>%
   group_by(ID, regime, personality, timepoint) %>%
   summarise(
@@ -1039,8 +850,7 @@ boxplot_data <- crickets_long %>%
     f = mean(resume_latency,    na.rm = TRUE),
     g = mean(total_freeze_time, na.rm = TRUE),
     h = mean(shelter_latency,   na.rm = TRUE),
-    .groups = "drop"
-  ) %>%
+    .groups = "drop") %>%
   pivot_longer(cols      = a:h,
                names_to  = "panel",
                values_to = "value") %>%
@@ -1059,8 +869,7 @@ boxplot_data <- crickets_long %>%
                          e = "e)  OFT: Freezing bouts (n)",
                          f = "f)  PCRT: Latency to resume activity (s)",
                          g = "g)  PCRT: Total freeze duration (s)",
-                         h = "h)  PCRT: Shelter-seeking latency (s)"
-    ),
+                         h = "h)  PCRT: Shelter-seeking latency (s)"),
     panel_label = factor(panel_label, levels = c(
       "a)  OFT: Latency to first move (s)",
       "b)  OFT: Total distance moved (cm)",
@@ -1069,36 +878,27 @@ boxplot_data <- crickets_long %>%
       "e)  OFT: Freezing bouts (n)",
       "f)  PCRT: Latency to resume activity (s)",
       "g)  PCRT: Total freeze duration (s)",
-      "h)  PCRT: Shelter-seeking latency (s)"
-    ))
-  )
+      "h)  PCRT: Shelter-seeking latency (s)")))
 
-# ── Step 2: The grid ──────────────────────────────────────────────────────────
 (fig_boxgrid <- ggplot(boxplot_data,
                       aes(x    = timepoint,
                           y    = value,
                           fill = regime)) +
   geom_boxplot(
-    position     = position_dodge(0.7),
-    width        = 0.55,
-    outlier.size  = 0.8,
+    position = position_dodge(0.7),
+    width = 0.55,
+    outlier.size = 0.8,
     outlier.shape = 21,
     outlier.alpha = 0.5,
-    alpha        = 0.8,
-    colour       = "grey30",
-    linewidth    = 0.4
-  ) +
+    alpha = 0.8,
+    colour = "grey30",
+    linewidth = 0.4) +
   facet_wrap(~ panel_label,
              scales = "free_y",
-             ncol   = 4) +
-  scale_fill_manual(
-    values = c(Sham = "lightblue3", Autotomy = "red"),
-    name   = "Regime"
-  ) +
-  labs(
-    x        = NULL,
-    y        = "Mean value (session average)"
-  ) +
+             ncol = 4) +
+  scale_fill_manual(values = c(Sham = "lightblue3", Autotomy = "red"),
+    name   = "Regime") +
+  labs(x = NULL, y = "Mean value (session average)") +
   theme_classic() +
   theme(
     plot.title       = element_text(face = "bold", size = 13),
@@ -1114,52 +914,39 @@ boxplot_data <- crickets_long %>%
 
 ggsave("fig_boxplot_grid.png",  fig_boxgrid,
        width = 20, height = 10, dpi = 300, bg = "white")
-ggsave("fig_boxplot_grid.pdf",  fig_boxgrid,
-       width = 10, height = 10)
 
-
-
-# =============================================================================
-# GRID OF BOXPLOTS a) – h) — split by PERSONALITY CATEGORY
-# =============================================================================
-
+#More grids
 (fig_boxgrid_pers <- ggplot(boxplot_data,
                            aes(x    = timepoint,
                                y    = value,
                                fill = personality)) +
-  geom_boxplot(
-    position      = position_dodge(0.75),
-    width         = 0.6,
-    outlier.size  = 0.8,
+  geom_boxplot(position = position_dodge(0.75),
+    width = 0.6,
+    outlier.size = 0.8,
     outlier.shape = 21,
     outlier.alpha = 0.5,
-    alpha         = 0.8,
-    colour        = "grey30",
-    linewidth     = 0.4
-  ) +
+    alpha = 0.8,
+    colour = "grey30",
+    linewidth = 0.4) +
   facet_wrap(~ panel_label,
              scales = "free_y",
              ncol   = 4) +
   scale_fill_manual(
     values = pal_personality,
-    name   = "Personality"
-  ) +
-  labs(
-    x        = NULL,
-    y        = "Mean value (session average)"
-  ) +
+    name = "Personality") +
+  labs(x = NULL, y = "Mean value (session average)") +
   theme_classic() +
   theme(
-    plot.title       = element_text(face = "bold", size = 13),
-    plot.subtitle    = element_text(size = 9, colour = "grey40"),
-    strip.text       = element_text(face = "bold", size = 9, hjust = 0),
+    plot.title = element_text(face = "bold", size = 13),
+    plot.subtitle = element_text(size = 9, colour = "grey40"),
+    strip.text = element_text(face = "bold", size = 9, hjust = 0),
     strip.background = element_rect(fill = "grey95", colour = NA),
-    axis.text.x      = element_text(size = 9),
-    axis.text.y      = element_text(size = 8),
-    axis.title.y     = element_text(size = 9),
-    legend.position  = "bottom",
-    legend.title     = element_text(face = "bold"),
-    panel.spacing    = unit(1, "lines")))
+    axis.text.x = element_text(size = 9),
+    axis.text.y = element_text(size = 8),
+    axis.title.y = element_text(size = 9),
+    legend.position = "bottom",
+    legend.title = element_text(face = "bold"),
+    panel.spacing = unit(1, "lines")))
 
 
 ggsave("fig_boxplot_grid_personality.png", fig_boxgrid_pers,
