@@ -83,15 +83,373 @@ pal_timepoint <- c(pre = "#888780",
 theme_cricket <- function() {
   theme_classic() +
     theme(
-      plot.title = element_text(face = "bold", size = 12),
-      plot.subtitle = element_text(size = 9, colour = "grey40"),
       axis.title = element_text(size = 10),
-      legend.position = "bottom",
-      strip.background = element_rect(fill = "grey95", colour = NA),
+      legend.position = c(0.1, 0.1),
+      strip.background = element_rect(fill = "white", colour = NA),
       strip.text = element_text(face = "bold", size = 9)
     )
 }
-#Plots ----
+#Final plots ----
+(p1 <- crickets_long %>%
+   filter(timepoint == "pre") %>%
+   group_by(ID, personality) %>%
+   summarise(across(c(FM_latency, total_distance, time_central,
+                      freezing_n, resume_latency, total_freeze_time,
+                      shelter_latency),
+                    \(x) mean(x, na.rm = TRUE)),
+             .groups = "drop") %>%
+   mutate(across(c(FM_latency, total_distance, time_central,
+                   freezing_n, resume_latency, total_freeze_time,
+                   shelter_latency), scale)) %>%
+   pivot_longer(cols = c(FM_latency, total_distance, time_central,
+                         freezing_n, resume_latency, total_freeze_time,
+                         shelter_latency),
+                names_to = "metric", values_to = "z_score") %>%
+   group_by(personality, metric) %>%
+   summarise(mean_z = mean(z_score, na.rm = TRUE),
+             se_z   = sd(z_score, na.rm = TRUE) / sqrt(n()),
+             .groups = "drop") %>%
+   mutate(metric = recode(metric,
+                          FM_latency        = "OFT: Latency\nto first move",
+                          total_distance    = "OFT: Total\ndistance",
+                          time_central      = "OFT: Central\nzone time",
+                          freezing_n        = "OFT: Freezing\nbouts",
+                          resume_latency    = "PCRT: Latency\nto resume",
+                          total_freeze_time = "PCRT: Freeze\nduration",
+                          shelter_latency   = "PCRT: Shelter\nlatency")) %>%
+   ggplot(aes(x = metric, y = mean_z,
+              fill = personality, colour = personality)) +
+   geom_hline(yintercept = 0, linetype = "dashed", colour = "grey50") +
+   geom_col(position = position_dodge(0.75), width = 0.65, alpha = 0.85) +
+   geom_errorbar(aes(ymin = mean_z - se_z, ymax = mean_z + se_z),
+                 position = position_dodge(0.75), width = 0.25, linewidth = 0.7) +
+   scale_fill_manual(values = pal_personality, name = "Personality") +
+   scale_colour_manual(values = pal_personality, name = "Personality") +
+   labs(x = NULL, y = "Mean z-score") +
+   theme_cricket() +
+   theme(axis.text.x = element_text(size = 8)) +
+   theme(legend.position = c(0.85, 0.9))) #pre
+
+ggsave("fig1_personality_profiles.png", p1, width = 10, height = 5, dpi = 300)
+message("✓ Figure 1 saved")
+
+(p1 <- crickets_long %>%
+    filter(timepoint == "post") %>%
+    group_by(ID, personality) %>%
+    summarise(across(c(FM_latency, total_distance, time_central,
+                       freezing_n, resume_latency, total_freeze_time,
+                       shelter_latency),
+                     \(x) mean(x, na.rm = TRUE)),
+              .groups = "drop") %>%
+    mutate(across(c(FM_latency, total_distance, time_central,
+                    freezing_n, resume_latency, total_freeze_time,
+                    shelter_latency), scale)) %>%
+    pivot_longer(cols = c(FM_latency, total_distance, time_central,
+                          freezing_n, resume_latency, total_freeze_time,
+                          shelter_latency),
+                 names_to = "metric", values_to = "z_score") %>%
+    group_by(personality, metric) %>%
+    summarise(mean_z = mean(z_score, na.rm = TRUE),
+              se_z   = sd(z_score, na.rm = TRUE) / sqrt(n()),
+              .groups = "drop") %>%
+    mutate(metric = recode(metric,
+                           FM_latency        = "OFT: Latency\nto first move",
+                           total_distance    = "OFT: Total\ndistance",
+                           time_central      = "OFT: Central\nzone time",
+                           freezing_n        = "OFT: Freezing\nbouts",
+                           resume_latency    = "PCRT: Latency\nto resume",
+                           total_freeze_time = "PCRT: Freeze\nduration",
+                           shelter_latency   = "PCRT: Shelter\nlatency")) %>%
+    ggplot(aes(x = metric, y = mean_z,
+               fill = personality, colour = personality)) +
+    geom_hline(yintercept = 0, linetype = "dashed", colour = "grey50") +
+    geom_col(position = position_dodge(0.75), width = 0.65, alpha = 0.85) +
+    geom_errorbar(aes(ymin = mean_z - se_z, ymax = mean_z + se_z),
+                  position = position_dodge(0.75), width = 0.25, linewidth = 0.7) +
+    scale_fill_manual(values = pal_personality, name = "Personality") +
+    scale_colour_manual(values = pal_personality, name = "Personality") +
+    labs(x = NULL, y = "Mean z-score") +
+    theme_cricket() +
+    theme(axis.text.x = element_text(size = 8)) +
+    theme(legend.position = c(0.85, 0.9))) #post
+
+
+(p2 <- crickets_long %>%
+   filter(timepoint %in% c("pre","post")) %>%
+   group_by(ID, personality, regime, timepoint) %>%
+   summarise(across(c(FM_latency, total_distance, time_central,
+                      freezing_n, resume_latency, total_freeze_time,
+                      shelter_latency),
+                    \(x) mean(x, na.rm = TRUE)),
+             .groups = "drop") %>%
+   mutate(across(c(FM_latency, total_distance, time_central,
+                   freezing_n, resume_latency, total_freeze_time,
+                   shelter_latency), scale)) %>%
+   pivot_longer(cols = c(FM_latency, total_distance, time_central,
+                         freezing_n, resume_latency, total_freeze_time,
+                         shelter_latency),
+                names_to = "metric", values_to = "z_score") %>%
+   group_by(personality, regime, timepoint, metric) %>%
+   summarise(mean_z = mean(z_score, na.rm = TRUE),
+             se_z   = sd(z_score, na.rm = TRUE) / sqrt(n()),
+             .groups = "drop") %>%
+   mutate(
+     metric = dplyr::recode(metric,
+                     FM_latency        = "OFT: Latency\nfirst move",
+                     total_distance    = "OFT: Total\ndistance",
+                     time_central      = "OFT: Central\nzone time",
+                     freezing_n        = "OFT: Freezing\nbouts",
+                     resume_latency    = "PCRT: Latency\nresume",
+                     total_freeze_time = "PCRT: Freeze\nduration",
+                     shelter_latency   = "PCRT: Shelter\nlatency"),
+     timepoint = factor(timepoint, levels = c("pre","post"))
+   ) %>%
+   ggplot(aes(x = metric, y = mean_z,
+              fill = personality, colour = personality,
+              alpha = timepoint)) +
+   geom_hline(yintercept = 0, linetype = "dashed", colour = "grey50") +
+   geom_col(position = position_dodge(0.75), width = 0.65) +
+   geom_errorbar(aes(ymin = mean_z - se_z, ymax = mean_z + se_z),
+                 position = position_dodge(0.75), width = 0.25, linewidth = 0.6) +
+   scale_fill_manual(values = pal_personality, name = "Personality") +
+   scale_colour_manual(values = pal_personality, name = "Personality") +
+   scale_alpha_manual(values = c(pre = 0.9, post = 0.4), name = "Timepoint") +
+   facet_wrap(~ regime, labeller = labeller(regime = c(sham = "Sham", autotomy = "Autotomy"))) +
+   labs(x = NULL, y = "Mean z-score") +
+   theme_cricket() +
+   theme(axis.text.x = element_text(size = 7))) #both together
+
+ggsave("fig2_pre_post_profiles.png", p2, width = 13, height = 5.5, dpi = 300)
+message("✓ Figure 2 saved")
+
+
+#Latency to autotomise by personality
+(p3 <- filter(crickets, autotomy_regime == "autotomy") %>%
+   mutate(
+     personality_category = factor(personality_category, levels = c("Shy","Intermediate","Bold")),
+     outcome = if_else(autotomy_latency_s >= 30, "Censored", "Autotomised")
+   ) %>%
+   ggplot(aes(x = personality_category, y = autotomy_latency_s,
+              fill = personality_category, shape = outcome)) +
+   geom_boxplot() +
+   geom_jitter(width = 0.15, size = 2.5, alpha = 0.8) +
+   geom_hline(yintercept = 30, linetype = "dashed", colour = "red3") +
+   annotate("text", x = 0.7, y = 30.8, label = "Censor (30 s)",
+            colour = "red3", size = 3) +
+   scale_fill_manual(values = pal_personality, guide = "none") +
+   scale_shape_manual(values = c(Autotomised = 16, Censored = 2), name = "Outcome") +
+   labs(x = "", y = "Latency to autotomise (s)") +
+   theme_cricket() +
+   theme(legend.position = c(0.1, 0.1)))
+
+ggsave("fig3_autotomy_latency.png", p3, width = 7, height = 5.5, dpi = 300)
+message("✓ Figure 3 saved")
+
+
+#Survival analysis plot by personality
+surv_data <- crickets_analysis %>%
+  filter(autotomy_regime == "autotomy",
+         !is.na(autotomy_latency_s), !is.na(surv_status))
+
+surv_obj <- Surv(time   = surv_data$autotomy_latency_s,
+                 event  = surv_data$surv_status)
+
+km_fit <- survfit(surv_obj ~ personality_category, data = surv_data)
+(p4 <- ggsurvplot(
+  km_fit,
+  data         = surv_data,
+  palette      = unname(pal_personality[levels(surv_data$personality_category)]),
+  conf.int     = TRUE,
+  pval         = TRUE,
+  risk.table   = FALSE,
+  legend = c(0.1, 0.1), 
+  legend.labs  = levels(surv_data$personality_category),
+  legend.title = "Personality",
+  xlab         = "Time (s)",
+  ylab         = "Probability of NOT autotomising",
+  ggtheme      = theme_cricket()))
+
+# Save via ggsurvplot's own method
+png("fig4_survival_curves.png", width = 2400, height = 1800, res = 300)
+print(p4)
+dev.off()
+message("✓ Figure 4 saved")
+
+
+#Pre- boldness vs latency to autotomise
+(p5 <- crickets_analysis %>%
+   filter(autotomy_regime == "autotomy") %>%
+   mutate(outcome = if_else(autotomy_occurred, "Autotomised", "Censored")) %>%
+   ggplot(aes(x = personality_PC1_pre, y = autotomy_latency_s,
+              colour = personality_category)) +
+   geom_point(aes(shape = outcome), alpha = 0.8, size = 2.8) +
+   geom_smooth(data = . %>% filter(autotomy_occurred),
+               method = "lm", se = TRUE, linewidth = 1,
+               aes(fill = personality_category), alpha = 0.15) +
+   geom_hline(yintercept = 30, linetype = "dashed", colour = "grey50") +
+   scale_colour_manual(values = pal_personality, name = "Personality") +
+   scale_fill_manual(values = pal_personality, guide = "none") +
+   scale_shape_manual(values = c(Autotomised = 16, Censored = 2),
+                      name = "Outcome") +
+   labs(x = "Pre-trial boldness (PC1)", y = "Latency to autotomise (s)") +
+   theme_cricket() +
+   theme(legend.position = c(0.1, 0.2)))
+
+ggsave("fig5_boldness_vs_latency.png", p5, width = 8, height = 5.5, dpi = 300)
+message("✓ Figure 5 saved")
+
+
+#Change in boldness by personality and treatment
+delta_data <- crickets_analysis %>%
+  select(individual_ID, personality_category, autotomy_regime, delta_boldness) %>%
+  drop_na(delta_boldness)
+
+(p6 <- ggplot(delta_data,
+              aes(x = personality_category, y = delta_boldness,
+                  fill = autotomy_regime, colour = autotomy_regime)) +
+    geom_hline(yintercept = 0, linetype = "dashed", colour = "grey50") +
+    geom_boxplot(alpha = 0.6, position = position_dodge(0.8), width = 0.7,
+                 outlier.shape = NA, colour = "grey30") +
+    geom_point(position = position_jitterdodge(jitter.width = 0.1, dodge.width = 0.8),
+               alpha = 0.6, size = 1.8) +
+    scale_fill_manual(values = pal_regime,
+                      labels = c(sham = "Sham", autotomy = "Autotomy"),
+                      name = "Treatment") +
+    scale_colour_manual(values = pal_regime,
+                        labels = c(sham = "Sham", autotomy = "Autotomy"),
+                        name = "Treatment") +
+    labs(x = "", y = "Δ Boldness (PC1 post − pre)") +
+    theme_cricket() +
+    theme(legend.position = c(0.1, 0.1)))
+
+ggsave("fig6_delta_boldness.png", p6, width = 8, height = 5.5, dpi = 300)
+message("✓ Figure 6 saved")
+
+
+#Pre vs post treatment PC1
+(p7 <- crickets_analysis %>%
+   select(individual_ID, personality_category, autotomy_regime,
+          personality_PC1_pre, personality_PC1_post) %>%
+   drop_na() %>%
+   ggplot(aes(x = personality_PC1_pre, y = personality_PC1_post,
+              colour = personality_category)) +
+   geom_abline(slope = 1, intercept = 0, linetype = "dashed", colour = "grey60") +
+   geom_segment(aes(xend = personality_PC1_pre, yend = personality_PC1_pre),
+                colour = "grey80", linewidth = 0.3) +
+   geom_point(size = 2.5, alpha = 0.8) +
+   facet_wrap(~ autotomy_regime,
+              labeller = labeller(autotomy_regime = c(sham = "Sham", autotomy = "Autotomy"))) +
+   scale_colour_manual(values = pal_personality, name = "Personality") +
+   labs(x = "Pre-trial boldness (PC1)", y = "Post-trial boldness (PC1)") +
+   theme_cricket() +
+   theme(legend.position = c(0.1, 0.1)))
+
+ggsave("fig7_pc1_scatter.png", p7, width = 9, height = 5, dpi = 300)
+message("✓ Figure 7 saved")
+
+
+#Body mass vs latency to autotomise (confounding variable)
+(p8 <- crickets_analysis %>%
+  filter(autotomy_regime == "autotomy") %>%
+  mutate(outcome = if_else(autotomy_occurred, "Autotomised", "Censored")) %>%
+  ggplot(aes(x = body_mass_g, y = autotomy_latency_s,
+             colour = personality_category, shape = outcome)) +
+  geom_point(size = 2.5, alpha = 0.8) +
+  geom_smooth(method = "lm", se = FALSE, linewidth = 0.8,
+              aes(group = 1), colour = "grey30") +
+  geom_hline(yintercept = 30, linetype = "dashed", colour = "grey50") +
+  scale_colour_manual(values = pal_personality, name = "Personality") +
+  scale_shape_manual(values = c(Autotomised = 16, Censored = 2),
+                     name = "Outcome") +
+  labs(title = "Figure 8 — Body mass vs autotomy latency (confound check)",
+       subtitle = "Overall regression line in grey. Use as covariate in LMM if correlated.",
+       x = "Body mass (g)", y = "Latency to autotomise (s)") +
+  theme_cricket())
+
+ggsave("fig8_mass_confound.png", p8, width = 7, height = 5, dpi = 300)
+message("✓ Figure 8 saved")
+
+#Sex vs latency to autotomise
+(p8 <- crickets_analysis %>%
+    filter(autotomy_regime == "autotomy") %>%
+    mutate(outcome = if_else(autotomy_occurred, "Autotomised", "Censored")) %>%
+    ggplot(aes(x = sex, y = autotomy_latency_s,
+               colour = personality_category, shape = outcome)) +
+    geom_point(size = 2.5, alpha = 0.8) +
+    geom_smooth(method = "lm", se = TRUE, linewidth = 0.8,
+                aes(group = 1), colour = "grey30") +
+    geom_hline(yintercept = 30, linetype = "dashed", colour = "grey50") +
+    scale_colour_manual(values = pal_personality, name = "Personality") +
+    scale_shape_manual(values = c(Autotomised = 16, Censored = 2),
+                       name = "Outcome") +
+    labs(x = "Sex", y = "Latency to autotomise (s)") +
+    theme_cricket() +
+    theme(legend.position = c(0.1, 0.2)))
+ggsave("Plots/sex_confound.png", p8, width = 7, height = 5, dpi = 300)
+
+
+#Samples
+(p9a <- crickets_analysis %>%
+   count(personality_category, autotomy_regime) %>%
+   ggplot(aes(x = personality_category, y = n,
+              fill = autotomy_regime)) +
+   geom_col(position = position_dodge(0.7), width = 0.6, alpha = 0.85) +
+   geom_text(aes(label = n),
+             position = position_dodge(0.7), vjust = -0.4, size = 3.2) +
+   scale_fill_manual(values = pal_regime,
+                     labels = c(sham = "Sham", autotomy = "Autotomy"),
+                     name = "Treatment") +
+   labs(subtitle = "Sample sizes per cell",
+        x = "Personality", y = "n") +
+   theme_cricket() +
+   theme(legend.position = "right"))
+
+(p9b <- crickets_analysis %>%
+  count(personality_category, sex) %>%
+  ggplot(aes(x = personality_category, y = n, fill = sex)) +
+  geom_col(position = position_dodge(0.7), width = 0.6, alpha = 0.85) +
+  geom_text(aes(label = n),
+            position = position_dodge(0.7), vjust = -0.4, size = 3.2) +
+  scale_fill_manual(values = c(M = "steelblue3", F = "salmon3"), name = "Sex") +
+  labs(subtitle = "Sex distribution per personality",
+       x = "Personality", y = "n") +
+  theme_cricket() +
+  theme(legend.position = "right"))
+
+p9 <- (p9a | p9b) +
+  plot_annotation(theme = theme(plot.title = element_text(face = "bold", size = 12)))
+
+ggsave("Plots/fig9_sample_composition.png", p9, width = 11, height = 4.5, dpi = 300)
+message("✓ Figure 9 saved")
+
+
+
+(p_pc1 <- crickets %>%
+    mutate(autotomy_regime = factor(autotomy_regime, levels = c("sham","autotomy"))) %>%
+    select(individual_ID, autotomy_regime,
+           personality_PC1_pre, personality_PC1_post) %>%
+    pivot_longer(cols = c(personality_PC1_pre, personality_PC1_post),
+                 names_to = "timepoint", values_to = "PC1") %>%
+    mutate(timepoint = factor(if_else(timepoint == "personality_PC1_pre", "pre", "post"),
+                              levels = c("pre","post"))) %>%
+    group_by(autotomy_regime, timepoint) %>%
+    summarise(mean_PC1 = mean(PC1, na.rm = TRUE),
+              se_PC1   = sd(PC1, na.rm = TRUE) / sqrt(n()),
+              .groups  = "drop") %>%
+    ggplot(aes(x = timepoint, y = mean_PC1,
+               colour = autotomy_regime, group = autotomy_regime)) +
+    geom_line(linewidth = 1.2) +
+    geom_point(size = 3) +
+    geom_errorbar(aes(ymin = mean_PC1 - se_PC1,
+                      ymax = mean_PC1 + se_PC1),
+                  width = 0.08, linewidth = 0.8) +
+    scale_colour_manual(values = c(sham = "cadetblue3", autotomy = "salmon"),
+                        name = "Treatment") +
+    labs(title = "Boldness (PC1) Change Pre→Post",
+         x = "Time", y = "Estimated Boldness (PC1)") +
+    theme_cricket()) #checking w wies 
+
+#All Plots ----
 #Distributions (1): 
 (p1a <- crickets_long %>%
   filter(timepoint == "pre", trial == 1) %>%   
@@ -152,9 +510,12 @@ ggsave("PC1grid.png", pc1_grid,
                alpha = 0.8, colour = "grey30") +
   scale_fill_manual(values = pal_regime, name = "Regime") +
   scale_x_discrete(labels = c(sham = "Sham", autotomy = "Autotomy")) +
-  labs(x = "Regime", y = "Δ Boldness (PC1 post − pre)") +
+  labs(x = "", y = "Δ Boldness (PC1 post − pre)") +
   theme_cricket() +
-  theme(legend.position = "none"))
+  theme(legend.position = c(0.1, 0.1)))
+ggsave("p2a.png", p2a,
+       width = 8, height = 8, dpi = 300, bg = "white")
+
 
 (p2b <- crickets_long %>%
   filter(trial == 1, timepoint == "pre") %>%
@@ -164,8 +525,13 @@ ggsave("PC1grid.png", pc1_grid,
   scale_fill_manual(values = pal_regime,
                     labels = c(sham = "Sham", autotomy = "Autotomy"),
                     name   = "Regime") +
-  labs(x = "Personality category", y = "Δ Boldness (post − pre)") +
-  theme_cricket())
+  labs(x = "", y = "Δ Boldness (post − pre)") +
+  theme_cricket() +
+  theme(legend.position = c(0.1, 0.1)))
+
+ggsave("p2b.png", p2b,
+       width = 8, height = 5, dpi = 300, bg = "white")
+
 
 (p2c <- crickets_long %>%
   filter(timepoint == "pre") %>%
@@ -199,7 +565,12 @@ ggsave("boldness_grid.png", p2_grid,
                     labels = c(sham = "Sham", autotomy = "Autotomy"),
                     name = "Regime") +
   labs(x = "Pre-trial boldness (PC1)", y = "Δ Boldness (post − pre)") +
-  theme_cricket())
+  theme_cricket() +
+  theme(legend.position = c(0.1, 0.1)))
+
+ggsave("change_in_boldness.png", p3a,
+       width = 8, height = 8, dpi = 300, bg = "white")
+
 
 (p3b <- crickets_long %>%
   filter(trial == 1, timepoint == "pre") %>%
@@ -219,15 +590,42 @@ ggsave("boldness_grid.png", p2_grid,
   theme_cricket())
 
 (p3c <- crickets_long %>%
-  filter(trial == 1, timepoint == "pre") %>%
-  ggplot(aes(x = mass, y = PC1_pre, colour = personality)) +
-  geom_point(alpha = 0.7, size = 2.5) +
-  geom_smooth(method = "lm", se = TRUE, colour = "grey30",
-              fill = "grey80", linewidth = 1, inherit.aes = FALSE,
-              aes(x = mass, y = PC1_pre)) +
+  filter(trial == 1) %>%
+  ggplot(aes(x = PC1_pre, y = d_boldness, 
+             colour = personality, linetype = regime)) +
+  geom_point(aes(shape = regime), alpha = 0.7, size = 2.5) +
+  geom_smooth(method = "lm", se = TRUE, alpha = 0.15, linewidth = 1) +
+  facet_wrap(~ personality, scales = "fixed") +
   scale_colour_manual(values = pal_personality, name = "Personality") +
-  labs(x = "Body mass (g)", y = "Pre-trial boldness (PC1)") +
-  theme_cricket())
+  scale_linetype_manual(values = c("sham" = "dashed", "autotomy" = "solid"),
+                        name = "Regime") +
+  scale_shape_manual(values = c("sham" = 1, "autotomy" = 16),
+                     name = "Regime") +
+  geom_hline(yintercept = 0, linetype = "dashed", colour = "grey50") +
+  labs(x = "Pre-trial boldness (PC1)", y = "Δ Boldness") +
+  theme_cricket() +
+  theme(legend.position = c(0.1, 0.2)))
+
+
+ggsave("boldness_change_RP.png", p3c,
+       width = 8, height = 5, dpi = 300, bg = "white")
+
+
+
+
+(p3d <- crickets_long %>%
+    filter(trial == 1, timepoint == "pre") %>%
+    ggplot(aes(x = mass, y = PC1_pre, colour = personality)) +
+    geom_point(alpha = 0.7, size = 2.5) +
+    geom_smooth(method = "lm", se = TRUE, linewidth = 1) +
+    scale_colour_manual(values = pal_personality, name = "Personality") +
+    labs(x = "Body mass (g)", y = "Pre-trial boldness (PC1)") +
+    theme_cricket() +
+    theme(legend.position = c(0.1, 0.1)))
+
+
+ggsave("boldnes_P_pre.png", p3d,
+       width = 8, height = 8, dpi = 300, bg = "white")
 
 p3_grid <- grid.arrange(p3a, p3c, nrow = 1)
 ggsave("boldness_grid2.png", p3_grid,
@@ -298,7 +696,7 @@ ggsave("autotomy_gridx.png", p4_grid,
   pivot_longer(cols = c(PC1_pre, PC1_post),
                names_to  = "time",
                values_to = "PC1") %>%
-  mutate(time = factor(recode(time, PC1_pre = "Pre", PC1_post = "Post"),
+  mutate(time = factor(dplyr::recode(time, PC1_pre = "Pre", PC1_post = "Post"),
                        levels = c("Pre", "Post"))) %>%
   ggplot(aes(x = time, y = PC1, group = ID, colour = regime)) +
   geom_line(alpha = 0.35, linewidth = 0.6) +
@@ -334,7 +732,11 @@ ggsave("autotomy_gridx.png", p4_grid,
                         labels = c(sham = "Sham", autotomy = "Autotomy"),
                         name   = "Regime") +
   labs(x = "Timepoint", y = "Mean Boldness PC1") +
-  theme_cricket())
+  theme_cricket() +
+  theme(legend.position = c(0.1, 0.2)))
+
+ggsave("Plots/boldness_pre_post.png", p5b,
+       width = 8, height = 8, dpi = 300, bg = "white")
 
 p5_grid <- grid.arrange(p5a, p5b, nrow = 1)
 ggsave("boldness_grid3.png", p5_grid,
@@ -425,10 +827,54 @@ ggsave("distance_grid.png", p6_grid,
   scale_colour_manual(values = pal_personality, name = "Personality") +
   labs(x = NULL, y = "Mean z-score") +
   theme_cricket() +
-  theme(axis.text.x = element_text(size = 8)))
+  theme(axis.text.x = element_text(size = 8)) +
+  theme(legend.position = c(0.85, 0.9)))
 
 ggsave("z-score_personality.png", p7,
        width = 10, height = 7, dpi = 300, bg = "white")
+
+(p8.1 <- crickets_long %>%
+    filter(timepoint == "post") %>%
+    group_by(ID, personality) %>%
+    summarise(across(c(FM_latency, total_distance, time_central,
+                       freezing_n, resume_latency, total_freeze_time,
+                       shelter_latency),
+                     mean, na.rm = TRUE),
+              .groups = "drop") %>%
+    # z-score each metric
+    mutate(across(c(FM_latency, total_distance, time_central,
+                    freezing_n, resume_latency, total_freeze_time,
+                    shelter_latency), scale)) %>%
+    pivot_longer(cols = c(FM_latency, total_distance, time_central,
+                          freezing_n, resume_latency, total_freeze_time,
+                          shelter_latency),
+                 names_to  = "metric",
+                 values_to = "z_score") %>%
+    group_by(personality, metric) %>%
+    summarise(mean_z = mean(z_score, na.rm = TRUE),
+              se_z = sd(z_score, na.rm = TRUE) / sqrt(n()),
+              .groups = "drop") %>%
+    mutate(metric = recode(metric,
+                           FM_latency = "OFT: Latency\nto first move",
+                           total_distance = "OFT: Total\ndistance",
+                           time_central = "OFT: Central\nzone time",
+                           freezing_n = "OFT: Freezing\nbouts",
+                           resume_latency = "PCRT: Latency\nto resume",
+                           total_freeze_time = "PCRT: Freeze\nduration",
+                           shelter_latency = "PCRT: Shelter\nlatency")) %>%
+    ggplot(aes(x = metric, y = mean_z,
+               fill = personality, colour = personality)) +
+    geom_hline(yintercept = 0, linetype = "dashed", colour = "grey50") +
+    geom_col(position = position_dodge(0.75), width = 0.65, alpha = 0.85) +
+    geom_errorbar(aes(ymin = mean_z - se_z, ymax = mean_z + se_z),
+                  position = position_dodge(0.75), width = 0.25,
+                  linewidth = 0.7) +
+    scale_fill_manual(values   = pal_personality, name = "Personality") +
+    scale_colour_manual(values = pal_personality, name = "Personality") +
+    labs(x = NULL, y = "Mean z-score") +
+    theme_cricket() +
+    theme(axis.text.x = element_text(size = 8)) +
+    theme(legend.position = c(0.85, 0.9)))
 
 #latency to autotomise (8)
 crickets_long <- crickets_long %>%
@@ -454,15 +900,45 @@ crickets_long <- crickets_long %>%
                 width = 0.12, size = 3.5, alpha = 0.85) +
     geom_hline(yintercept = 30, linetype = "dashed",
                colour = "#C04828", linewidth = 0.6) +
-    annotate("text", x = 0.6, y = 29.2,
+    annotate("text", x = 0.5, y = 29.2,
              label = "Censor (30 s)", hjust = 0,
              size = 3, colour = "#C04828") +
     scale_colour_manual(values = pal_personality, guide = "none") +
     scale_shape_manual(values = c("Autotomised" = 16, "Censored" = 2),
                        name   = "Outcome") +
-    labs(x = "Personality category", y = "Latency to autotomy (s)") +
+    labs(x = "", y = "Latency to autotomise (s)") +
     theme_cricket() +
-    theme(legend.position = "right"))
+    theme(legend.position = c(0.1, 0.1)))
+
+ggsave("autotomy_latency_pre.png", p8a,
+       width = 8, height = 8, dpi = 300, bg = "white")
+
+(p8b <- crickets_long %>%
+    filter(trial == 1,
+           timepoint == "post",
+           regime == "autotomy",
+           !is.na(a_latency)) %>%
+    ggplot(aes(x = personality, y = a_latency, colour = personality)) +
+    geom_boxplot(data = . %>% filter(a_occured == "Autotomised"),
+                 width = 0.35, outlier.shape = NA,
+                 colour = "grey40", fill = "white", alpha = 0.6) +
+    geom_jitter(aes(shape = a_occured),
+                width = 0.12, size = 3.5, alpha = 0.85) +
+    geom_hline(yintercept = 30, linetype = "dashed",
+               colour = "#C04828", linewidth = 0.6) +
+    annotate("text", x = 0.5, y = 29.2,
+             label = "Censor (30 s)", hjust = 0,
+             size = 3, colour = "#C04828") +
+    scale_colour_manual(values = pal_personality, guide = "none") +
+    scale_shape_manual(values = c("Autotomised" = 16, "Censored" = 2),
+                       name   = "Outcome") +
+    labs(x = "", y = "Latency to autotomise (s)") +
+    theme_cricket() +
+    theme(legend.position = c(0.1, 0.1)))
+
+ggsave("autotomy_latency_pre.png", p8a,
+       width = 8, height = 8, dpi = 300, bg = "white")
+
 
 (p8b <- crickets_long %>%
     filter(trial == 1,
@@ -665,6 +1141,10 @@ delta_metrics <- metric_means %>%
   labs(x = "Mean Δ z-score (post − pre)", y = NULL) + #negative z-score = becomes shyer
   theme_cricket() + 
   theme(panel.grid.major.x = element_line(colour = "grey92")))
+
+ggsave("boldness_drivers.png", p_delta_metrics,
+       width = 8, height = 8, dpi = 300, bg = "white")
+
 
 (fig_drivers <- p_loadings / p_delta_metrics +
   plot_annotation(
