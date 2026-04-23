@@ -131,6 +131,9 @@ summary(rq1_lm) #significant effect of pre_PC1 and body mass on latency to autot
                 data = filter(crickets_analysis, autotomy_regime == "autotomy"))
   summary(rq1_lm3) #all significant predictors
   #Adjusted R^2 even beter (0.7453); model significant
+  rq1_lm3_int <- lm(autotomy_latency_s ~ personality_PC1_pre * I(personality_PC1_pre^3) * body_mass_g,
+                data = filter(crickets_analysis, autotomy_regime == "autotomy"))
+  summary(summary(rq1_lm3)) #all significant predictors
   
   residualPlots(rq1_lm3) #GOOD
   
@@ -147,8 +150,7 @@ summary(rq1_lm) #significant effect of pre_PC1 and body mass on latency to autot
   residualPlots(rq1_lm_poly) 
   
   
-  AICc(rq1_lm2, rq1_lm, rq1_lm_poly, rq1_lm3) #Cubic alone better fit (delta AICc > 2)
-  
+  AICc(rq1_lm3_int, rq1_lm2, rq1_lm, rq1_lm_poly, rq1_lm3) #Cubic alone better fit (delta AICc > 2)
   #In conclusion: relationship between PC1_pre and latency to autotomise best explained by a cubic tranformation
     #In the linear model
       plot(autotomy_latency_s ~ personality_PC1_pre, data = crickets)
@@ -161,7 +163,7 @@ summary(rq1_lm) #significant effect of pre_PC1 and body mass on latency to autot
   
 #Tobit regression
 rq1_tobit <- vglm(
-  autotomy_latency_s ~ personality_PC1_pre + body_mass_g,
+  autotomy_latency_s ~ personality_PC1_pre + body_mass_g + sex,
   tobit(Upper = 30),
   data = filter(crickets_analysis, autotomy_regime == "autotomy"))
 summary(rq1_tobit) #Significant effect of body mass and PC1_pre on latency to autotomise (same trends as above)
@@ -395,23 +397,41 @@ summary(rq2_model) #PC1_pre significant; interaction between regime and time
     
     #LM without PC1 (use this one)
     rq2_model_lm <- lmer(
-      boldness ~ autotomy_regime * time + (1 | individual_ID),
+      boldness ~ body_mass_g + autotomy_regime * time + (1 | individual_ID),
       data = dat_long)  
     summary(rq2_model_lm) #significant effect of time*regime
 
+    sim_resid <- simulateResiduals(rq2_model_lm) #still issues
+    plot(rq2_model_lm)
+    testDispersion(rq2_model_lm)
+    
+    shapiro.test(resid(rq2_model_lm))
+    vif(rq2_model_lm) #all good
+    outlierTest(rq2_model) #some significant outliers (points 166, 132)
+    influenceIndexPlot(rq2_model, vars = c("Studentized", "Bonf")) #points 166 and 132 significant outliers
+    
+    qPlot(resid(rq2_model_lm))
+    shapiro.test(resid(rq2_model_lm))
+    qqnorm(resid(rq2_model_lm)); qqline(resid(rq2_model_lm), col = "red", lwd = 2) #looks bad
+    
+    
     emm    <- emmeans(rq2_model_lm, ~ autotomy_regime * time)
     emm_df <- as.data.frame(emm)
-
+    standardize_parameters(rq2_model_lm)
+    confint(rq2_model_lm, method = "boot", nsim = 1000)
+    
+    
     cor.test(
       filter(crickets_analysis, autotomy_regime == "autotomy")$personality_PC1_pre,
       filter(crickets_analysis, autotomy_regime == "autotomy")$autotomy_latency_s,
       method = "spearman"
     )
     
+    rq2_glm <- glmmTMB::glmmTMB(
+      boldness ~ autotomy_regime * time + (1 | individual_ID),
+      data = dat_long)
+    summary(rq2_glm)
   
-    standardize_parameters(rq2_model_lm)
-    confint(rq2_model_lm, method = "boot", nsim = 1000)
-    
     
 #Plots for RQ2: ----
 (emm_plot <- ggplot(emm_df, aes(x = time, y = emmean,
