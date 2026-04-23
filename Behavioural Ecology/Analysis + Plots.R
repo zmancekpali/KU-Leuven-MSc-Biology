@@ -12,6 +12,7 @@ getwd()
 
 #Libraries
 library(car)
+library(corrplot)
 library(DHARMa)
 library(effectsize)
 library(emmeans)
@@ -755,27 +756,66 @@ corr_data <- crickets_long %>%
                      freezing_n, resume_latency, total_freeze_time,
                      shelter_latency),
                    \(x) mean(x, na.rm = TRUE)),
-            .groups = "drop") %>%
-  select(-ID)
+            .groups = "drop") %>% select(-ID)
 
-colnames(corr_data) <- c("OFT: Latency\nfirst move", "OFT: Total\ndistance",
-                         "OFT: Central\nzone time", "OFT: Freezing\nbouts",
-                         "PCRT: Latency\nresume", "PCRT: Freeze\nduration",
-                         "PCRT: Shelter\nlatency")
+colnames(cor_matrix) <- c("Latency first move", "Total distance", "Central zone time",
+                          "Freezing bouts", "Latency to resume movement", "Freeze duration", 
+                          "Shelter latency")
+rownames(cor_matrix) <- c("Latency first move", "Total distance",
+                          "Central zone time", "Freezing bouts",
+                          "Latency to resume movement", "Freeze duration",
+                          "Shelter latency")
 
-(cor_matrix <- cor(corr_data, use = "complete.obs", method = "pearson"))
-
-png("Plots/fig_corrplot.png", width = 2400, height = 2000, res = 300)
 corrplot(cor_matrix,
-         method   = "color",
-         type     = "upper",
-         tl.col   = "black",
-         tl.srt   = 45,
-         tl.cex   = 0.8,
-         addCoef.col = "black",
-         number.cex  = 0.7,
-         col      = colorRampPalette(c("red3", "white", "steelblue3"))(200),
-         diag     = FALSE)
+         method = "color",
+         type = "upper",
+         addCoef.col = "white",
+         number.cex = 0.8,
+         tl.col = "black",
+         tl.srt = 45,
+         tl.cex = 0.75,
+         col = colorRampPalette(c("#C84B4B", "white", "#5B8DB8"))(200),
+         diag = FALSE,
+         cl.ratio = 0.15,
+         cl.cex = 0.8)
+cor_matrix <- cor(corr_data, method = "pearson")
+
+cor_long <- cor_matrix %>%
+  as.data.frame() %>%
+  rownames_to_column("var1") %>%
+  pivot_longer(-var1, names_to = "var2", values_to = "r") %>%
+  mutate(var1 = factor(var1, levels = colnames(cor_matrix)),
+    var2 = factor(var2, levels = rev(colnames(cor_matrix))),
+    label_bold = ifelse(abs(r) > 0.5, "bold", "plain")) %>%  
+  filter(as.integer(var1) > as.integer(var2))
+
+corrplot(cor_matrix,
+         method = "color",
+         type = "upper",          
+         addCoef.col = "white",   
+         number.cex = 0.8,
+         tl.col = "black",        
+         tl.srt = 0,             
+         tl.cex = 0.8,
+         col = colorRampPalette(c("#C84B4B", "white", "#5B8DB8"))(200),
+         diag = FALSE,            
+         cl.ratio = 0.15,
+         cl.cex = 0.8)
+
+png("Plots/fig_corrplot.png", width = 1000, height = 1000, res = 150)
+par(mar = c(0, 8, 8, 0))
+corrplot(cor_matrix,
+         method = "color",
+         type = "lower",          
+         addCoef.col = "white",   
+         number.cex = 0.8,
+         tl.col = "black",        
+         tl.srt = 0,             
+         tl.cex = 0.8,
+         col = colorRampPalette(c("#C84B4B", "white", "#5B8DB8"))(200),
+         diag = FALSE,            
+         cl.ratio = 0.15,
+         cl.cex = 0.8)
 dev.off()
 
 (crickets_long %>%
