@@ -1,0 +1,27 @@
+Bioclimatic variables:
+AHM:  annual heat moisture index, calculated as (MAT+10)/(MAP/1000)
+bFFP: the julian date on which the frost-free period begins
+CMD:  Hargreave's climatic moisture index
+DD_0: degree-days below 0°C (chilling degree days)
+DD_18: degree-days below 18°C
+DD18: degree-days above 18°C
+DD5: degree-days above 5°C (growing degree days)
+eFFP: the julian date on which the frost-free period ends
+EMT:  extreme minimum temperature over 30 years
+Eref: Hargreave's reference evaporation
+FFP: frost-free period
+MAP:  mean annual precipitation (mm)
+MAR: mean annual solar radiation (MJ m-2 d-1) (excludes areas south of US and some high-latitude areas)
+MAT:  mean annual temperature (°C)
+MCMT: mean temperature of the coldest month (°C)
+MSP:  mean summer (May to Sep) precipitation (mm)
+MWMT: mean temperature of the warmest month (°C)
+NFFD: the number of frost-free days
+PAS:  precipitation as snow (mm)
+PPT_sm:  summer (June to August) precipitation (mm)
+PPT_wt:  winter (December to February) precipitation (mm)
+RH: mean annual relative humidity (%)
+SHM:  summer heat moisture index, calculated as MWMT/(MSP/1000)
+Tave_sm: summer (June to August) mean temperature (°C)
+Tave_wt: winter (December to February) mean temperature (°C)
+TD:   difference between MCMT and MWMT, as a measure of continentality (°C)

@@ -1,0 +1,447 @@
+---
+title: "Practical -- RDA analysis for Landscape Genomics"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+
+# 0 Some explanations about the practical
+This exercise session will let you get a taste a particular, and very versatile, type of landscape genomic analyses: RDA.  
+As this practical does not entail any aspect regarding the use of the VSC, this exercise is also intended to work on your scripting fluency and what I call scripting attitude (= attitude towards finding a way to make your analyses work).  
+
+In real life it is often not the ase that you know all commands and functions by heart -- so, that is not what I'll be expecting from you. This notebook mainly helps you to get through the exercise, but you will need to fill in some of the code yourself. Feel free to work with your neighbour(s) and **don't forget to check the documentation of the commands you want to use** (by typing `?Command()`(e.g., `?t.test()`) in your console).
+
+You can also make use of online fora, like StackOverflow, or make use of GenAI. Of course, when using the latter, **Make sure you understand what is happening and that it actually does what you want it to do!! Never, follow AI's suggestions blindly!**
+
+> So in a nutshell:  
+> This notebook will guide you through the practical, using a small subset of the data.  
+> There will be **Exercises** marked where you will need to fill in the code yourself.
+
+
+## 0.1 Welcome - this is an R-notebook.
+This notebook format is similar to how a jupyter (Python) notebook works. It allows you to cut your script in chunks of code that you can run seperately.
+
+- **To run a chunk of code:** Press Crtl+Shift+Enter (Windows) OR Cmd+Shift+Enter (Mac)  
+- **To add a new chunk of code:** Press Crtl+Alt+I (Windows) OR Cmd+Option+I (Mac)  
+
+- Outside of code chunks you can just type text freely. This works under the R-Markdown format --> see [here](https://rmarkdown.rstudio.com/lesson-8.html?_gl=1*176vys3*_up*MQ..*_ga*MzE4ODUyNjMxLjE3NzYxNTQ5ODg.*_ga_X64JZVV9NC*czE3NzYxNTQ5ODgkbzEkZzEkdDE3NzYxNTUxMzEkajU0JGwwJGgw) for some basics Markdown use cases.  
+
+Alright, let's get started!  
+
+
+## 0.2 Before we actually start: the 'here' package
+> TIP: Try to have a seperate R project for each project / type of analyses you do.
+
+**TO DO:** Make such a seperate project in the RDA-Landscape-genomics folder you downloaded.
+
+Doing so will automatically set your working directory to this folder from which you can dive into all the subfolders that are encompassed by this folder.
+
+Now we do not need to make use of  `setwd()` anymore but can make use of a better way to access files AND keep our working directory in one place.
+
+**Enter the 'here' package:**
+``` {r message=F, warning=F, eval=T}
+#install.packages('here')
+library(here)
+?here() ## run this to get info on the function.
+
+### example: accessing the Allele Frequencies file
+here('Data', 'Allele-Frequencies.txt')
+here('Data/Allele-Frequencies.txt')
+```
+
+In this example we tried to access the same file in two different ways. Feel free to use the formulation that you find the most convenient.
+
+**Exercise 1:** use 'here()' to access the Variables.txt file in the Data folder.
+``` {r warning=F, eval=F}
+here(...)
+```
+
+# 1. Loading (and potentially) installing packages
+Uncomment the 'install.packages()' lines if these packages are not yet installed.
+```{r message=F, warning=F, eval=F}
+#install.packages('pegas')
+library(pegas)
+
+#install.packages('tidyverse')
+library(tidyverse)
+
+#install.packages('raster')
+library(raster)
+
+#install.packages('rnaturalearth')
+library(rnaturalearth)
+
+#install.packages('rnaturalearthdata')
+library(rnaturalearthdata)
+
+#install.packages('RColorBrewer')
+library(RColorBrewer)
+
+#install.packages('ggpubr')
+library(ggpubr)
+
+#install.packages('vegan')
+library(vegan)
+
+#install.packages('robust')
+library(robust)
+
+#install.packages('ggVennDiagram')
+library(ggVennDiagram)
+
+#install.packages('cowplot')
+library(cowplot)
+
+#install.packages('corrplot')
+library(corrplot)
+
+#install.packages('UpSetR')
+library(UpSetR)
+
+#install.packages('BiocManager') ## Needed to install qvalue
+#BiocManager::install("qvalue")
+library(qvalue)
+
+#install.packages('psych')
+library(psych)
+
+### Load additional functions needed for the practical:
+source(here('RDA_Functions.R'))
+```
+
+# 2. Loading / Formatting data
+
+>Again:  
+>If you're not sure how to get started you can use the '?' option (e.g., '?read.table()') to see what you can do with a specific function. Otherwise, you can also find help from fora like StackOverflow or make use of GenAI. When doing the latter: **Make sure you understand what is happening and that it atually does what you want it to do!!**
+
+## 2.1 Genetic data (allele frequencies)
+**Exercise 2:** Read in the allele frequencies dataset.
+```{r message=F, warning=F, eval=F}
+AllFreq <- read.table(...)
+```
+
+In order to make things go more swiftly in this exercise session we will take a random sample of loci from this set of loci.  
+Be aware that, when your are comparing your results with your neighbours, that you might have slightly different results. This will be due to the fact that you **random** subsample from the data will be different for everyone.
+
+```{r message=F, warning=F, eval=F}
+##[INFORMATIVE]
+smpl <- sample(colnames(AllFreq), size = 2000)
+AllFreq <- AllFreq[,which(colnames(AllFreq) %in% smpl)]
+```
+
+## 2.2 Metadata (Coordinates, environmental data, neutral pop. structure, phenotypic traits)
+**Exercise 3:** Read in the Variables dataset.
+```{r message=F, warning=F, eval=F}
+Variables <- read.table(...)
+```
+
+## 2.3 GIS data
+```{r message=F, warning=F, eval=F}
+##[INFORMATIVE]
+
+## Administrative data:
+admin <- rnaturalearth::ne_countries(scale = "medium", returnclass = "sf")
+
+## plotting data points:
+ggplot2::ggplot() + 
+  ## adding administrative data
+  geom_sf(data = admin, fill=gray(.9), size=0) +
+  ## adding our data points
+  geom_point(data = Variables, aes(x = Longitude, y = Latitude, fill = 'steelblue'), shape = 21) + 
+  ## set fill-color of our points
+  scale_fill_manual(values = c('steelblue')) +
+  ## set the limitations of our plot
+  coord_sf(xlim = c(-145, -105), ylim = c(44, 65), expand = FALSE) +
+  ## set the axis labels
+  xlab("Longitude") + ylab("Latitude") +
+  ## setting the general theme of our plot
+  theme_bw(base_size = 11, base_family = "Times") +
+  theme(panel.grid = element_blank(), plot.background = element_blank(), panel.background = element_blank(), strip.text = element_text(size=11))
+```
+
+# 3. Variable Selection
+As most **environmental variables** (n = 27) are highliy correlated with one another, we cannot just include all environmental varibles in our models as this will skew the results due to a thing called multicollinearity or autocorrelation.
+
+Here is an illustrative example:
+```{r message=F, warning=F, eval=F}
+psych::pairs.panels(Variables[,8:18])
+```
+
+Or, even better, plotting all correlations. This figure is too big to plot in RStudio so we directly export it to a PDF file.
+```{r message=F, warning=F, eval=F}
+pdf(file = here('Data', 'Env_correlation.pdf'), width = 14, height = 14)
+psych::pairs.panels(Variables)
+dev.off()
+```
+
+Now, how do we choose which variables to retain for our analyses and which not?  
+Instead of just randomly choosing, we can make use of something called **Forward Selection**.  
+
+Forward selection starts from a *“null” model* where the response is explained only by an intercept. Variables are then added to the model one by one to try to reach the amount of variance explained by a *“full” model* (i.e., model including all the explanatory variables), while limiting the amount of redundancy among included variables.  
+
+To do this type of *Forward selection* in R, we will make use of the "vegan" package.
+More specifically, we define both the *"null" and the "full" model* after which we use the 'ordiR2step' function which uses these two "extreme" model states to evaluate every variable against one another.
+
+```{r message=F, warning=F, eval=F}
+## The NULL model:
+RDA0 <- vegan::rda(AllFreq ~ 1,  Variables) 
+
+## The FULL model:
+RDAfull <- vegan::rda(AllFreq ~ AHM.6190 + bFFP.6190 + CMD.6190 + DD_0.6190 + DD_18.6190 + DD18.6190 + DD5.6190 + eFFP.6190 + EMT.6190 + Eref.6190 + FFP.6190 + MAP.6190 + MAR.6190 + MAT.6190 + MCMT.6190 + MSP.6190 + MWMT.6190 + NFFD.6190 + PAS.6190 + PPT_sm.6190 + PPT_wt.6190 + RH.6190 + SHM.6190 + Tave_sm.6190 + Tave_wt.6190 + TD.6190, Variables)
+```
+
+Now that these two models have been defined we will use the ordiR2step function.  
+
+**Exercise 4:** Try run this function with the following criteria.  
+1) Set threshold for p-value significance to 0.01.  
+2) Perform 1000 permutations.  
+3) Use the adjusted R^2 as stopping criterion.  
+*Tip: make use of `?ordiR2step()`.*  
+
+```{r message=F, warning=F, eval=F}
+Var.sel <- vegan::ordiR2step(...)
+```
+
+Next, we will summarize the results from de Forward Selection procedure:
+```{r message=F, warning=F, eval=F}
+summary(Var.sel)
+```
+
+**Notes on interpretation and best practices: **  
+- This is a predictive approach to variable selection which optimizes the variance explained, but does not necessarily identify the ecological or mechanistic drivers of genetic variation.  
+- Additionally, pairwise predictor correlations can be very high, e.g., among seasonal calculations of temperature or precipitation. While one variable may maximize variance explained, it may be another, correlated variable, potentially even unmeasured, that is the actual mechanistic driver of variation.  
+- The ubiquitous nature of environmental correlation means that it is critical to carefully investigate selected variables but also avoid overinterpretation of variable importance in downstream analyses unless mechanistic data support observed relationships.
+
+
+# 4. Variation Partitioning
+Variance partitioning with partial RDA (pRDA) can identify the contribution of different factors to reducing gene flow and triggering genetic divergence among populations. We apply pRDA-based variance partitioning to the lodgepole pine data to decompose the contribution of **climate, neutral population structure, and geography** in explaining genetic variation.  
+
+We will make use of three sets of variables:  
+1) the X number of selected bioclimate variables;  (`Change these variable names in the code chunk below to accomodate your findings from the previous section.`)   
+2) three proxies of neutral genetic structure (population scores along the first three axes of a genetic PCA conducted on the 3,934 neutral loci);  
+3) population coordinates (longitude and latitude) to characterize geographic variation.
+
+We start by defining the **Full model**, including all these variables, and extract some statistics from this RDA model.
+```{r message=F, warning=F, eval=F}
+## Full model:
+pRDAfull <- vegan::rda(AllFreq ~ PC1 + PC2 + PC3 + Longitude + Latitude + MAR.6190 + EMT.6190 + MWMT.6190 + CMD.6190 + Tave_wt.6190 + DD_18.6190 + MAP.6190 + Eref.6190 + PAS.6190,  Variables)
+
+RsquareAdj(pRDAfull) 
+anova(pRDAfull) ## Significance testing of the model
+summary(pRDAfull) ## Summary of the Full RDA model
+```
+
+The `summary()` function generates a lot of output, but one of the **most important** statistics are printed at the beginning, namely the amount of variance that is explained by the model. You will find in the summary the *total amount of variance* present in the data, the amount of *constrained* and *unconstrained variance* with their proportions.  
+- Constrained is the amount of variance that is explained by the explanatory variables that we included in our model.  
+- Unconstrained is then the amount of variance that is **not** explained by our model.  
+
+The next steps are to make separate models where we consistently partition each type of variable, while still accounting for the other variables (i.e., conditioning). In these partitioned RDA models (pRDA), you will also notice an additional type of variance, the *conditioned variance*. This merely indicates the amount of variance that is explained by the conditioned variables in the models with respect to the total amount of variance explained and the variance explained by the partitioned variables (constrained variance).
+
+```{r message=F, warning=F, eval=F}
+## An example:
+test.pRDA <- vegan::rda(Response_Var ~ Climate_Var1 + Climate_Var2 + Condition(Neutral_pop_PC1 + Neutral_pop_PC2), Variables)
+```
+
+**Exercise 5:** Create such a partial RDA model for the following conditions + test for their significance:  
+1) the climate variables from the variable selection;  
+2) the neutral population structure;  
+3) geography;  
+4) climate + neutral population structure;  
+5) climate + geography;  
+6) neutral population structure + geography;  
+
+```{r message=F, warning=F, eval=F}
+## 1) Pure climate model
+pRDAclim <- vegan::rda(...)
+
+RsquareAdj(...) 
+anova(...) 
+summary(...) 
+
+## 2) Pure neutral population structure 
+pRDAstruct <- vegan::rda(...)
+
+...
+
+## 3) Pure geography  
+pRDAgeog <- vegan::rda(...)
+
+...
+
+## 4) climate + structure
+pRDAclim.struct <- vegan::rda(...)
+
+...
+
+## 5) climate + geography
+pRDAclim.geog <- vegan::rda(...)
+
+...
+
+## 6) neutral population structure + geography
+pRDAstruct.geog <- vegan::rda(...)
+
+...
+
+```
+
+As we now made all of these models, it is time to make some nice figures in order to visualize differences between the different types of variables that affect our observed genetic variability.  
+
+We start with extracting some information from each of the models and putting them into a new data frame which we then can use to plot the things we want.
+
+```{r message=F, warning=F, eval=F}
+## [INFORMATIVE]
+
+Var.part.list <- list()
+
+part.list <- list(pRDAfull, pRDAclim, pRDAstruct, pRDAgeog, pRDAclim.struct, pRDAclim.geog, pRDAstruct.geog)
+for (i in 1:length(part.list)){
+  if (i == 1){
+    Var.part.list[[i]] <- c(RsquareAdj(part.list[[i]])[2], summary(part.list[[i]])[6], summary(part.list[[i]])[7], summary(part.list[[i]])[8])
+  }
+  else {
+    Var.part.list[[i]] <- c(RsquareAdj(part.list[[i]])[2], summary(part.list[[i]])[7], summary(part.list[[i]])[8], summary(part.list[[i]])[9])
+  }
+}
+
+Var.part.df <- do.call(rbind, Var.part.list)
+
+rownames(Var.part.df) <- c('pRDAfull', 'pRDAclim', 'pRDAstruct', 'pRDAgeog', 'pRDAclim.struct', 'pRDAclim.geog', 'pRDAstruct.geog')
+
+Var.part.df <- as.data.frame(Var.part.df)
+```
+
+**Exercise 6:** Create/add a column to our new data frame (Var.part.df) that contains the *percentage of the constrained genetic variance relative to the total variance (total.chi)*.  
+Remember that some of the variables in the data frame are not (yet) coded as numeric. This can easily be changed by using the 'as.numeric()' function.
+
+```{r message=F, warning=F, eval=F}
+## Adding a new column:
+Var.part.df$total.expl.perc <- ...
+```
+
+Let's make a visual instead of just looking it up on the table:
+```{r message=F, warning=F, eval=F}
+### Visualization of the differences in Total variance explained:
+
+## Making an expression input object for the visual:
+expressionInput_1 <- c(`geo&clim&str` = Var.part.df[1,5], `clim&geo` = Var.part.df[6,5], 
+                       `clim&str` = Var.part.df[5,5], `geo&str` = Var.part.df[7,5], 
+                       clim = Var.part.df[2,5], str = Var.part.df[3,5], geo = Var.part.df[4,5])
+
+## The actual visual:
+UpSetR::upset(fromExpression(expressionInput_1), order.by = 'freq', set_size.show = FALSE, mainbar.y.label = "Proportion Total variance Explained")
+```
+
+Now we looked at the percentage of the explained variance for each of the components. As we now know that the full RDA model explains XX% of the total genetic variance, we can also look at the individual contribution of each these components to get to this percentage:
+
+```{r message=F, warning=F, eval=F}
+### Adding a new column
+Var.part.df$perc.expl <- (as.numeric(Var.part.df$constr.chi)/as.numeric(Var.part.df[1,3]))*100
+```
+
+**Exercise 7:** Create a similar type of visualization with these newly calculated percentages.  
+Y-axis label = Proportion of Explained Variance.
+
+```{r message=F, warning=F, eval=F}
+## Expression input:
+expressionInput_2 <- ...
+
+## Upset plot:
+UpSetR::upset(...)
+```
+
+
+# 5. Genotype - Environment association
+We will make use of a pRDA model to identify candidate adaptive markers in the lodgepole pine data using population allele frequencies for the *2000 sub-setted loci* as response and the *9 selected bioclimatic variables* as predictors, while *accounting for the neuteral population structure and geography*.  
+
+**[INFORMATIVE]**  
+We followed the procedure described in Capblancq et al. (2018) where outliers are identified based on their extremeness along a distribution of **Mahalanobis distances** estimated between each locus and the center of the RDA space using a certain number of axes (K).  
+
+The **Mahalanobis distance (MD)** measures distance relative to the centroid — a base or central point which can be thought of as an overall mean for multivariate data. The centroid is a point in multivariate space where all means from all variables intersect. The larger the MD, the further away from the centroid the data point is.
+
+**Exercise 8:** Create the required pRDA model as we have seen in previous chunks of code and based on the description here above.
+```{r message=F, warning=F, eval=F}
+RDA_env <- vegan::rda(...)
+```
+
+
+Next, we will try to perform a genome scan to identify putatively adaptive loci.
+```{r message=F, warning=F, eval=F}
+## INFORMATIVE
+
+## Plotting a screeplot (similar to PCA) to explore the importance of the different RDA axes.
+screeplot(RDA_env, main="Eigenvalues of constrained axes")
+```
+
+```{r message=F, warning=F, eval=F}
+## Running the function with K = 2 = number of PCs you want to keep
+rdadapt_env<-rdadapt(RDA_env, 2)
+
+## P-values threshold after Bonferroni correction
+thres_env <- 0.01/length(rdadapt_env$p.values)
+
+## Identifying the loci that are below the p-value threshold
+outliers <- data.frame(Loci = colnames(AllFreq)[which(rdadapt_env$p.values<thres_env)], p.value = rdadapt_env$p.values[which(rdadapt_env$p.values<thres_env)], contig = unlist(lapply(strsplit(colnames(AllFreq)[which(rdadapt_env$p.values<thres_env)], split = "_"), function(x) x[1])))
+
+## Re-ordering our outlier hits per contig
+outliers <- outliers[order(outliers$contig, outliers$p.value),]
+
+##List of Top outlier names, ordered from highest significant to lowest and one per contig!
+outliers_rdadapt_env <- as.character(outliers$Loci[!duplicated(outliers$contig)])
+
+## Formatting table for ggplot
+locus_scores <- scores(RDA_env, choices=c(1:2), display="species", scaling="none") # vegan references "species", here these are the loci
+TAB_loci <- data.frame(names = row.names(locus_scores), locus_scores)
+TAB_loci$type <- "Neutral"
+TAB_loci$type[TAB_loci$names%in%outliers$Loci] <- "All outliers"
+TAB_loci$type[TAB_loci$names%in%outliers_rdadapt_env] <- "Top outliers"
+TAB_loci$type <- factor(TAB_loci$type, levels = c("Neutral", "All outliers", "Top outliers"))
+TAB_loci <- TAB_loci[order(TAB_loci$type),]
+TAB_var <- as.data.frame(scores(RDA_env, choices=c(1,2), display="bp")) # pull the biplot scores
+```
+
+Now we can make some nice plots!!
+```{r message=F, warning=F, eval=F}
+## Biplot of RDA loci and variables scores
+ggplot() +
+  geom_hline(yintercept=0, linetype="dashed", color = gray(.80), size=0.6) +
+  geom_vline(xintercept=0, linetype="dashed", color = gray(.80), size=0.6) +
+  geom_point(data = TAB_loci, aes(x=RDA1*20, y=RDA2*20, colour = type), size = 1.4) +
+  scale_color_manual(values = c("gray90", "#F9A242FF", "#6B4596FF")) +
+  geom_segment(data = TAB_var, aes(xend=RDA1, yend=RDA2, x=0, y=0), colour="black", size=0.15, linetype=1, arrow=arrow(length = unit(0.02, "npc"))) +
+  geom_text(data = TAB_var, aes(x=1.1*RDA1, y=1.1*RDA2, label = row.names(TAB_var)), size = 2.5, family = "Times") +
+  xlab("RDA 1") + ylab("RDA 2") +
+  facet_wrap(~"RDA space") +
+  guides(color=guide_legend(title="Locus type")) +
+  theme_bw(base_size = 11, base_family = "Times") +
+  theme(panel.background = element_blank(), legend.background = element_blank(), panel.grid = element_blank(), plot.background = element_blank(), legend.text=element_text(size=rel(.8)), strip.text = element_text(size=11))
+```
+
+```{r message=F, warning=F, eval=F}
+## Manhattan plot
+Outliers <- rep("Neutral", length(colnames(AllFreq)))
+Outliers[colnames(AllFreq)%in%outliers$Loci] <- "All outliers"
+Outliers[colnames(AllFreq)%in%outliers_rdadapt_env] <- "Top outliers"
+Outliers <- factor(Outliers, levels = c("Neutral", "All outliers", "Top outliers"))
+TAB_manhatan <- data.frame(pos = 1:length(colnames(AllFreq)), 
+                           pvalues = rdadapt_env$p.values, 
+                           Outliers = Outliers)
+TAB_manhatan <- TAB_manhatan[order(TAB_manhatan$Outliers),]
+ggplot(data = TAB_manhatan) +
+  geom_point(aes(x=pos, y=-log10(pvalues), col = Outliers), size=1.4) +
+  scale_color_manual(values = c("gray90", "#F9A242FF", "#6B4596FF")) +
+  xlab("Loci") + ylab("-log10(p.values)") +
+  geom_hline(yintercept=-log10(thres_env), linetype="dashed", color = gray(.80), size=0.6) +
+  facet_wrap(~"Manhattan plot", nrow = 3) +
+  guides(color=guide_legend(title="Locus type")) +
+  theme_bw(base_size = 11, base_family = "Times") +
+  theme(legend.position="right", legend.background = element_blank(), panel.grid = element_blank(), legend.box.background = element_blank(), plot.background = element_blank(), panel.background = element_blank(), legend.text=element_text(size=rel(.8)), strip.text = element_text(size=11))
+```
+
+
+
+
+
+
+
