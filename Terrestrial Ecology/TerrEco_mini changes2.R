@@ -9,11 +9,9 @@ getwd()
 dir.create("figures2", showWarnings = FALSE)
 
 #Libraries
-library(readxl)
 library(vegan)
 library(readxl)
 library(ggplot2)
-library(cluster)
 library(ggvegan)
 library(ggrepel)
 library(dplyr)
@@ -48,10 +46,6 @@ species_num <- species %>%
   as.data.frame() #reformat as data frame from matrix (t())
 
 plots <- data[78:82,] #environmental variables only
-
-species_cover_matrix <- as.data.frame(lapply(species, as.numeric))
-colnames(species_cover_matrix) <- gsub("^X", "", colnames(species_cover_matrix))
-#removes the leading X from the column names
 
 environment <- plots %>% t() %>% #transpose
   as.data.frame() %>% #back to data frame
@@ -92,12 +86,13 @@ ellenberg <- read_excel("Ellenberg Indicator values-2022-11-07.xlsx", sheet = "T
          species = `...2`,
          L = LIGHT,
          T = TEMPERATURE,
-         F = MOISTURE,
+         M = MOISTURE,
          R = REACTION,
-         N = NUTRIENTS) %>%
+         N = NUTRIENTS,
+         ellenberg_S = SALINITY) %>%
   slice(-1) %>% 
-  mutate(across(c(L, T, F, R, N), ~ suppressWarnings(as.numeric(.)))) %>%
-  select(species, L, T, F, R, N)
+  mutate(across(c(L, T, M, R, N, ellenberg_S), ~ suppressWarnings(as.numeric(.)))) %>%
+  select(species, L, T, M, R, N, ellenberg_S) #changed to ellenberg_S because I use S for species richness later
 head(ellenberg)
 
 #Diversity indices + species richness: ----
@@ -318,7 +313,7 @@ complete <- hclust(bray, "complete")
 UPGMA <- hclust(bray, "average")
 Ward <- hclust(bray, "ward.D")
 
-par(mf.row=c(2,2))
+par(mfrow=c(2,2))
 
 plot(single, hang = -1)
 plot(complete, hang = -1)
@@ -373,31 +368,9 @@ plot(as.dendrogram(tw, "quadrat", height = "level"), type = "rectangle")
 plot(as.dendrogram(tw, "species", height = "level"), type = "rectangle")
 
 #Ellenberg: ----
-ellenberg <- as.data.frame(read_excel(
-  "Ellenberg Indicator values-2022-11-07.xlsx",
-  sheet = "Tab-OriginalNamesValues"))
-ellenberg <- ellenberg[ , c("Taxon", "L", "T", "M", "R", "N", "S")] #select only species name and ellenberg variables
-ellenberg <- ellenberg %>% rename(species = Taxon) #"Taxon" called "species" now
-sum(colnames(species_num) %in% ellenberg$species) #72 matches between the two datasets
+sum(colnames(species_num) %in% ellenberg$species) #71 matches between the two datasets
 
-colnames(species_num)[!colnames(species_num) %in% ellenberg$species] #the ones that don't match between the two datasets
-
-colnames(species_num) <- recode(colnames(species_num),
-                                "Brachythecium rutabulum" = "Brachythecium rutabulum",
-                                "Carex acutiformes" = "Carex acutiformis",
-                                "Galeopsis tetrahit" = "Galeopsis tetrahit", 
-                                "Gymnocarpium spp." = "Gymnocarpium dryopteris",
-                                "Hedera helix" = "Hedera helix aggr.",
-                                "Poa spec" = "Poa pratensis aggr.",
-                                "Populus canescens" = "Populus alba",
-                                "Ribes rubrum" = "Ribes rubrum aggr.",
-                                "Rubus sp." = "Rubus fruticosus aggr.",
-                                "Veronica hederifolia" = "Veronica hederifolia aggr.",
-                                "Waldsteinia fragarioides" = "Waldsteinia fragarioides") 
-#Euonymus europaeus doesnt want to be matched (some trailing space somewhere and i cant figure it out): so by hand:
-position <- grep("Euonymus", colnames(species_num)) #position of E. europaeus in the dataset
-colnames(species_num)[position] <- "Euonymus europaeus"
-colnames(species_num)[!colnames(species_num) %in% ellenberg$species] #only 5 remaining unmatched
+colnames(species_num)[!colnames(species_num) %in% ellenberg$species] #the ones that don't match between the two datasets (6)
 
 #now matching the ellenberg values to the species
 L_vals <- ellenberg$L[match(colnames(species_num), ellenberg$species)]
@@ -405,16 +378,17 @@ R_vals <- ellenberg$R[match(colnames(species_num), ellenberg$species)]
 M_vals <- ellenberg$M[match(colnames(species_num), ellenberg$species)] 
 T_vals <- ellenberg$T[match(colnames(species_num), ellenberg$species)]
 N_vals <- ellenberg$N[match(colnames(species_num), ellenberg$species)]
+S_vals <- ellenberg$ellenberg_S[match(colnames(species_num), ellenberg$species)]
 
 #Converting for matrices:
 ellenberg_vals <- data.frame(L = L_vals, T = T_vals,
-  M = M_vals, R = R_vals, N = N_vals, row.names = colnames(species_num)) #matrix of the ellenberg variables
+  M = M_vals, R = R_vals, N = N_vals, ellenberg_S = S_vals, row.names = colnames(species_num)) #matrix of the ellenberg variables
 
   #removing NAs:
   ellenberg_vals <- ellenberg_vals %>%
     mutate(across(everything(), ~ replace_na(., 0))) 
 
-  #species and ellenberg matrices (see also above)
+  #species and ellenberg matrices
   species_cover_matrix <- as.matrix(species_num)
   ellenberg_matrix <- as.matrix(ellenberg_vals)
   
@@ -429,6 +403,7 @@ ellenberg_vals <- data.frame(L = L_vals, T = T_vals,
   cor.test(nmds_scores$NMDS1, ellenberg_per_plot$M, method = "spearman") #positive; significant
   cor.test(nmds_scores$NMDS1, ellenberg_per_plot$R, method = "spearman") #positive; significant
   cor.test(nmds_scores$NMDS1, ellenberg_per_plot$N, method = "spearman") #n.s.
+  cor.test(nmds_scores$NMDS1, ellenberg_per_plot$ellenberg_S, method = "spearman") #n.s.
   #the NMDS1 axis is driven by soil moisture and pH
   
   #Correlations between NMDS2 sites and ellenberg values:
@@ -437,16 +412,18 @@ ellenberg_vals <- data.frame(L = L_vals, T = T_vals,
   cor.test(nmds_scores$NMDS2, ellenberg_per_plot$M, method = "spearman") #n.s.
   cor.test(nmds_scores$NMDS2, ellenberg_per_plot$R, method = "spearman") #positive; significant
   cor.test(nmds_scores$NMDS2, ellenberg_per_plot$N, method = "spearman") #positive; significant
-  #NMDS2 axis also captures light availability, temperature, and soil nutrients
+  cor.test(nmds_scores$NMDS2, ellenberg_per_plot$ellenberg_S, method = "spearman") #positive; significant
+  #NMDS2 axis also captures light availability, temperature, salinity, and soil nutrients
   
   #Correlations between ellenberg values and our measured values:
   cor.test(ellenberg_per_plot$R, merged$pH_H2O, method = "spearman") #n.s.
-  cor.test(ellenberg_per_plot$R, merged$pH_KCl, method = "spearman") #n.s.
-    #pH values not correlated with R (reaction)
-  cor.test(ellenberg_per_plot$M, merged$moisture, method = "spearman") #positive, significant
-    #Makes sense: moisture ~ moisture (ellenberg values meaningful)
-  cor.test(ellenberg_per_plot$N, merged$NO3, method = "spearman") #positive; borderline (p = 0.08) -> small sample size?
-  cor.test(ellenberg_per_plot$N, merged$NH4, method = "spearman") #n.s.
+  cor.test(ellenberg_per_plot$R, merged$pH_KCl, method = "spearman") #positive, significant
+    #pH values correlated with R (reaction)
+  cor.test(ellenberg_per_plot$ellenberg_S, merged$pH_KCl, method = "spearman") #negative, significant
+    #pH values correlated with salinity
+  cor.test(ellenberg_per_plot$M, merged$moisture, method = "spearman") #n.s.
+  cor.test(ellenberg_per_plot$N, merged$NO3, method = "spearman") #positive; significant 
+  cor.test(ellenberg_per_plot$N, merged$NH4, method = "spearman") #positive, significant
 
   
 #NMDS + Cluster analysis plots----
@@ -661,8 +638,8 @@ hulls <- rbind(hull1, hull2)
     geom_vline(xintercept = 0, linetype = "dotted", colour = "grey60") +
     scale_size_continuous(range = c(1, 5), name = "Plot occurrence \nfrequency") +
     labs(x = "NMDS1", y = "NMDS2", fill = "Cluster") +
-    theme_classic())
-ggsave("figures/nmds_species + envfit + clusters.png", p_sp_envfit, width = 13, height = 10,
+    theme_classic()) #hard to read
+ggsave("figures2/nmds_species + envfit + clusters.png", p_sp_envfit, width = 13, height = 10,
        dpi = 180, bg = "white")
 
 
@@ -766,7 +743,7 @@ ggsave("figures2/fig_ellenberg_R_plots_species.png", p_ell_R_species_plots,
 
 #Ellenberg S:
 (p_ell_S_species_plots <- ggplot(ellenberg_merged, aes(x = NMDS1, y = NMDS2)) +
-    geom_point(aes(colour = S), alpha = 0.8) +
+    geom_point(aes(colour = ellenberg_S), alpha = 0.8) +
     geom_polygon(data = hulls, aes(x = NMDS1, y = NMDS2, group = cluster),
                  fill = NA, colour = c("red", "blue")[hulls$cluster],
                  linewidth = 0.8, linetype = "dashed") +
