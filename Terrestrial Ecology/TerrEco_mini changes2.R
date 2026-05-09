@@ -208,7 +208,6 @@ D_hellinger <- decostand(species_num, method = "hellinger")
 S_Jaccard <- 1 - D_Jaccard
 S_Sorensen <- 1 - D_Sorensen
 S_Bray <- 1 - D_Bray
-S_Hellinger <- 1 - D_hellinger
 
 #Correlations between diversity/SR and environmental variables----
 merged <- cbind(diversity, environment[diversity$plot, ])
