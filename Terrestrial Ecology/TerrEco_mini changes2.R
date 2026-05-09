@@ -29,20 +29,23 @@ library(twinspan)
 
 #Data
 #Data (plots) ----
-data <- as.data.frame(read_excel("data.xlsx", sheet = "Combined")) %>% 
-  column_to_rownames(var = names(.)[1]) %>% #
-  rename_with(trimws) %>% 
-  rename_with(~ sapply(.x, fix_colname)) %>% 
-  rename_with(~ gsub("^3\\.", "11.", .x)) %>%
-  rename_with(~ gsub("^4\\.", "12.", .x))
+data <- as.data.frame(read_excel("data.xlsx", sheet = "Combined")) %>% #import
+  column_to_rownames(var = names(.)[1]) %>% #makes 'species' the row names
+  rename_with(trimws) %>% #removes trailing spaces
+  rename_with(~ ifelse(suppressWarnings(!is.na(as.numeric(.x))), 
+                       as.character(round(as.numeric(.x), 1)),
+                       .x)) %>% #removes floating decimals for better formatting
+  rename_with(~ gsub("[^[:alnum:]._]", "_", .x)) %>% #replaces non-letter/number/./_ characters with _
+  rename_with(~ gsub("^3\\.", "11.", .x)) %>% #stand '3' = stand 11
+  rename_with(~ gsub("^4\\.", "12.", .x)) #stand '4' = stand 12
 head(data)
 str(data)
 
 species <- data[1:77,] #species only
 species_num <- species %>%
-  mutate(across(everything(), as.numeric)) %>%
-  t() %>%
-  as.data.frame()
+  mutate(across(everything(), as.numeric)) %>% #as.numeric for everything
+  t() %>% #plots = rows, species = columns
+  as.data.frame() #reformat as data frame from matrix (t())
 
 plots <- data[78:82,] #environmental variables only
 
@@ -50,33 +53,33 @@ species_cover_matrix <- as.data.frame(lapply(species, as.numeric))
 colnames(species_cover_matrix) <- gsub("^X", "", colnames(species_cover_matrix))
 #removes the leading X from the column names
 
-environment <- plots %>% t() %>% #longer format
-  as.data.frame() %>%
-  rownames_to_column("plot") %>%
-  mutate(plot = gsub("^X", "", plot)) %>%
+environment <- plots %>% t() %>% #transpose
+  as.data.frame() %>% #back to data frame
+  rownames_to_column("plot") %>% #plot ID as separate column
+  mutate(plot = gsub("^X", "", plot)) %>% #remove leading X
   rename(dominant_tree = `Dominant tree species`,
     winter_water = `Winter water`,
     summer_water  = `Summer water`,
     Ah = `Ah`,
-    litter = `litter layer`) %>%
+    litter = `litter layer`) %>% #renaming to R-friendly
   mutate(winter_water = as.numeric(winter_water),
     summer_water = as.numeric(summer_water),
     Ah = as.numeric(Ah),
-    litter = as.numeric(litter),
-    stand = as.integer(sub("\\..*", "", plot))) %>%
-  column_to_rownames("plot")
+    litter = as.numeric(litter), #all as.numeric
+    stand = as.integer(sub("\\..*", "", plot))) %>% #stand only numebrs for each stand
+  column_to_rownames("plot") #plot = column names
 
 lab <- read_excel("lab.xlsx", sheet = "results") %>%
   as.data.frame() %>%
   rename_with(trimws) %>%
-  mutate(plot = gsub("-", ".", trimws(as.character(Plot))),
-         plot = gsub("^3\\.", "11.", plot),
-         plot = gsub("^4\\.", "12.", plot)) %>%
+  mutate(plot = gsub("-", ".", trimws(as.character(Plot))), #remove characters, trim trailing spaces
+         plot = gsub("^3\\.", "11.", plot), #plot 3 = plot 11
+         plot = gsub("^4\\.", "12.", plot)) %>% #plot 4 = plot 12
   select(plot, moisture = Moisture, OM = `Organic Matter`,
          pH_H2O = `Ph H2O`, pH_KCl = `Ph KCl`,
-         NO3 = `mg NO3/kg soil`, NH4 = `mg NH4-N/kg soil`)
+         NO3 = `mg NO3/kg soil`, NH4 = `mg NH4-N/kg soil`) #select and rename
 
-environment <- environment %>%
+environment <- environment %>% 
   select(dominant_tree, winter_water, summer_water, Ah, litter, stand) %>%
   rownames_to_column("plot") %>%
   left_join(lab, by = "plot") %>%
@@ -110,6 +113,7 @@ diversity <- data.frame(plot = rownames(species_num), S = S, H = H, Simpson = Si
   J = J, E = E)
 
 #ANOVA for each diversity metric
+merged <- cbind(diversity, environment[diversity$plot, ])
 merged$stand <- sub("\\..*", "", rownames(merged))
 summary(aov(S ~ stand, data = merged)) #significant; species richness differs between the stands
 summary(aov(H ~ stand, data = merged)) #significant; H' differs between the stands
@@ -174,7 +178,7 @@ renyi <- renyi(species_num, scales = c(0,1,2), hill=FALSE)
 plot(renyi)
 hill <- renyi(species_num, scales = c(0,1,2), hill=TRUE)
 plot(hill) #deprecated plotting code
-  
+
   #Hill numbers in ggplot
   hill_df <- as.data.frame(hill)
   hill_df$plot <- rownames(hill_df)
@@ -192,11 +196,12 @@ plot(hill) #deprecated plotting code
       geom_line(alpha = 0.7) +
       geom_point(size = 2) +
       scale_x_continuous(breaks = c(0, 1, 2),
-                         labels = c("q=0\n(Richness)", "q=1\n(Shannon)", "q=2\n(Simpson)")) +
+                         labels = c("Richness", "Shannon", "Simpson")) +
       labs(x = "Order q", y = "Effective number of species", colour = "Stand") +
       facet_wrap(~stand, ncol = 5) +
-      theme_classic())
-  ggsave("figures2/hill_numbers.png", p_hill_facet, width = 10, height = 7)
+      theme_classic() +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1)))
+  ggsave("figures2/hill_numbers.png", p_hill_facet, width = 12, height = 7)
 
 #Dissimilarities ----
 D_Jaccard <- vegdist(species_num, method="jaccard", binary=TRUE)
@@ -214,7 +219,7 @@ S_Hellinger <- 1 - D_hellinger
 merged <- cbind(diversity, environment[diversity$plot, ])
 
 #S:
-cor.test(merged$S, merged$pH_H2O, method = "spearman") #n.s.
+cor.test(merged$S, merged$pH_H2O, method = "spearman") #n.s. 
 cor.test(merged$S, merged$pH_KCl, method = "spearman") #negative; significant
 cor.test(merged$S, merged$moisture, method = "spearman") #n.s.
 cor.test(merged$S, merged$OM, method = "spearman") #n.s.
@@ -286,7 +291,7 @@ env_num <- merged[, env_cols]
 env_num[] <- lapply(env_num, as.numeric)#only looking at the environmental columns
 
 nmds_envfit <- envfit(nmds, env_num, permutations = 999, na.rm = TRUE)
-#moisture, NH4, winter water, and Ah significant; pHKCl and litter borderline
+#moisture, NH4, winter water, pHKCl, and Ah significant; litter borderline
 print(nmds_envfit)
 
 envfit_df <- as.data.frame(scores(nmds_envfit, display = "vectors"))
@@ -302,7 +307,7 @@ perm <- adonis2(species_num ~ stand, method = "bray", permutations = 999)
 adonis2(species_num ~ pH_H2O + moisture + OM + NO3 + NH4 + 
           winter_water + summer_water + Ah + litter,
         data = env_num, method = "bray", permutations = 999, na.action = na.omit)
-#52.7% explained by environmental variables; significant
+#52.57% explained by environmental variables; significant
 
 
 #Clustering ----
@@ -345,8 +350,7 @@ sil <- silhouette(clusters, bray)
 print(summary(sil))
 #Average silhouette width: > 0.5 = reasonable, > 0.7 = strong: here; mean = 0.23765 (bad)
 png("figures2/fig_silhouette.png", width = 800, height = 600, res = 130)
-plot(sil, col = CLUST_COLS[1:4],
-     border = NA)
+plot(sil, border = NA)
 dev.off()
 
 
@@ -355,7 +359,7 @@ dev.off()
   which.max(c(cor_single, cor_complete, cor_UPGMA, cor_ward))]) #UPGMA is best
 
 plot(UPGMA, hang = -1)
-rect.hclust(UPGMA, 4) 
+rect.hclust(UPGMA, 2) 
 
 
 #TWINSPAN ----
@@ -364,9 +368,9 @@ summary(tw)
 twintable(tw)
 plot(tw)
 
-plot(as.dendrogram(tw, "quadrat"), type = "triangle")
-plot(as.dendrogram(tw, "quadrat"), type = "rectangle")
-plot(as.dendrogram(tw, "species"), type = "triangle")
+plot(as.dendrogram(tw, "quadrat", height = "level"), type = "triangle")
+plot(as.dendrogram(tw, "quadrat", height = "level"), type = "rectangle")
+plot(as.dendrogram(tw, "species", height = "level"), type = "rectangle")
 
 #Ellenberg: ----
 ellenberg <- as.data.frame(read_excel(
@@ -374,7 +378,7 @@ ellenberg <- as.data.frame(read_excel(
   sheet = "Tab-OriginalNamesValues"))
 ellenberg <- ellenberg[ , c("Taxon", "L", "T", "M", "R", "N", "S")] #select only species name and ellenberg variables
 ellenberg <- ellenberg %>% rename(species = Taxon) #"Taxon" called "species" now
-sum(colnames(species_num) %in% ellenberg$species) #63 matches between the two datasets
+sum(colnames(species_num) %in% ellenberg$species) #72 matches between the two datasets
 
 colnames(species_num)[!colnames(species_num) %in% ellenberg$species] #the ones that don't match between the two datasets
 
@@ -393,7 +397,7 @@ colnames(species_num) <- recode(colnames(species_num),
 #Euonymus europaeus doesnt want to be matched (some trailing space somewhere and i cant figure it out): so by hand:
 position <- grep("Euonymus", colnames(species_num)) #position of E. europaeus in the dataset
 colnames(species_num)[position] <- "Euonymus europaeus"
-colnames(species_num)[!colnames(species_num) %in% ellenberg$species] #only 3 remaining unmatched
+colnames(species_num)[!colnames(species_num) %in% ellenberg$species] #only 5 remaining unmatched
 
 #now matching the ellenberg values to the species
 L_vals <- ellenberg$L[match(colnames(species_num), ellenberg$species)]
@@ -438,7 +442,7 @@ ellenberg_vals <- data.frame(L = L_vals, T = T_vals,
   #Correlations between ellenberg values and our measured values:
   cor.test(ellenberg_per_plot$R, merged$pH_H2O, method = "spearman") #n.s.
   cor.test(ellenberg_per_plot$R, merged$pH_KCl, method = "spearman") #n.s.
-    #pH values not correlaed with R (reaction)
+    #pH values not correlated with R (reaction)
   cor.test(ellenberg_per_plot$M, merged$moisture, method = "spearman") #positive, significant
     #Makes sense: moisture ~ moisture (ellenberg values meaningful)
   cor.test(ellenberg_per_plot$N, merged$NO3, method = "spearman") #positive; borderline (p = 0.08) -> small sample size?
@@ -577,7 +581,7 @@ diversity_long <- diversity %>%
                  width = 0.3, linewidth = 0.7) +
     facet_wrap(~metric, scales = "free_y", ncol = 3) +
     labs(x = "Stand", y = NULL) +
-    base_theme +
+    theme_classic() +
     theme(strip.text = element_text(face = "bold"),
           legend.position = "none")) 
 
@@ -663,7 +667,7 @@ ggsave("figures/nmds_species + envfit + clusters.png", p_sp_envfit, width = 13, 
 
 
 #Ellenberg plots ----
-ellenberg_merged <- merge(species_scores, ellenberg, by = "species")
+ellenberg_merged <- merge(spe_scores, ellenberg, by = "species")
 
 #Polygons for the plots (with two clusters)
 hull1 <- site_scores[site_scores$cluster == 1, ] %>%
@@ -690,7 +694,7 @@ hulls <- rbind(hull1, hull2)
      name = "Ellenberg N", na.value = "grey80") +
    scale_size_continuous(range = c(1,5), guide = "none") +
    labs(x = "NMDS1", y = "NMDS2") +
-   base_theme)
+   theme_classic())
 ggsave("figures2/fig_ellenberg_N_plots_species.png", p_ell_N_species_plots,
          width = 11, height = 9, dpi = 180, bg = "white")
 
@@ -712,7 +716,7 @@ ggsave("figures2/fig_ellenberg_N_plots_species.png", p_ell_N_species_plots,
       name = "Ellenberg T", na.value = "grey80") +
     scale_size_continuous(range = c(1,5), guide = "none") +
     labs(x = "NMDS1", y = "NMDS2") +
-    base_theme)
+   theme_classic())
 ggsave("figures2/fig_ellenberg_T_plots_species.png", p_ell_T_species_plots,
        width = 11, height = 9, dpi = 180, bg = "white")
 
@@ -734,7 +738,7 @@ ggsave("figures2/fig_ellenberg_T_plots_species.png", p_ell_T_species_plots,
       name = "Ellenberg M", na.value = "grey80") +
     scale_size_continuous(range = c(1,5), guide = "none") +
     labs(x = "NMDS1", y = "NMDS2") +
-    base_theme)
+    theme_classic())
 ggsave("figures2/fig_ellenberg_M_plots_species.png", p_ell_M_species_plots,
        width = 11, height = 9, dpi = 180, bg = "white")
 
@@ -756,7 +760,7 @@ ggsave("figures2/fig_ellenberg_M_plots_species.png", p_ell_M_species_plots,
       name = "Ellenberg R", na.value = "grey80") +
     scale_size_continuous(range = c(1,5), guide = "none") +
     labs(x = "NMDS1", y = "NMDS2") +
-    base_theme)
+    theme_classic())
 ggsave("figures2/fig_ellenberg_R_plots_species.png", p_ell_R_species_plots,
        width = 11, height = 9, dpi = 180, bg = "white")
 
@@ -778,7 +782,7 @@ ggsave("figures2/fig_ellenberg_R_plots_species.png", p_ell_R_species_plots,
       name = "Ellenberg S", na.value = "grey80") +
     scale_size_continuous(range = c(1,5), guide = "none") +
     labs(x = "NMDS1", y = "NMDS2") +
-    base_theme)
+    theme_classic())
 ggsave("figures2/fig_ellenberg_S_plots_species.png", p_ell_S_species_plots,
        width = 11, height = 9, dpi = 180, bg = "white")
 
@@ -800,11 +804,10 @@ ggsave("figures2/fig_ellenberg_S_plots_species.png", p_ell_S_species_plots,
       name = "Ellenberg L", na.value = "grey80") +
     scale_size_continuous(range = c(1,5), guide = "none") +
     labs(x = "NMDS1", y = "NMDS2") +
-    base_theme)
+    theme_classic())
 ggsave("figures2/fig_ellenberg_L_plots_species.png", p_ell_L_species_plots,
        width = 11, height = 9, dpi = 180, bg = "white")
 
 #Grid of all ellenberg values:
-(ellenberg_grid <- ((p_ell_N_species_plots + p_ell_T_species_plots + p_ell_M_species_plots) / (p_ell_R_species_plots + p_ell_S_species_plots + p_ell_L_species_plots) +
-  plot_annotation(title = "Species ordination coloured by Ellenberg indicator values")))
+(ellenberg_grid <- ((p_ell_N_species_plots + p_ell_T_species_plots + p_ell_M_species_plots) / (p_ell_R_species_plots + p_ell_S_species_plots + p_ell_L_species_plots)))
 ggsave("figures2/ellenberg_grid.png", ellenberg_grid, width = 15, height = 7, dpi = 180, bg = "white")
