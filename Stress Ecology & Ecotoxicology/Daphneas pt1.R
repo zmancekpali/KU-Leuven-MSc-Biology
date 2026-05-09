@@ -69,19 +69,14 @@ CI_high <- 0.408
 conc_breaks <- c(0.1, 0.2, 0.4, 0.8, 1.6)
 
 (daph_plot <- ggplot() +
-    # observed points
     geom_point(data = daph,
                aes(x = conc, y = immobility, colour = "Observed data"),
                size = 2) +
-    # fitted line
     geom_line(data = daph_1,
               aes(x = conc, y = fit, colour = "Dose-response model fit"),
               linewidth = 1) +
-    # vertical line at EC50
     geom_vline(xintercept = EC50, linetype = "dashed", colour = "red") +
-    # EC50 point
     geom_point(aes(x = EC50, y = 50), colour = "red", size = 3) +
-    # EC50 label with CI
     annotate("text", x = EC50, y = 45,
              label = paste0("EC50 = ", EC50, 
                             " mg/L\n(95% CI: ", 

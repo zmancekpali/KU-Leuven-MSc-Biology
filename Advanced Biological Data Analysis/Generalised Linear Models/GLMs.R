@@ -377,9 +377,9 @@ Anova(model11, type = "III")
   #smokers have lower expected counts than non-smokers
   plot(allEffects(model11), multiline = T, confint = list(style = "auto"), type = "response")
 
-  #  We conclude that there are overall effects of smoking and weight on the damaged bloodcell count.
-  #  Also,  being a smoker impacts this count more strongly in females than in males.
-  #  Finally, the effect of weight is much stronger in smokers than in non-smokers.
+  #We conclude that there are overall effects of smoking and weight on the damaged bloodcell count.
+  #Being a smoker impacts this count more strongly in females than in males.
+  #The effect of weight is much stronger in smokers than in non-smokers.
   
 
 ###
@@ -394,7 +394,5 @@ best@formulas
 best #gives the models with AIC in ascending order
 summary(best) #$bestmodel
 #[1] "cells ~ 1 + smoker + sex + weight + sex:smoker + smoker:weight"
-
-#so after this, you can check assumptions and then move on -> shortens step c from exercise 3 a lot
 
 

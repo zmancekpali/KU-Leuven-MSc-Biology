@@ -27,7 +27,7 @@ library(reshape2)
 #Lecture ----
 df <- read.csv("red_fox.csv")
 
-# Histograms for each Prey Selection category, split by Vegetation Cover
+#Histograms for each Prey Selection category, split by Vegetation Cover
 ggplot(df, aes(x = Prox_Human_Activity)) +
   geom_histogram(binwidth = 1, fill = "skyblue", color = "black") +
   facet_grid(Diet ~ Veg_Cover) +
@@ -36,31 +36,20 @@ ggplot(df, aes(x = Prox_Human_Activity)) +
        y = "Count") +
   theme_minimal()
 
-# Fit the multinomial logistic regression model
-# We need to ensure the outcome variable is a factor
+#Fit the multinomial logistic regression model
 df$Diet <- as.factor(df$Diet)
 
-# Fit the model
 fit <- multinom(Diet ~ Prox_Human_Activity + Veg_Cover, data = df)
-
-# Summary of the model
 summary(fit)
 Anova(fit, type="III")
 
 plot(allEffects(fit), multiline=TRUE, confint=list(style="auto"))
-
-
 graph2ppt(file="effectplot_additive")
 
-# Fit the model
 fit2 <- multinom(Diet ~ Prox_Human_Activity * Veg_Cover, data = df)
-
-# Summary of the model
 summary(fit2)
 Anova(fit2, type="III")
-
 plot(allEffects(fit2), multiline=TRUE, confint=list(style="auto"))
-
 AICc(fit, fit2)
 
 #extract model effects for predictor 'Prox_Human_Activity'
@@ -97,7 +86,7 @@ head(df)
 
 df$Dev_Stage <- factor(df$Dev_Stage, levels = c("Egg", "Larva", "Pupa", "Adult"), ordered = TRUE)
 
-# Fit the ordinal logistic regression model
+#Fit the ordinal logistic regression model
 fit3 <- polr(Dev_Stage ~ Temp + Host_Species + Week, data = df, Hess = TRUE)
 Anova(fit3, type="III")
 
@@ -105,7 +94,6 @@ Temp_effect <- as.data.frame(Effect("Temp", fit3, xlevels=list(Temp=seq(min(df$T
 #use 'melt' to turn the table from wide to long format
 Temp_effect <- melt(Temp_effect, id.vars = "Temp", variable.name = "Dev_Stage", value.name = "Probability")
 
-#make a stacked effects plot
 ggplot(Temp_effect, aes(x = Temp, y = Probability, fill = Dev_Stage)) +
   geom_area() +
   labs(x = "Average Temperature",
@@ -113,10 +101,8 @@ ggplot(Temp_effect, aes(x = Temp, y = Probability, fill = Dev_Stage)) +
   theme_minimal()
 
 Host_effect <- as.data.frame(Effect("Host_Species", fit3))[,1:5]
-#use 'melt' to turn the table from wide to long format
 Host_effect <- melt(Host_effect, id.vars = "Host_Species", variable.name = "Dev_Stage", value.name = "Probability")
 
-#make a stacked effects plot
 ggplot(Host_effect, aes(x = Host_Species, y = Probability, fill = Dev_Stage)) +
   geom_bar(stat = "identity", position = 'stack') +
   labs(x = "Host_Species",
@@ -124,19 +110,15 @@ ggplot(Host_effect, aes(x = Host_Species, y = Probability, fill = Dev_Stage)) +
   theme_minimal()
 
 Time_effect <- as.data.frame(Effect("Week", fit3, xlevels=list(Week=seq(min(df$Week), max(df$Week), length.out=100))))[,1:5]
-#use 'melt' to turn the table from wide to long format
 Time_effect <- melt(Time_effect, id.vars = "Week", variable.name = "Dev_Stage", value.name = "Probability")
 
-#make a stacked effects plot
 ggplot(Time_effect, aes(x = Week, y = Probability, fill = Dev_Stage)) +
   geom_area() +
   labs(x = "Time",
        y = "Probability") +
   theme_minimal()
 
-#
 set_sum_contrasts()
-
 d = read.csv("fitness.csv")
 head(d)
 str(d)
