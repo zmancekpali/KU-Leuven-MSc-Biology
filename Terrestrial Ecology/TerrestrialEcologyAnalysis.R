@@ -14,6 +14,7 @@ library(readxl)
 library(ggplot2)
 library(ggvegan)
 library(ggrepel)
+library(reshape2)
 library(dplyr)
 library(tibble)
 library(tidyr)
@@ -33,9 +34,7 @@ data <- as.data.frame(read_excel("data.xlsx", sheet = "Combined")) %>% #import
   rename_with(~ ifelse(suppressWarnings(!is.na(as.numeric(.x))), 
                        as.character(round(as.numeric(.x), 1)),
                        .x)) %>% #removes floating decimals for better formatting
-  rename_with(~ gsub("[^[:alnum:]._]", "_", .x)) %>% #replaces non-letter/number/./_ characters with _
-  rename_with(~ gsub("^3\\.", "11.", .x)) %>% #stand '3' = stand 11
-  rename_with(~ gsub("^4\\.", "12.", .x)) #stand '4' = stand 12
+  rename_with(~ gsub("[^[:alnum:]._]", "_", .x)) #replaces non-letter/number/./_ characters with _
 head(data)
 str(data)
 
@@ -85,14 +84,14 @@ ellenberg <- read_excel("Ellenberg Indicator values-2022-11-07.xlsx", sheet = "T
   rename(SeqID = `...1`,
          species = `...2`,
          L = LIGHT,
-         T = TEMPERATURE,
+         ellenberg_T = TEMPERATURE,
          M = MOISTURE,
          R = REACTION,
          N = NUTRIENTS,
          ellenberg_S = SALINITY) %>%
   slice(-1) %>% 
-  mutate(across(c(L, T, M, R, N, ellenberg_S), ~ suppressWarnings(as.numeric(.)))) %>%
-  select(species, L, T, M, R, N, ellenberg_S) #changed to ellenberg_S because I use S for species richness later
+  mutate(across(c(L, ellenberg_T, M, R, N, ellenberg_S), ~ suppressWarnings(as.numeric(.)))) %>%
+  select(species, L, ellenberg_T, M, R, N, ellenberg_S) #changed to ellenberg_S/T because I use S for species richness later and T is TRUE in R
 head(ellenberg)
 
 #Diversity indices + species richness: ----
@@ -107,9 +106,14 @@ E <- D2/S
 diversity <- data.frame(plot = rownames(species_num), S = S, H = H, Simpson = Simpson,
   J = J, E = E)
 
+boxplot(S~stand, data = merged)
+
 #ANOVA for each diversity metric
 merged <- cbind(diversity, environment[diversity$plot, ])
 merged$stand <- sub("\\..*", "", rownames(merged))
+s_lm <- lm(S ~ stand, data = merged)
+plot(s_lm)
+shapiro.test(resid(s_lm))
 summary(aov(S ~ stand, data = merged)) #significant; species richness differs between the stands
 summary(aov(H ~ stand, data = merged)) #significant; H' differs between the stands
 summary(aov(Simpson ~ stand, data = merged)) #significant; Simpson's D differs between the stands
@@ -191,13 +195,25 @@ plot(hill) #deprecated plotting code
       geom_line(alpha = 0.7) +
       geom_point(size = 2) +
       scale_x_continuous(breaks = c(0, 1, 2),
-                         labels = c("Richness", "Shannon", "Simpson")) +
-      labs(x = "Order q", y = "Effective number of species", colour = "Stand") +
+                         labels = c("0", "1", "2")) +
+      labs(x = "Order q", y = "Effective number of species (exp H')", colour = "Stand") +
       facet_wrap(~stand, ncol = 5) +
-      theme_classic() +
-      theme(axis.text.x = element_text(angle = 45, hjust = 1)))
+      theme_classic())
   ggsave("figures2/hill_numbers.png", p_hill_facet, width = 12, height = 7)
 
+  (Ne <- exp(diversity$H)) #effective species number
+  hill_df$Ne <- exp(diversity$H)
+  hill_df$stand <- factor(hill_df$stand, levels = c("1", "2", "3", "4", "5", "6", "7", "8", "9", "10"))
+
+  (p_hill_pp <- ggplot(hill_df, aes(x = stand, y = Ne, fill = stand)) +
+    geom_boxplot(alpha = 0.6, outlier.shape = NA) +
+    geom_jitter(width = 0.1, size = 2) +
+    labs(y = "Effective number of species (exp H')",
+         x = "Stand") +
+    theme_classic() +
+    theme(legend.position = "none"))
+  ggsave("figures2/hill_numbers_per_plot.png", p_hill_pp, width = 12, height = 7)
+  
 #Dissimilarities ----
 D_Jaccard <- vegdist(species_num, method="jaccard", binary=TRUE)
 D_Sorensen <- vegdist(species_num, method="bray", binary=TRUE)
@@ -252,31 +268,72 @@ cor.test(merged$Simpson, merged$litter, method = "spearman") #n.s.
 env_cols <- c("pH_H2O", "pH_KCl", "moisture", "OM",
               "NO3", "NH4", "winter_water", "summer_water", "Ah", "litter")
 merged[env_cols] <- lapply(merged[env_cols], as.numeric)
-cor(merged[, c("S", "H", "Simpson")],
+cors <- cor(merged[, c("S", "H", "Simpson")],
     merged[, env_cols],
     method = "spearman",
     use = "pairwise.complete.obs") #gives all Spearman correlations for each env variable and each diversity measure
 
 
+
+cor_df <- data.frame(
+  Index = c("S", "H", "Simpson"),
+  rbind(cors[1,], cors[2,], cors[3,])) %>%   #your three correlation vectors
+  pivot_longer(-Index, names_to = "Variable", values_to = "r")
+
+(corr_plot <- ggplot(cor_df, aes(x = Variable, y = Index, fill = r)) +
+  geom_tile(color = "white") +
+  geom_text(aes(label = round(r, 2)), size = 3.5) +
+  scale_fill_gradient2(low = "#D64045", mid = "white", high = "steelblue",
+                       midpoint = 0, limits = c(-1, 1),
+                       name = "Spearman r") +
+  theme_classic() +
+  scale_y_discrete(labels = c("H" = "H'", "S" = "SR", "Simpson" = "Simpson's D")) +
+  scale_x_discrete(labels = c(
+      "Ah" = "Ah",
+      "litter" = "Litter",
+      "moisture" = "Moisture",
+      "NH4" = expression(NH[4]),
+      "NO3" = expression(NO[3]),
+      "OM" = "OM",
+      "pH_H2O" = expression(pH~(H[2]*O)),
+      "pH_KCl"= "pH (KCl)",
+      "summer_water" = "SWT",
+      "winter_water" = "WWT")) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        plot.title = element_text(hjust = 0.5, face = "bold")) +
+  labs(x = NULL, y = NULL))
+ggsave("figures2/env_div_corr.png", p_hill_pp, width = 12, height = 7)
+
 #NMDS ----
-nmds <- metaMDS(species_num, distance="bray", k=3)
-plot(nmds, type='t')
-nmds$stress #0.138 (with k = 3)
-  #Stress much lower (0.138 vs > 0.21) when k = 3 instead of k = 2
+names(colSums(species_num)[colSums(species_num) == 0])
+sum(species_num$`Gymnocarpium spp.`)
+species_num <- species_num[, colnames(species_num) != "Gymnocarpium spp."]
+names(colSums(species_num)[colSums(species_num) == 0])
+
+#Bray NMDS
+set.seed(123)
+nmdsBray <- metaMDS(species_num, distance="bray", k=3)
+plot(nmdsBray, type='t')
+nmdsBray$stress #0.138 (with k = 3) and 0.210 with k = 2
+
+#Chord NMDS
+nmdsChord <- metaMDS(decostand(species_num,"norm"),distance="euclidean")
+nmds <- nmdsChord
+nmdsChord$stress #0.137 (basically identical)
 stressplot(nmds, main="Shepard plot") #good
 
-site_scores <- as.data.frame(scores(nmds, display = "sites"))
-species_scores <- as.data.frame(scores(nmds, display = "species"))
+site_scores <- as.data.frame(scores(nmdsChord, display = "sites"))
+species_scores <- as.data.frame(scores(nmdsChord, display = "species"))
 species_scores$species <- rownames(species_scores)
-nmds$species <- wascores(nmds$points, species_num)
+nmdsChord$species <- wascores(nmdsChord$points, species_num)
 
 site_scores$plot <- rownames(site_scores)
 site_scores$stand <- sub("\\..*", "", site_scores$plot)
 species_scores$species <- rownames(species_scores)
 
-plot(nmds, display = "sites", type = "t")
-plot(nmds, display = "species", type = "t")
-plot(nmds, type = "t") #biplot
+plot(nmdsChord, display = "sites", type = "t")
+plot(nmdsChord, display = "species", type = "t")
+plot(nmdsChord, type = "t") #biplot
 
 #envfit
 env_cols <- c("winter_water", "summer_water", "Ah", "litter",
@@ -284,25 +341,22 @@ env_cols <- c("winter_water", "summer_water", "Ah", "litter",
 env_num <- merged[, env_cols]
 env_num[] <- lapply(env_num, as.numeric)#only looking at the environmental columns
 
-nmds_envfit <- envfit(nmds, env_num, permutations = 999, na.rm = TRUE)
-#moisture, NH4, winter water, pHKCl, and Ah significant; litter borderline
+nmds_envfit <- envfit(nmdsChord, env_num, permutations = 999, na.rm = TRUE)
+#wnter water, Ah, litter, moisture, and NH4 significant, summer water borderline
 print(nmds_envfit)
 
 envfit_df <- as.data.frame(scores(nmds_envfit, display = "vectors"))
 
-plot(nmds, type='t')
+plot(nmdsChord, type='t')
 plot(nmds_envfit, p.max = 0.05)
 
 #permanova
 stand <- sub("\\..*", "", rownames(species_num)) #plot number (no subplot)
-perm <- adonis2(species_num ~ stand, method = "bray", permutations = 999)
-#significant; 61.89% of variance in community composition explained by plot
+perm_bray <- adonis2(species_num ~ stand, method = "bray", permutations = 999)
+#significant; 61.85% of variance in community composition explained by plot
 
-adonis2(species_num ~ pH_H2O + moisture + OM + NO3 + NH4 + 
-          winter_water + summer_water + Ah + litter,
-        data = env_num, method = "bray", permutations = 999, na.action = na.omit)
-#52.57% explained by environmental variables; significant
-
+perm_chord <- adonis2(species_num ~ stand, method = "chord", permutations = 999)
+#significant; 57.12% of variance in community composition explained by plot
 
 #Clustering ----
 bray <- vegdist(species_num, method="bray")
@@ -347,40 +401,95 @@ png("figures2/fig_silhouette.png", width = 800, height = 600, res = 130)
 plot(sil, border = NA)
 dev.off()
 
+par(mfrow=c(1,1))
 
 #OR a faster way to find the best cluster ----
 (best_method <- c("Single","Complete","UPGMA","Ward")[
   which.max(c(cor_single, cor_complete, cor_UPGMA, cor_ward))]) #UPGMA is best
 
 plot(UPGMA, hang = -1)
-rect.hclust(UPGMA, 2) 
+rect.hclust(UPGMA, 2) #2 clusters makes most sense
 
+#Chord clustering: ----
+grpdist <- function(X)
+{require(cluster)
+  gr <- as.data.frame(as.factor(X))
+  distgr <- daisy(gr, "gower")
+  distgr}
+kt <- data.frame(k=1:nrow(species_num), r=0)
+for (i in 2:(nrow(species_num)-1)){
+  gr <- cutree(UPGMA, i)
+  distgr <- grpdist(gr)
+  mt <- cor(bray, distgr, method="pearson")
+  kt[i,2] <- mt}
+k.best <- which.max(kt$r)
+plot(kt$k, kt$r, type="h", main="Mantel-optimal number of clusters, UPGMA",
+     xlab="k (number of groups)", ylab="Pearson's correlation")
+axis(1, k.best, paste("optimum",k.best,sep="\n"), col="red", font=2, col.axis="red")
+points(k.best, max(kt$r), pch=16, col="red", cex=1.5)
+#8 clusters best (way too many)
 
-#TWINSPAN ----
-tw <- twinspan(species_num)
-summary(tw)
-twintable(tw)
-plot(tw)
+plot(UPGMA$height, nrow(species_num):2, type="S", main="Fusion levels - Chord - UPGMA",
+     ylab="k (number of clusters)", xlab="h (node height)", col="grey")
+text(UPGMA$height, nrow(species_num):2, nrow(species_num):2, col="red", cex = 0.8);
+#See jumps from 8 - 9, 7 - 8, and 
+#Gotta pick lower than 11 cause too much either 8 or 5
+# when I rerun kt, 11 clusters has a lower r than 10, and highest is technically 8 but thats too many still
 
-plot(as.dendrogram(tw, "quadrat", height = "level"), type = "triangle")
-plot(as.dendrogram(tw, "quadrat", height = "level"), type = "rectangle")
-plot(as.dendrogram(tw, "species", height = "level"), type = "rectangle")
+#it keeps climbing to 11 but that's way too much, settle down for 5 or so because the climb isn't that big either way:
+#k         r
+#1   1 0.0000000
+#2   2 0.6015669
+#3   3 0.6131204
+#4   4 0.6364870
+#5   5 0.6400609
+#6   6 0.7216084
+#7   7 0.7471950
+#8   8 0.7488695 (highest)
+#9   9 0.7432208
+#10 10 0.7243540
+#11 11 0.6859614
+
 
 #Ellenberg: ----
-sum(colnames(species_num) %in% ellenberg$species) #71 matches between the two datasets
+colnames(species_num) <- trimws(colnames(species_num))
+colnames(species_num) <- gsub("\u00a0", "", colnames(species_num)) #E. europaeus has some weird spacing issue
+sum(colnames(species_num) %in% ellenberg$species) #63 matches between the two datasets
 
 colnames(species_num)[!colnames(species_num) %in% ellenberg$species] #the ones that don't match between the two datasets (6)
+ellenberg$species[grepl("^Poa", ellenberg$species)] #could be any of them
+ellenberg$species[grepl("^Ulmus", ellenberg$species)] #renaming it to U. minor
+ellenberg$species[grepl("^Rubus", ellenberg$species)] #could be any of them
+ellenberg$species[grepl("^Dryopteris", ellenberg$species)] #could be any of them
+ellenberg$species[grepl("^Quercus", ellenberg$species)] #there is no Quercus rubra in Ellenberg
+ellenberg$species[grepl("^Populus", ellenberg$species)] #no Populus canescens in Ellenberg
+ellenberg$species[grepl("^Ribes", ellenberg$species)] #aggregate found
+ellenberg$species[grepl("^Veronica", ellenberg$species)] #same as above
+ellenberg$species[grepl("^Waldsteinia", ellenberg$species)] #no W. fragarioides in Ellenberg
+ellenberg$species[grepl("^Brachythecium", ellenberg$species)] #none at all in Ellenberg
+ellenberg$species[grepl("^Hedera", ellenberg$species)] #aggregate found
+ellenberg$species[grepl("^Galeopsis", ellenberg$species)] #aggregate found
+colnames(species_num) <- dplyr::recode(colnames(species_num),
+                                       "Carex acutiformes" = "Carex acutiformis",    
+                                       "Euonymus europaeus " = "Euonymus europaeus", 
+                                       "Hedera helix" = "Hedera helix aggr.",
+                                       "Galeopsis tetrahit" = "Galeopsis tetrahit aggr.", 
+                                       "Ribes rubrum" = "Ribes rubrum aggr.",
+                                       "Veronica hederifolia" = "Veronica hederifolia aggr.")     
+colnames(species_num)[colnames(species_num) == "Euonymus europaeus "] <- "Euonymus europaeus"
+colnames(species_num)[!colnames(species_num) %in% ellenberg$species] #the ones that don't match between the two datasets (9)
+#didnt rename Ulmust spec. and Dryopteris sp. because it creates a duplication error with other data with correct species names
 
 #now matching the ellenberg values to the species
 L_vals <- ellenberg$L[match(colnames(species_num), ellenberg$species)]
 R_vals <- ellenberg$R[match(colnames(species_num), ellenberg$species)]
 M_vals <- ellenberg$M[match(colnames(species_num), ellenberg$species)] 
-T_vals <- ellenberg$T[match(colnames(species_num), ellenberg$species)]
+T_vals <- ellenberg$ellenberg_T[match(colnames(species_num), ellenberg$species)]
 N_vals <- ellenberg$N[match(colnames(species_num), ellenberg$species)]
 S_vals <- ellenberg$ellenberg_S[match(colnames(species_num), ellenberg$species)]
 
 #Converting for matrices:
-ellenberg_vals <- data.frame(L = L_vals, T = T_vals,
+ellenberg_vals <- data.frame(L = L_vals, ellenberg_T = T_vals,
   M = M_vals, R = R_vals, N = N_vals, ellenberg_S = S_vals, row.names = colnames(species_num)) #matrix of the ellenberg variables
 
   #removing NAs:
@@ -395,31 +504,29 @@ ellenberg_vals <- data.frame(L = L_vals, T = T_vals,
   ellenberg_per_plot <- as.data.frame(species_cover_matrix %*% ellenberg_matrix / rowSums(species_cover_matrix))
   print(ellenberg_per_plot) #now we have each ellenberg value for each plot of the forest
 
-  #Correlations between NMDS1 sites and ellenberg variables:
-  nmds_scores <- as.data.frame(scores(nmds, display = "sites"))
+  #Correlations between NMDS1 sites and ellenberg variables: (with chord NMDS different)
+  nmds_scores <- as.data.frame(scores(nmdsBray, display = "sites"))
   cor.test(nmds_scores$NMDS1, ellenberg_per_plot$L, method = "spearman") #n.s.
-  cor.test(nmds_scores$NMDS1, ellenberg_per_plot$T, method = "spearman") #n.s.
-  cor.test(nmds_scores$NMDS1, ellenberg_per_plot$M, method = "spearman") #positive; significant
-  cor.test(nmds_scores$NMDS1, ellenberg_per_plot$R, method = "spearman") #positive; significant
+  cor.test(nmds_scores$NMDS1, ellenberg_per_plot$ellenberg_T, method = "spearman") #n.s
+  cor.test(nmds_scores$NMDS1, ellenberg_per_plot$M, method = "spearman") #n.s.
+  cor.test(nmds_scores$NMDS1, ellenberg_per_plot$R, method = "spearman") #negative, significant
   cor.test(nmds_scores$NMDS1, ellenberg_per_plot$N, method = "spearman") #n.s.
-  cor.test(nmds_scores$NMDS1, ellenberg_per_plot$ellenberg_S, method = "spearman") #n.s.
-  #the NMDS1 axis is driven by soil moisture and pH
+  cor.test(nmds_scores$NMDS1, ellenberg_per_plot$ellenberg_S, method = "spearman") #n.s
+  #NMDS1(Bray) captures reaction out of the ellenberg values variation
   
   #Correlations between NMDS2 sites and ellenberg values:
   cor.test(nmds_scores$NMDS2, ellenberg_per_plot$L, method = "spearman") #positive; significant
-  cor.test(nmds_scores$NMDS2, ellenberg_per_plot$T, method = "spearman") #positive, significant
-  cor.test(nmds_scores$NMDS2, ellenberg_per_plot$M, method = "spearman") #n.s.
-  cor.test(nmds_scores$NMDS2, ellenberg_per_plot$R, method = "spearman") #positive; significant
-  cor.test(nmds_scores$NMDS2, ellenberg_per_plot$N, method = "spearman") #positive; significant
+  cor.test(nmds_scores$NMDS2, ellenberg_per_plot$ellenberg_T, method = "spearman") #positive, significant
+  cor.test(nmds_scores$NMDS2, ellenberg_per_plot$M, method = "spearman") #negative, borderline (p = 0.077)
+  cor.test(nmds_scores$NMDS2, ellenberg_per_plot$R, method = "spearman") #n.s.
+  cor.test(nmds_scores$NMDS2, ellenberg_per_plot$N, method = "spearman") #positive, significant
   cor.test(nmds_scores$NMDS2, ellenberg_per_plot$ellenberg_S, method = "spearman") #positive; significant
-  #NMDS2 axis also captures light availability, temperature, salinity, and soil nutrients
-  
+
   #Correlations between ellenberg values and our measured values:
   cor.test(ellenberg_per_plot$R, merged$pH_H2O, method = "spearman") #n.s.
   cor.test(ellenberg_per_plot$R, merged$pH_KCl, method = "spearman") #positive, significant
     #pH values correlated with R (reaction)
-  cor.test(ellenberg_per_plot$ellenberg_S, merged$pH_KCl, method = "spearman") #negative, significant
-    #pH values correlated with salinity
+  cor.test(ellenberg_per_plot$ellenberg_S, merged$pH_KCl, method = "spearman") #n.s.
   cor.test(ellenberg_per_plot$M, merged$moisture, method = "spearman") #n.s.
   cor.test(ellenberg_per_plot$N, merged$NO3, method = "spearman") #positive; significant 
   cor.test(ellenberg_per_plot$N, merged$NH4, method = "spearman") #positive, significant
@@ -429,14 +536,14 @@ ellenberg_vals <- data.frame(L = L_vals, T = T_vals,
   #cluster analysis
   UPGMA <- hclust(bray, "average") #same as above
   plot(UPGMA, hang = -1, main = "UPGMA cluster dendrogram")
-  rect.hclust(UPGMA, k = 2, border = "green") 
-  rect.hclust(UPGMA, k = 3, border = "blue") #this one looks most appropriate based on the groups
-  rect.hclust(UPGMA, k = 4, border = "red")
+  rect.hclust(UPGMA, k = 2, border = "green") #two clusters make most sense
+  rect.hclust(UPGMA, k = 3, border = "blue") #here one plot (11.2) is stand-alone as a cluster
+  rect.hclust(UPGMA, k = 4, border = "red") #here 11.2 and 9.1 are stand-alone custers
   
   groups <- cutree(UPGMA, k = 3)
   plot(nmds, display = "sites", type = "n")
   text(nmds, display = "sites", labels = rownames(species_num), col = groups)
-  ordihull(nmds, groups, col = c("black", "red", "green"), lwd = 2) #still only makes two big groups on the NMDS plot
+  ordihull(nmds, groups, col = c("black", "red", "green"), lwd = 2) #two clusters; even when k = 3, with 11.2 alone
   #distinct groups visible: black and red are the biggest; with green and blue stand alone
   
   #Nicer plot for three original clusters
@@ -451,7 +558,7 @@ ellenberg_vals <- data.frame(L = L_vals, T = T_vals,
                    alpha = 0.1, colour = NA) +
       geom_point(size = 3) +
       geom_text_repel(size = 2.5) +
-      theme_classic()) #two distinct clusters
+      theme_classic()) #two distinct clusters with 11.2 alone
   ggsave("figures2/cluster_nmds_threeclusters.png", p_clust, width = 7, height = 6)
   
   
@@ -472,7 +579,7 @@ ellenberg_vals <- data.frame(L = L_vals, T = T_vals,
                    alpha = 0.1, colour = NA) +
       geom_point(size = 3) +
       geom_text_repel(size = 2.5) +
-      theme_classic()) #two distinct clusters
+      theme_classic()) #two distinct clusters; with 2 stand-alone stands
   ggsave("figures2/cluster_nmds_4clusters.png", p_clust4, width = 7, height = 6)
   
   #BEST ONE (imo):
@@ -495,7 +602,28 @@ ellenberg_vals <- data.frame(L = L_vals, T = T_vals,
   ggsave("figures2/cluster_nmds.png", p_clust2, width = 7, height = 6)
   
   
-  #Comparing each of the two clusters with the lab variables:
+  #cluster analysis with chord (looks bad) ----
+  chord <- vegdist(species_num, method = "chord")
+  chord_clust <- hclust(chord, "ward.D2")
+  groups <- cutree(chord_clust, k = 8)
+  
+  site_scores$cluster <- as.factor(groups[site_scores$plot])
+  
+  hulls <- site_scores %>%
+    group_by(cluster) %>%
+    slice(chull(NMDS1, NMDS2))
+  
+  (p_clust_chord <- ggplot(site_scores, aes(NMDS1, NMDS2, color = cluster, label = plot)) +
+      geom_polygon(data = hulls, aes(x = NMDS1, y = NMDS2, group = cluster, fill = cluster),
+                   alpha = 0.1, colour = NA) +
+      geom_point(size = 3) +
+      geom_text_repel(size = 2.5) +
+      theme_classic()) #terrible
+  ggsave("figures2/cluster_nmds_8clusters_chord.png", p_clust_chord, width = 7, height = 6)
+  
+  
+  
+  #Comparing each of the two clusters with the lab variables: ---- (probably delete)
   merged$cluster <- as.factor(groups2[rownames(merged)])
   boxplot(stand ~ cluster, data = merged, main = "stand by cluster") #similar
   boxplot(pH_H2O ~ cluster, data = merged, main = "pH(H2O) by cluster") #Similar pH for both; cluster 1 more variability
@@ -526,7 +654,7 @@ ellenberg_vals <- data.frame(L = L_vals, T = T_vals,
   
   #comparing each cluster with the diversity variables
   boxplot(S ~ cluster, data = merged, main = "S by cluster") #Similar 
-  boxplot(H ~ cluster, data = merged, main = "H' by cluster") #similar, one large outlier
+  boxplot(H ~ cluster, data = merged, main = "H' by cluster") #similar, one outlier
   boxplot(Simpson ~ cluster, data = merged, main = "Simpson by cluster") #similar 
   boxplot(J ~ cluster, data = merged, main = "J by cluster") #similar ish
   boxplot(E ~ cluster, data = merged, main = "E by cluster") #somewhat different; 3 outliers
@@ -585,9 +713,9 @@ env_sig <- env_scores[env_scores$pval <= 0.05, ] #only keeping environmental var
 env_sig$label <- var_labels[env_sig$variable] #adding above labels
 
 groups2 <- cutree(UPGMA, k = 2)
-plot(nmds, display = "sites", type = "n")
-text(nmds, display = "sites", labels = rownames(species_num), col = groups2)
-ordihull(nmds, groups, col = c("black", "red"), lwd = 2) #two clear groups 
+plot(nmdsBray, display = "sites", type = "n")
+text(nmdsBray, display = "sites", labels = rownames(species_num), col = groups2)
+ordihull(nmdsBray, groups, col = c("black", "red"), lwd = 2) #???
 
 site_scores$cluster <- as.factor(groups2[site_scores$plot])
 hull1 <- site_scores[site_scores$cluster == 1, ] %>% slice(chull(NMDS1, NMDS2))
@@ -604,12 +732,36 @@ hulls <- rbind(hull1, hull2)
     geom_text_repel(data = env_sig, aes(x = NMDS1, y = NMDS2, label = label),
                     size = 3, colour = "black", fontface = "bold") +
     labs(x = "NMDS1", y = "NMDS2", colour = "Stand") +
-    theme_classic())
+    theme_classic()) #two clusters; 5 env. drivers
 ggsave("figures2/nmds+envfit+clusters.png", p_envfit, width = 9, height = 8,
        dpi = 180, bg = "white")
 
 #NMDS species plot ----
-spe_scores <- as.data.frame(nmds$species)
+names(colSums(species_num)[colSums(species_num) == 0])
+sum(species_num$`Gymnocarpium spp.`)
+species_num <- species_num[, colnames(species_num) != "Gymnocarpium spp."]
+names(colSums(species_num)[colSums(species_num) == 0])
+
+#Bray NMDS
+set.seed(123)
+nmdsBray <- metaMDS(species_num, distance="bray", k=3)
+plot(nmdsBray, type='t')
+nmdsBray$stress #0.138 (with k = 3) and 0.210 with k = 2
+
+site_scores <- as.data.frame(scores(nmdsBray, display = "sites"))
+species_scores <- as.data.frame(scores(nmdsBray, display = "species"))
+species_scores$species <- rownames(species_scores)
+nmdsBray$species <- wascores(nmdsBray$points, species_num)
+
+site_scores$plot <- rownames(site_scores)
+site_scores$stand <- sub("\\..*", "", site_scores$plot)
+species_scores$species <- rownames(species_scores)
+
+plot(nmdsBray, display = "sites", type = "t")
+plot(nmdsBray, display = "species", type = "t")
+plot(nmdsBray, type = "t") #biplot
+
+spe_scores <- as.data.frame(nmdsBray$species)
 colnames(spe_scores)[1:2] <- c("NMDS1", "NMDS2")
 spe_scores$species <- rownames(spe_scores)
 
@@ -676,7 +828,7 @@ ggsave("figures2/fig_ellenberg_N_plots_species.png", p_ell_N_species_plots,
 
 #Ellenberg T:
 (p_ell_T_species_plots <- ggplot(ellenberg_merged, aes(x = NMDS1, y = NMDS2)) +
-    geom_point(aes(colour = T), alpha = 0.8) +
+    geom_point(aes(colour = ellenberg_T), alpha = 0.8) +
     geom_polygon(data = hulls, aes(x = NMDS1, y = NMDS2, group = cluster),
                  fill = NA, colour = c("red", "blue")[hulls$cluster],
                  linewidth = 0.8, linetype = "dashed") +
