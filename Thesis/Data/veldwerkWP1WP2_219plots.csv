@@ -1,0 +1,439 @@
+NAAM,plotID,X_LAMBERTX_hoekpunt,X_LAMBERTY_hoekpunt,X_HOOGTE_MT,PRECISIE_H,PRECISIE_X,Lambert72X_middentussenhoekpunten,Lambert72Y_middentussenhoekpunten,SuitableLocation,SuitableDimensions,SuitableDikeSide,Management,Vegtype,limiteddataORextensivedata,Suitability
+bv030,BV09/003,125382.988,188715.317,5.937,0.012,0.008,125382.351,188714.571,yes,yes,yes,schapen,2,extensive data,very suitable
+bv031,BV09/003,125381.714,188713.825,5.921,0.011,0.008,125382.351,188714.571,yes,yes,yes,schapen,2,extensive data,very suitable
+bv040,BV09/004,125559.215,188890.927,7.69,0.014,0.012,125558.518,188890.216,yes,yes,yes,schapen,2,extensive data,very suitable
+bv041,BV09/004,125557.82,188889.504,7.656,0.016,0.014,125558.518,188890.216,yes,yes,yes,schapen,2,extensive data,very suitable
+bv060,BV09/006,126240.255,189409.822,7.776,0.014,0.01,126239.534,189409.137,yes,yes,yes,schapen,1,extensive data,very suitable
+bv061,BV09/006,126238.812,189408.451,7.753,0.01,0.007,126239.534,189409.137,yes,yes,yes,schapen,1,extensive data,very suitable
+bv070,BV09/007,126236.541,189413.686,6.024,0.014,0.011,126235.791,189413.038,yes,yes,yes,schapen,2,extensive data,very suitable
+bv071,BV09/007,126235.04,189412.39,6.109,0.018,0.014,126235.791,189413.038,yes,yes,yes,schapen,2,extensive data,very suitable
+bv080,BV09/008,126615.801,189709.208,7.864,0.015,0.01,126614.956,189708.689,yes,yes,yes,schapen,1,extensive data,very suitable
+bv081,BV09/008,126614.111,189708.169,7.873,0.013,0.008,126614.956,189708.689,yes,yes,yes,schapen,1,extensive data,very suitable
+bv090,BV09/009,126612.83,189713.725,5.657,0.015,0.01,126612.034,189713.159,yes,yes,yes,schapen,1,extensive data,very suitable
+bv091,BV09/009,126611.237,189712.592,5.573,0.02,0.013,126612.034,189713.159,yes,yes,yes,schapen,1,extensive data,very suitable
+bv130,BV09/013,142500.878,201033.502,6.97,0.011,0.008,142500.132,201032.855,yes,yes,yes,schapen,4,extensive data,very suitable
+bv131,BV09/013,142499.385,201032.208,7.011,0.012,0.01,142500.132,201032.855,yes,yes,yes,schapen,4,extensive data,very suitable
+bv150,BV09/015,141774.519,200983.506,7.59,0.011,0.007,141773.52,200983.49,yes,yes,yes,schapen,4,extensive data,very suitable
+bv151,BV09/015,141772.521,200983.474,7.559,0.01,0.007,141773.52,200983.49,yes,yes,yes,schapen,4,extensive data,very suitable
+bv240,BV09/024,142990.187,200677.309,6.615,0.013,0.013,142990.963,200677.931,yes,yes,yes,schapen,4,extensive data,very suitable
+bv241,BV09/024,142991.739,200678.553,6.662,0.012,0.011,142990.963,200677.931,yes,yes,yes,schapen,4,extensive data,very suitable
+bv290,BV09/029,140695.47,200576.932,7.161,0.01,0.006,140696.245,200576.253,yes,yes,yes,schapen,3,extensive data,very suitable
+bv291,BV09/029,140697.019,200575.574,7.116,0.012,0.008,140696.245,200576.253,yes,yes,yes,schapen,3,extensive data,very suitable
+bv310,BV09/031,138879.437,200875.879,7.462,0.009,0.007,138880.058,200876.679,yes,yes,yes,schapen,3,extensive data,very suitable
+bv311,BV09/031,138880.678,200877.478,7.448,0.01,0.008,138880.058,200876.679,yes,yes,yes,schapen,3,extensive data,very suitable
+bv320,BV09/032,138274.118,200221.223,7.073,0.01,0.008,138274.736,200222.017,yes,yes,yes,schapen,1,extensive data,very suitable
+bv321,BV09/032,138275.353,200222.811,7.101,0.01,0.008,138274.736,200222.017,yes,yes,yes,schapen,1,extensive data,very suitable
+bv340,BV09/034,136781.14,198766.25,6.491,0.01,0.007,136780.758,198767.166,yes,yes,yes,schapen,4,extensive data,very suitable
+bv341,BV09/034,136780.375,198768.082,6.524,0.01,0.007,136780.758,198767.166,yes,yes,yes,schapen,4,extensive data,very suitable
+bv350,BV09/035,136596.383,198196.789,7.098,0.009,0.006,136597.006,198197.565,yes,yes,yes,schapen,4,extensive data,very suitable
+bv351,BV09/035,136597.629,198198.34,7.038,0.01,0.007,136597.006,198197.565,yes,yes,yes,schapen,4,extensive data,very suitable
+bv440,BV09/044,137256.727,197396.772,7.282,0.009,0.007,137255.752,197396.965,yes,yes,yes,schapen,1,extensive data,very suitable
+bv441,BV09/044,137254.777,197397.157,7.223,0.009,0.007,137255.752,197396.965,yes,yes,yes,schapen,1,extensive data,very suitable
+bv450,BV09/045,137734.791,196548.051,5.289,0.01,0.009,137735.449,196547.3,yes,yes,yes,schapen,4,extensive data,very suitable
+bv451,BV09/045,137736.106,196546.549,5.302,0.009,0.008,137735.449,196547.3,yes,yes,yes,schapen,4,extensive data,very suitable
+bv480,BV09/048,137359.765,194528.519,7.329,0.089,0.063,137359.535,194529.512,yes,yes,yes,klepelen,4,extensive data,very suitable
+bv481,BV09/048,137359.304,194530.505,7.234,0.123,0.07,137359.535,194529.512,yes,yes,yes,klepelen,4,extensive data,very suitable
+bv490,BV09/049,137827.102,194590.004,7.369,0.012,0.007,137826.131,194590.175,yes,yes,yes,maaien,2,extensive data,very suitable
+bv491,BV09/049,137825.159,194590.345,7.369,0.012,0.007,137826.131,194590.175,yes,yes,yes,maaien,2,extensive data,very suitable
+bv500,BV09/050,137821.062,193373.263,7.562,0.01,0.006,137821.755,193373.964,yes,yes,yes,klepelen,2,extensive data,very suitable
+bv501,BV09/050,137822.448,193374.665,7.539,0.013,0.008,137821.755,193373.964,yes,yes,yes,klepelen,2,extensive data,very suitable
+bv530,BV09/053,137517.908,192450.098,7.725,0.009,0.006,137517.529,192451.017,yes,yes,yes,maaien,2,extensive data,very suitable
+bv531,BV09/053,137517.149,192451.936,7.697,0.011,0.009,137517.529,192451.017,yes,yes,yes,maaien,2,extensive data,very suitable
+bv730,BV09/073,131905.825,191890.56,7.396,0.013,0.008,131906.794,191890.753,yes,yes,yes,schapen,1,extensive data,very suitable
+bv731,BV09/073,131907.762,191890.945,7.411,0.01,0.007,131906.794,191890.753,yes,yes,yes,schapen,1,extensive data,very suitable
+bv740,BV09/074,131720.074,191737.145,7.404,0.015,0.013,131720.691,191737.928,yes,yes,yes,schapen,1,extensive data,very suitable
+bv741,BV09/074,131721.307,191738.711,7.399,0.012,0.01,131720.691,191737.928,yes,yes,yes,schapen,1,extensive data,very suitable
+bv770,BV09/077,128622.279,193243.693,6.936,0.01,0.008,128622.366,193243.195,yes,yes,yes,klepelen,3,extensive data,very suitable
+bv771,BV09/077,128622.452,193242.697,6.56,0.01,0.008,128622.366,193243.195,yes,yes,yes,klepelen,3,extensive data,very suitable
+bv780,BV09/078,127460.513,192351.25,7.65,0.011,0.008,127461.012,192352.101,yes,yes,yes,schapen,1,extensive data,very suitable
+bv781,BV09/078,127461.51,192352.951,7.691,0.01,0.007,127461.012,192352.101,yes,yes,yes,schapen,1,extensive data,very suitable
+bv810,BV09/081,127113.909,191691.195,7.606,0.014,0.009,127114.594,191691.922,yes,yes,yes,schapen,1,extensive data,very suitable
+bv811,BV09/081,127115.279,191692.648,7.573,0.009,0.006,127114.594,191691.922,yes,yes,yes,schapen,1,extensive data,very suitable
+bv860,BV09/086,127247.923,192212.284,7.32,0.019,0.012,127247.792,192211.305,yes,yes,yes,klepelen,2,extensive data,very suitable
+bv861,BV09/086,127247.66,192210.325,7.274,0.015,0.01,127247.792,192211.305,yes,yes,yes,klepelen,2,extensive data,very suitable
+bv870,BV09/087,127742.216,192967.276,7.425,0.014,0.01,127741.746,192966.411,yes,yes,yes,schapen,2,extensive data,very suitable
+bv871,BV09/087,127741.275,192965.545,7.444,0.016,0.012,127741.746,192966.411,yes,yes,yes,schapen,2,extensive data,very suitable
+bv970,BV09/097,133882.246,194252.97,7.569,0.01,0.008,133881.322,194253.373,yes,yes,yes,schapen,2,extensive data,very suitable
+bv971,BV09/097,133880.398,194253.776,7.56,0.011,0.008,133881.322,194253.373,yes,yes,yes,schapen,2,extensive data,very suitable
+bv1060,BV09/106,137501.405,194176.722,7.661,0.017,0.013,137502.331,194176.358,yes,yes,yes,schapen,3,extensive data,very suitable
+bv1061,BV09/106,137503.257,194175.993,7.683,0.008,0.009,137502.331,194176.358,yes,yes,yes,schapen,3,extensive data,very suitable
+bv1080,BV09/108,137162.974,195708.85,7.902,0.011,0.008,137162.907,195707.856,yes,yes,yes,klepelen,4,extensive data,very suitable
+bv1081,BV09/108,137162.84,195706.862,7.924,0.011,0.009,137162.907,195707.856,yes,yes,yes,klepelen,4,extensive data,very suitable
+bv1090,BV09/109,137108.999,196908.274,8.197,0.011,0.007,137109.414,196907.357,yes,yes,yes,klepelen,1,extensive data,very suitable
+bv1091,BV09/109,137109.829,196906.439,8.233,0.009,0.006,137109.414,196907.357,yes,yes,yes,klepelen,1,extensive data,very suitable
+bv1170,BV09/117,136824.018,197097.597,7.447,0.016,0.014,136823.032,197097.596,yes,yes,yes,schapen,3,extensive data,very suitable
+bv1171,BV09/117,136822.045,197097.594,7.473,0.009,0.01,136823.032,197097.596,yes,yes,yes,schapen,3,extensive data,very suitable
+bv1180,BV09/118,136150.668,198496.349,6.69,0.019,0.017,136150.813,198497.356,yes,yes,yes,klepelen,5,extensive data,very suitable
+bv1181,BV09/118,136150.958,198498.362,6.699,0.012,0.011,136150.813,198497.356,yes,yes,yes,klepelen,5,extensive data,very suitable
+bv1200,BV09/120,136001.195,199767.668,7.352,0.01,0.008,136000.605,199768.474,yes,yes,yes,klepelen,4,extensive data,very suitable
+bv1201,BV09/120,136000.015,199769.28,7.317,0.01,0.008,136000.605,199768.474,yes,yes,yes,klepelen,4,extensive data,very suitable
+bv1230,BV09/123,117296.32,189403.347,6.54,0.009,0.006,117295.346,189403.156,yes,yes,yes,maaien,2,extensive data,very suitable
+bv1231,BV09/123,117294.371,189402.965,6.574,0.009,0.006,117295.346,189403.156,yes,yes,yes,maaien,2,extensive data,very suitable
+bv1280,BV09/128,132274.95,199704.306,6.99,0.012,0.007,132274.001,199704.604,yes,yes,yes,schapen,4,extensive data,very suitable
+bv1281,BV09/128,132273.051,199704.902,7.022,0.012,0.007,132274.001,199704.604,yes,yes,yes,schapen,4,extensive data,very suitable
+bv1290,BV09/129,129552.51,199107.625,7.306,0.01,0.007,129552.197,199106.674,yes,yes,yes,klepelen,4,extensive data,very suitable
+bv1291,BV09/129,129551.884,199105.722,7.292,0.01,0.007,129552.197,199106.674,yes,yes,yes,klepelen,4,extensive data,very suitable
+bv1360,BV09/136,130433.36,199225.607,7.025,0.016,0.013,130432.425,199225.222,yes,yes,yes,klepelen,5,extensive data,very suitable
+bv1361,BV09/136,130431.49,199224.836,7.012,0.029,0.023,130432.425,199225.222,yes,yes,yes,klepelen,5,extensive data,very suitable
+tt20,TT09/002,142683.192,200543.133,4.762,0.012,0.007,142684.154,200543.003,yes,yes,yes,schapen,5,extensive data,very suitable
+tt21,TT09/002,142685.115,200542.873,4.729,0.02,0.012,142684.154,200543.003,yes,yes,yes,schapen,5,extensive data,very suitable
+tt080,TT09/008,140690.101,200570.769,4.836,0.011,0.006,140690.815,200570.041,yes,yes,yes,schapen,3,extensive data,very suitable
+tt081,TT09/008,140691.528,200569.312,4.849,0.017,0.01,140690.815,200570.041,yes,yes,yes,schapen,3,extensive data,very suitable
+tt090,TT09/009,140214.039,200873.044,5.457,0.012,0.007,140214.865,200872.488,yes,yes,yes,schapen,3,extensive data,very suitable
+tt091,TT09/009,140215.69,200871.931,5.435,0.013,0.008,140214.865,200872.488,yes,yes,yes,schapen,3,extensive data,very suitable
+tt130,TT09/013,136788.371,198769.438,4.107,0.009,0.006,136788.003,198770.348,yes,yes,yes,schapen,2,extensive data,very suitable
+tt131,TT09/013,136787.634,198771.257,4.073,0.009,0.006,136788.003,198770.348,yes,yes,yes,schapen,2,extensive data,very suitable
+tt140,TT09/014,136606.898,198189.437,3.542,0.01,0.007,136607.461,198190.258,yes,yes,yes,schapen,2,extensive data,very suitable
+tt141,TT09/014,136608.024,198191.079,3.544,0.01,0.007,136607.461,198190.258,yes,yes,yes,schapen,2,extensive data,very suitable
+tt160,TT09/016,137258.135,197403.264,5.395,0.011,0.009,137257.158,197403.417,yes,yes,yes,schapen,3,extensive data,very suitable
+tt161,TT09/016,137256.18,197403.569,5.404,0.012,0.009,137257.158,197403.417,yes,yes,yes,schapen,3,extensive data,very suitable
+tt210,TT09/021,137876.997,194577.129,7.305,0.025,0.017,137876.059,194577.387,yes,yes,yes,maaien,2,extensive data,very suitable
+tt211,TT09/021,137875.121,194577.644,7.325,0.028,0.017,137876.059,194577.387,yes,yes,yes,maaien,2,extensive data,very suitable
+tt230,TT09/023,137665.729,193242.817,7.495,0.012,0.007,137666.509,193243.485,yes,yes,yes,maaien,1,extensive data,very suitable
+tt231,TT09/023,137667.288,193244.152,7.621,0.01,0.006,137666.509,193243.485,yes,yes,yes,maaien,1,extensive data,very suitable
+tt250,TT09/025,137558.775,192281.731,7.81,0.008,0.006,137558.536,192282.705,yes,yes,yes,maaien,1,extensive data,very suitable
+tt251,TT09/025,137558.297,192283.679,7.779,0.012,0.008,137558.536,192282.705,yes,yes,yes,maaien,1,extensive data,very suitable
+tt270,TT09/027,135244.024,192958.568,5.011,0.009,0.007,135244.615,192957.769,yes,yes,yes,maaien,4,extensive data,very suitable
+tt271,TT09/027,135245.206,192956.969,4.999,0.011,0.007,135244.615,192957.769,yes,yes,yes,maaien,4,extensive data,very suitable
+tt310,TT09/031,133409.226,193341.015,7.103,0.017,0.013,133410.214,193341.105,yes,yes,yes,klepelen,2,extensive data,very suitable
+tt311,TT09/031,133411.201,193341.194,7.189,0.016,0.013,133410.214,193341.105,yes,yes,yes,klepelen,2,extensive data,very suitable
+tt330,TT09/033,132117.45,191942.192,5.762,0.015,0.011,132118.398,191942.442,yes,yes,yes,schapen,2,extensive data,very suitable
+tt331,TT09/033,132119.345,191942.692,5.798,0.013,0.012,132118.398,191942.442,yes,yes,yes,schapen,2,extensive data,very suitable
+tt410,TT09/041,127323.182,191931.04,5.374,0.012,0.009,127323.573,191931.954,yes,yes,yes,schapen,1,extensive data,very suitable
+tt411,TT09/041,127323.964,191932.868,5.402,0.015,0.011,127323.573,191931.954,yes,yes,yes,schapen,1,extensive data,very suitable
+tt420,TT09/042,127118.14,191687.053,5.492,0.01,0.007,127118.828,191687.769,yes,yes,yes,schapen,1,extensive data,very suitable
+tt421,TT09/042,127119.516,191688.484,5.461,0.011,0.007,127118.828,191687.769,yes,yes,yes,schapen,1,extensive data,very suitable
+tt430,TT09/043,127069.395,191317.502,6.788,0.01,0.006,127069.183,191318.471,yes,yes,yes,schapen,1,extensive data,very suitable
+tt431,TT09/043,127068.97,191319.439,6.825,0.009,0.005,127069.183,191318.471,yes,yes,yes,schapen,1,extensive data,very suitable
+tt500,TT09/050,132052.536,192106.45,4.885,0.01,0.008,132051.588,192106.17,yes,yes,yes,schapen,2,extensive data,very suitable
+tt501,TT09/050,132050.64,192105.889,4.913,0.013,0.011,132051.588,192106.17,yes,yes,yes,schapen,2,extensive data,very suitable
+tt510,TT09/051,132854.753,192643.134,5.191,0.011,0.009,132855.058,192642.185,yes,yes,yes,schapen,3,extensive data,very suitable
+tt511,TT09/051,132855.362,192641.235,5.197,0.01,0.008,132855.058,192642.185,yes,yes,yes,schapen,3,extensive data,very suitable
+tt520,TT09/052,133303.284,193814.131,5.653,0.015,0.012,133302.841,193813.246,yes,yes,yes,schapen,4,extensive data,very suitable
+tt521,TT09/052,133302.398,193812.36,5.594,0.013,0.01,133302.841,193813.246,yes,yes,yes,schapen,4,extensive data,very suitable
+tt530,TT09/053,133885.629,194260.73,5.533,0.01,0.007,133884.714,194261.155,yes,yes,yes,schapen,2,extensive data,very suitable
+tt531,TT09/053,133883.798,194261.58,5.562,0.011,0.008,133884.714,194261.155,yes,yes,yes,schapen,2,extensive data,very suitable
+tt540,TT09/054,135241.508,193817.144,4.935,0.009,0.006,135241.942,193818.022,yes,yes,yes,schapen,1,extensive data,very suitable
+tt541,TT09/054,135242.376,193818.9,4.967,0.011,0.007,135241.942,193818.022,yes,yes,yes,schapen,1,extensive data,very suitable
+tt580,TT09/058,136913.794,191957.055,5.106,0.01,0.008,136913.328,191956.171,yes,yes,yes,schapen,4,extensive data,very suitable
+tt581,TT09/058,136912.861,191955.286,5.147,0.009,0.007,136913.328,191956.171,yes,yes,yes,schapen,4,extensive data,very suitable
+tt610,TT09/061,137758.034,193834.245,7.143,0.014,0.015,137758,193833.259,yes,yes,yes,klepelen,5,extensive data,very suitable
+tt611,TT09/061,137757.965,193832.272,7.095,0.014,0.012,137758,193833.259,yes,yes,yes,klepelen,5,extensive data,very suitable
+tt630,TT09/063,137083.446,194839.556,5.746,0.008,0.007,137083.45,194838.574,yes,yes,yes,klepelen,3,extensive data,very suitable
+tt631,TT09/063,137083.454,194837.592,5.723,0.009,0.008,137083.45,194838.574,yes,yes,yes,klepelen,3,extensive data,very suitable
+tt730,TT09/073,129151.948,193559.587,7.431,0.02,0.015,129150.973,193559.405,yes,yes,yes,klepelen,4,extensive data,very suitable
+tt731,TT09/073,129149.997,193559.222,7.449,0.013,0.009,129150.973,193559.405,yes,yes,yes,klepelen,4,extensive data,very suitable
+tt740,TT09/074,129257.497,193555.178,7.893,0.017,0.012,129256.515,193555.302,yes,yes,yes,klepelen,2,extensive data,very suitable
+tt741,TT09/074,129255.532,193555.425,7.909,0.015,0.014,129256.515,193555.302,yes,yes,yes,klepelen,2,extensive data,very suitable
+tt750,TT09/075,136824.124,197091.975,6.072,0.01,0.009,136823.131,197091.929,yes,yes,yes,schapen,3,extensive data,very suitable
+tt751,TT09/075,136822.138,197091.882,6.095,0.013,0.012,136823.131,197091.929,yes,yes,yes,schapen,3,extensive data,very suitable
+tt810,TT09/081,117411.226,189427.874,6.701,0.011,0.007,117410.269,189427.581,yes,yes,yes,maaien,3,extensive data,very suitable
+tt811,TT09/081,117409.311,189427.288,6.649,0.013,0.009,117410.269,189427.581,yes,yes,yes,maaien,3,extensive data,very suitable
+tt840,TT09/084,129555.759,199104.495,5.614,0.011,0.008,129556.047,199105.468,yes,yes,yes,klepelen,5,extensive data,very suitable
+tt841,TT09/084,129556.334,199106.44,5.674,0.012,0.008,129556.047,199105.468,yes,yes,yes,klepelen,5,extensive data,very suitable
+tt850,TT09/085,128444.895,199197.921,7.735,0.013,0.011,128443.937,199197.703,yes,yes,yes,klepelen,5,extensive data,very suitable
+tt851,TT09/085,128442.979,199197.484,7.735,0.011,0.009,128443.937,199197.703,yes,yes,yes,klepelen,5,extensive data,very suitable
+tt860,TT09/086,127536.397,198680.008,6.801,0.011,0.009,127535.561,198679.482,yes,yes,yes,klepelen,5,extensive data,very suitable
+tt861,TT09/086,127534.724,198678.956,6.824,0.016,0.014,127535.561,198679.482,yes,yes,yes,klepelen,5,extensive data,very suitable
+tt880,TT09/088,126086.824,198639.493,7.502,0.019,0.011,126087.419,198640.233,yes,yes,yes,klepelen,5,extensive data,very suitable
+tt881,TT09/088,126088.013,198640.972,7.6,0.015,0.009,126087.419,198640.233,yes,yes,yes,klepelen,5,extensive data,very suitable
+tt910,TT09/091,130494.616,199251.638,7.09,0.016,0.014,130493.719,199251.248,yes,yes,yes,klepelen,5,extensive data,very suitable
+tt911,TT09/091,130492.822,199250.857,7.049,0.016,0.014,130493.719,199251.248,yes,yes,yes,klepelen,5,extensive data,very suitable
+bv020,BV09/002,125386.915,188712.065,7.657,0.01,0.007,125386.299,188711.274,yes,yes,yes,schapen,2,limited data,relatively suitable
+bv021,BV09/002,125385.683,188710.483,7.717,0.01,0.007,125386.299,188711.274,yes,yes,yes,schapen,2,limited data,relatively suitable
+bv050,BV09/005,125556.243,188893.899,6.155,0.017,0.015,125555.534,188893.207,yes,yes,yes,schapen,2,limited data,relatively suitable
+bv051,BV09/005,125554.825,188892.515,6.112,0.014,0.011,125555.534,188893.207,yes,yes,yes,schapen,2,limited data,relatively suitable
+bv140,BV09/014,142495.773,201039.307,4.004,0.013,0.01,142495.037,201038.645,yes,yes,yes,schapen,4,limited data,relatively suitable
+bv141,BV09/014,142494.301,201037.983,4.047,0.012,0.01,142495.037,201038.645,yes,yes,yes,schapen,4,limited data,relatively suitable
+bv160,BV09/016,141524.008,201057.833,7.939,0.009,0.006,141523.27,201057.167,yes,yes,yes,schapen,4,limited data,relatively suitable
+bv161,BV09/016,141522.532,201056.501,7.947,0.01,0.006,141523.27,201057.167,yes,yes,yes,schapen,4,limited data,relatively suitable
+bv170,BV09/017,141519.877,201062.279,5.273,0.013,0.009,141519.154,201061.599,yes,yes,yes,schapen,4,limited data,relatively suitable
+bv171,BV09/017,141518.43,201060.919,5.317,0.01,0.007,141519.154,201061.599,yes,yes,yes,schapen,4,limited data,relatively suitable
+bv180,BV09/018,140475.837,201192.907,7.872,0.012,0.011,140474.918,201193.277,yes,yes,yes,schapen,4,limited data,relatively suitable
+bv181,BV09/018,140473.999,201193.647,7.954,0.013,0.01,140474.918,201193.277,yes,yes,yes,schapen,4,limited data,relatively suitable
+bv190,BV09/019,140477.815,201197.851,5.762,0.009,0.008,140476.867,201198.271,yes,yes,yes,schapen,4,limited data,relatively suitable
+bv191,BV09/019,140475.919,201198.691,5.693,0.009,0.009,140476.867,201198.271,yes,yes,yes,schapen,4,limited data,relatively suitable
+bv200,BV09/020,141633.827,200373.353,7.379,0.01,0.007,141634.777,200373.554,yes,yes,yes,schapen,3,limited data,relatively suitable
+bv201,BV09/020,141635.727,200373.754,7.371,0.009,0.006,141634.777,200373.554,yes,yes,yes,schapen,3,limited data,relatively suitable
+bv210,BV09/021,141635.734,200364.738,5.444,0.011,0.007,141636.714,200364.981,yes,yes,yes,schapen,4,limited data,relatively suitable
+bv211,BV09/021,141637.694,200365.223,5.478,0.011,0.007,141636.714,200364.981,yes,yes,yes,schapen,4,limited data,relatively suitable
+bv220,BV09/022,142205.909,200400.497,6.875,0.01,0.007,142206.876,200400.219,yes,yes,yes,schapen,4,limited data,relatively suitable
+bv221,BV09/022,142207.842,200399.941,6.901,0.011,0.008,142206.876,200400.219,yes,yes,yes,schapen,4,limited data,relatively suitable
+bv230,BV09/023,142683.733,200547.961,7.47,0.01,0.007,142684.796,200547.844,yes,yes,yes,schapen,4,limited data,relatively suitable
+bv231,BV09/023,142685.859,200547.726,7.407,0.018,0.012,142684.796,200547.844,yes,yes,yes,schapen,4,limited data,relatively suitable
+bv250,BV09/025,143542.009,201038.302,6.799,0.01,0.007,143542.796,201038.94,yes,yes,yes,maaien,4,limited data,relatively suitable
+bv251,BV09/025,143543.582,201039.578,6.852,0.011,0.007,143542.796,201038.94,yes,yes,yes,maaien,4,limited data,relatively suitable
+bv260,BV09/026,144416.172,201332.249,6.145,0.011,0.008,144417.149,201332.021,yes,yes,yes,schapen,4,limited data,relatively suitable
+bv261,BV09/026,144418.125,201331.792,6.134,0.011,0.007,144417.149,201332.021,yes,yes,yes,schapen,4,limited data,relatively suitable
+bv270,BV09/027,144938.615,201300.097,2.392,0.011,0.007,144939.615,201300.112,yes,yes,yes,schapen,3,limited data,relatively suitable
+bv271,BV09/027,144940.614,201300.127,2.392,0.01,0.006,144939.615,201300.112,yes,yes,yes,schapen,3,limited data,relatively suitable
+bv280,BV09/028,145106.303,201306.146,5.769,0.015,0.009,145107.284,201306.041,yes,yes,yes,schapen,3,limited data,relatively suitable
+bv281,BV09/028,145108.264,201305.935,5.762,0.012,0.007,145107.284,201306.041,yes,yes,yes,schapen,3,limited data,relatively suitable
+bv300,BV09/030,140217.663,200879.513,7.255,0.01,0.006,140218.491,200878.973,yes,yes,yes,schapen,3,limited data,relatively suitable
+bv301,BV09/030,140219.318,200878.433,7.259,0.012,0.007,140218.491,200878.973,yes,yes,yes,schapen,3,limited data,relatively suitable
+bv330,BV09/033,138231.41,200169.745,7.715,0.01,0.007,138232.067,200170.519,yes,yes,yes,schapen,1,limited data,relatively suitable
+bv331,BV09/033,138232.723,200171.292,7.679,0.009,0.007,138232.067,200170.519,yes,yes,yes,schapen,1,limited data,relatively suitable
+bv360,BV09/036,136755.531,199519.427,6.268,0.011,0.008,136754.599,199519.092,yes,yes,yes,maaien,1,limited data,relatively suitable
+bv361,BV09/036,136753.667,199518.756,6.286,0.009,0.007,136754.599,199519.092,yes,yes,yes,maaien,1,limited data,relatively suitable
+bv370,BV09/037,136753.867,199523.97,4.589,0.009,0.007,136752.926,199523.639,yes,yes,yes,maaien,1,limited data,relatively suitable
+bv371,BV09/037,136751.984,199523.308,4.586,0.009,0.006,136752.926,199523.639,yes,yes,yes,maaien,1,limited data,relatively suitable
+bv380,BV09/038,137194.946,199603.812,5.856,0.011,0.006,137194.201,199603.16,yes,yes,yes,maaien,2,limited data,relatively suitable
+bv381,BV09/038,137193.456,199602.507,5.87,0.017,0.01,137194.201,199603.16,yes,yes,yes,maaien,2,limited data,relatively suitable
+bv390,BV09/039,137510.573,199851.374,5.737,0.014,0.008,137509.717,199850.887,yes,yes,yes,maaien,2,limited data,relatively suitable
+bv391,BV09/039,137508.861,199850.399,5.752,0.014,0.008,137509.717,199850.887,yes,yes,yes,maaien,2,limited data,relatively suitable
+bv400,BV09/040,136080.615,200044.569,7.433,0.012,0.008,136079.626,200044.54,yes,yes,yes,schapen,2,limited data,relatively suitable
+bv401,BV09/040,136078.637,200044.51,7.443,0.01,0.007,136079.626,200044.54,yes,yes,yes,schapen,2,limited data,relatively suitable
+bv410,BV09/041,135361.821,200070.724,7.072,0.016,0.009,135361.533,200069.769,yes,yes,yes,schapen,2,limited data,relatively suitable
+bv411,BV09/041,135361.244,200068.814,7.117,0.016,0.009,135361.533,200069.769,yes,yes,yes,schapen,2,limited data,relatively suitable
+bv420,BV09/042,134515.414,199858.936,6.98,0.013,0.008,134514.668,199858.302,yes,yes,yes,maaien,4,limited data,relatively suitable
+bv421,BV09/042,134513.921,199857.668,7.028,0.013,0.009,134514.668,199858.302,yes,yes,yes,maaien,4,limited data,relatively suitable
+bv430,BV09/043,136665.022,197628.71,7.458,0.01,0.007,136664.19,197628.157,yes,yes,yes,schapen,2,limited data,relatively suitable
+bv431,BV09/043,136663.358,197627.603,7.456,0.009,0.006,136664.19,197628.157,yes,yes,yes,schapen,2,limited data,relatively suitable
+bv510,BV09/051,137680.377,193254.212,7.566,0.011,0.007,137681.136,193254.848,yes,yes,yes,maaien,1,limited data,relatively suitable
+bv511,BV09/051,137681.894,193255.484,7.493,0.01,0.006,137681.136,193254.848,yes,yes,yes,maaien,1,limited data,relatively suitable
+bv520,BV09/052,137427.262,192639.556,6.386,0.01,0.007,137426.9,192640.466,yes,yes,yes,klepelen,5,limited data,relatively suitable
+bv521,BV09/052,137426.538,192641.375,6.358,0.014,0.009,137426.9,192640.466,yes,yes,yes,klepelen,5,limited data,relatively suitable
+bv540,BV09/054,137566.728,192239.633,7.079,0.011,0.008,137566.644,192240.603,yes,yes,yes,maaien,1,limited data,relatively suitable
+bv541,BV09/054,137566.559,192241.572,7.048,0.012,0.009,137566.644,192240.603,yes,yes,yes,maaien,1,limited data,relatively suitable
+bv560,BV09/056,135249.067,192962.027,6.64,0.011,0.009,135249.642,192961.227,yes,yes,yes,maaien,3,limited data,relatively suitable
+bv561,BV09/056,135250.217,192960.426,6.641,0.01,0.008,135249.642,192961.227,yes,yes,yes,maaien,3,limited data,relatively suitable
+bv700,BV09/070,133382.096,193341.2,6.998,0.012,0.009,133383.093,193341.24,yes,yes,yes,klepelen,4,limited data,relatively suitable
+bv701,BV09/070,133384.089,193341.28,6.913,0.014,0.01,133383.093,193341.24,yes,yes,yes,klepelen,4,limited data,relatively suitable
+bv710,BV09/071,133194.954,192735.244,7.272,0.011,0.007,133194.452,192736.11,yes,yes,yes,schapen,1,limited data,relatively suitable
+bv711,BV09/071,133193.95,192736.976,7.265,0.01,0.006,133194.452,192736.11,yes,yes,yes,schapen,1,limited data,relatively suitable
+bv720,BV09/072,132116.156,191947.657,7.212,0.016,0.011,132117.103,191947.917,yes,yes,yes,schapen,1,limited data,relatively suitable
+bv721,BV09/072,132118.05,191948.177,7.245,0.019,0.013,132117.103,191947.917,yes,yes,yes,schapen,1,limited data,relatively suitable
+bv750,BV09/075,130078.965,193148.626,7.559,0.006,0.006,130079.773,193148.052,yes,yes,yes,maaien,1,limited data,relatively suitable
+bv751,BV09/075,130080.581,193147.478,7.614,0.011,0.009,130079.773,193148.052,yes,yes,yes,maaien,1,limited data,relatively suitable
+bv760,BV09/076,129110.23,193145.354,6.362,0.008,0.007,129111.023,193145.945,yes,yes,yes,klepelen,5,limited data,relatively suitable
+bv761,BV09/076,129111.815,193146.536,6.438,0.009,0.008,129111.023,193145.945,yes,yes,yes,klepelen,5,limited data,relatively suitable
+bv790,BV09/079,127358.2,192063.948,7.549,0.011,0.008,127358.336,192064.924,yes,yes,yes,schapen,1,limited data,relatively suitable
+bv791,BV09/079,127358.472,192065.9,7.567,0.015,0.011,127358.336,192064.924,yes,yes,yes,schapen,1,limited data,relatively suitable
+bv800,BV09/080,127317.901,191933.298,7.505,0.012,0.009,127318.344,191934.177,yes,yes,yes,schapen,1,limited data,relatively suitable
+bv801,BV09/080,127318.787,191935.055,7.486,0.01,0.008,127318.344,191934.177,yes,yes,yes,schapen,1,limited data,relatively suitable
+bv830,BV09/083,127074.631,191252.058,6.984,0.01,0.006,127074.557,191253.041,yes,yes,yes,schapen,1,limited data,relatively suitable
+bv831,BV09/083,127074.482,191254.023,6.978,0.011,0.006,127074.557,191253.041,yes,yes,yes,schapen,1,limited data,relatively suitable
+bv940,BV09/094,132055.059,192098.142,7.051,0.01,0.008,132054.1,192097.876,yes,yes,yes,schapen,1,limited data,relatively suitable
+bv941,BV09/094,132053.141,192097.609,7.13,0.011,0.009,132054.1,192097.876,yes,yes,yes,schapen,1,limited data,relatively suitable
+bv950,BV09/095,132862.723,192645.076,7.411,0.011,0.01,132862.985,192644.143,yes,yes,yes,schapen,4,limited data,relatively suitable
+bv951,BV09/095,132863.246,192643.209,7.423,0.01,0.009,132862.985,192644.143,yes,yes,yes,schapen,4,limited data,relatively suitable
+bv960,BV09/096,133310.033,193810.649,7.621,0.008,0.007,133309.56,193809.78,yes,yes,yes,schapen,3,limited data,relatively suitable
+bv961,BV09/096,133309.087,193808.91,7.602,0.011,0.009,133309.56,193809.78,yes,yes,yes,schapen,3,limited data,relatively suitable
+bv980,BV09/098,135235.15,193820.401,6.785,0.017,0.011,135235.597,193821.285,yes,yes,yes,schapen,1,limited data,relatively suitable
+bv981,BV09/098,135236.044,193822.169,6.776,0.01,0.007,135235.597,193821.285,yes,yes,yes,schapen,1,limited data,relatively suitable
+bv990,BV09/099,135392.39,193071.657,7.675,0.011,0.008,135391.836,193072.478,yes,yes,yes,schapen,1,limited data,relatively suitable
+bv991,BV09/099,135391.281,193073.298,7.659,0.01,0.007,135391.836,193072.478,yes,yes,yes,schapen,1,limited data,relatively suitable
+bv1000,BV09/100,136115.233,192031.431,5.893,0.009,0.006,136114.764,192032.298,yes,yes,yes,schapen,5,limited data,relatively suitable
+bv1001,BV09/100,136114.295,192033.164,5.896,0.012,0.008,136114.764,192032.298,yes,yes,yes,schapen,5,limited data,relatively suitable
+bv1010,BV09/101,136674.105,191727.217,6.1,0.011,0.009,136673.149,191726.868,yes,yes,yes,schapen,5,limited data,relatively suitable
+bv1011,BV09/101,136672.192,191726.518,6.144,0.009,0.007,136673.149,191726.868,yes,yes,yes,schapen,5,limited data,relatively suitable
+bv1020,BV09/102,136920.129,191953.761,7.498,0.009,0.008,136919.732,191952.851,yes,yes,yes,schapen,5,limited data,relatively suitable
+bv1021,BV09/102,136919.335,191951.941,7.485,0.01,0.008,136919.732,191952.851,yes,yes,yes,schapen,5,limited data,relatively suitable
+bv1030,BV09/103,137027.246,192460.544,7.606,0.01,0.008,137027.106,192459.581,yes,yes,yes,schapen,4,limited data,relatively suitable
+bv1031,BV09/103,137026.966,192458.618,7.664,0.009,0.007,137027.106,192459.581,yes,yes,yes,schapen,4,limited data,relatively suitable
+bv1070,BV09/107,137090.396,194839.59,7.813,0.01,0.01,137090.382,194838.58,yes,yes,yes,klepelen,1,limited data,relatively suitable
+bv1071,BV09/107,137090.367,194837.57,7.825,0.01,0.01,137090.382,194838.58,yes,yes,yes,klepelen,1,limited data,relatively suitable
+bv1210,BV09/121,134853.822,199747.061,7.291,0.014,0.007,134852.832,199746.922,yes,yes,yes,klepelen,4,limited data,relatively suitable
+bv1211,BV09/121,134851.841,199746.783,7.262,0.017,0.008,134852.832,199746.922,yes,yes,yes,klepelen,4,limited data,relatively suitable
+bv1220,BV09/122,119944.242,188755.554,6.667,0.01,0.007,119943.5,188756.225,yes,yes,yes,maaien,2,limited data,relatively suitable
+bv1221,BV09/122,119942.758,188756.895,6.761,0.01,0.007,119943.5,188756.225,yes,yes,yes,maaien,2,limited data,relatively suitable
+bv1300,BV09/130,128420.324,199190.448,7.679,0.014,0.011,128419.405,199190.079,yes,yes,yes,klepelen,5,limited data,relatively suitable
+bv1301,BV09/130,128418.486,199189.709,7.702,0.009,0.007,128419.405,199190.079,yes,yes,yes,klepelen,5,limited data,relatively suitable
+bv1310,BV09/131,127680.658,198741.341,6.93,0.011,0.013,127679.896,198740.672,yes,yes,yes,klepelen,5,limited data,relatively suitable
+bv1311,BV09/131,127679.133,198740.002,6.986,0.016,0.015,127679.896,198740.672,yes,yes,yes,klepelen,5,limited data,relatively suitable
+bv1340,BV09/134,132546.303,199678.466,5.57,0.012,0.009,132545.483,199679.022,yes,yes,yes,klepelen,5,limited data,relatively suitable
+bv1341,BV09/134,132544.663,199679.578,5.61,0.014,0.011,132545.483,199679.022,yes,yes,yes,klepelen,5,limited data,relatively suitable
+bv1350,BV09/135,131780.901,199846.251,6.007,0.015,0.011,131779.912,199846.203,yes,yes,yes,klepelen,5,limited data,relatively suitable
+bv1351,BV09/135,131778.923,199846.154,6.005,0.008,0.006,131779.912,199846.203,yes,yes,yes,klepelen,5,limited data,relatively suitable
+bv1372,BV09/137,128591.069,199586.5,7.294,0.01,0.009,128591.903,199587.015,yes,yes,yes,klepelen,5,limited data,relatively suitable
+bv1373,BV09/137,128592.737,199587.529,7.345,0.009,0.008,128591.903,199587.015,yes,yes,yes,klepelen,5,limited data,relatively suitable
+tt010,TT09/001,142202.046,200389.094,3.483,0.015,0.01,142202.987,200388.815,yes,yes,yes,schapen,3,limited data,relatively suitable
+tt011,TT09/001,142203.927,200388.535,3.556,0.013,0.008,142202.987,200388.815,yes,yes,yes,schapen,3,limited data,relatively suitable
+tt30,TT09/003,142995.355,200670.209,4.156,0.012,0.011,142996.175,200670.821,yes,yes,yes,schapen,4,limited data,relatively suitable
+tt31,TT09/003,142996.995,200671.433,4.218,0.013,0.012,142996.175,200670.821,yes,yes,yes,schapen,4,limited data,relatively suitable
+tt40,TT09/004,143546.815,201031.917,5.832,0.01,0.007,143547.648,201032.504,yes,yes,yes,maaien,3,limited data,relatively suitable
+tt41,TT09/004,143548.481,201033.091,5.819,0.01,0.007,143547.648,201032.504,yes,yes,yes,maaien,3,limited data,relatively suitable
+tt50,TT09/005,144412.958,201321.818,3.304,0.012,0.008,144413.93,201321.514,yes,yes,yes,schapen,3,limited data,relatively suitable
+tt51,TT09/005,144414.902,201321.21,3.24,0.012,0.009,144413.93,201321.514,yes,yes,yes,schapen,3,limited data,relatively suitable
+tt60,TT09/006,144938.556,201313.794,5.851,0.019,0.012,144939.564,201313.734,yes,yes,yes,schapen,3,limited data,relatively suitable
+tt61,TT09/006,144940.572,201313.673,5.818,0.011,0.007,144939.564,201313.734,yes,yes,yes,schapen,3,limited data,relatively suitable
+tt70,TT09/007,145105.112,201293.582,2.798,0.013,0.008,145106.12,201293.517,yes,yes,yes,schapen,3,limited data,relatively suitable
+tt71,TT09/007,145107.127,201293.452,2.768,0.012,0.007,145106.12,201293.517,yes,yes,yes,schapen,3,limited data,relatively suitable
+tt100,TT09/010,138885.51,200871.136,5.529,0.009,0.008,138886.138,200871.892,yes,yes,yes,schapen,3,limited data,relatively suitable
+tt101,TT09/010,138886.765,200872.647,5.472,0.01,0.009,138886.138,200871.892,yes,yes,yes,schapen,3,limited data,relatively suitable
+tt110,TT09/011,138278.405,200217.872,5.416,0.009,0.008,138279.023,200218.677,yes,yes,yes,schapen,1,limited data,relatively suitable
+tt111,TT09/011,138279.641,200219.481,5.424,0.012,0.01,138279.023,200218.677,yes,yes,yes,schapen,1,limited data,relatively suitable
+tt120,TT09/012,138237.141,200164.007,6.206,0.011,0.008,138237.744,200164.789,yes,yes,yes,schapen,1,limited data,relatively suitable
+tt121,TT09/012,138238.346,200165.57,6.203,0.013,0.01,138237.744,200164.789,yes,yes,yes,schapen,1,limited data,relatively suitable
+tt150,TT09/015,136660.324,197635.732,4.616,0.01,0.007,136659.493,197635.184,yes,yes,yes,schapen,3,limited data,relatively suitable
+tt151,TT09/015,136658.662,197634.635,4.649,0.009,0.007,136659.493,197635.184,yes,yes,yes,schapen,3,limited data,relatively suitable
+tt170,TT09/017,137740.495,196553.846,7.543,0.009,0.008,137741.238,196553.173,yes,yes,yes,schapen,1,limited data,relatively suitable
+tt171,TT09/017,137741.981,196552.5,7.562,0.01,0.009,137741.238,196553.173,yes,yes,yes,schapen,1,limited data,relatively suitable
+tt200,TT09/020,137354.667,194544.899,7.455,0.019,0.011,137354.419,194545.868,yes,yes,yes,klepelen,5,limited data,relatively suitable
+tt201,TT09/020,137354.171,194546.836,7.325,0.013,0.007,137354.419,194545.868,yes,yes,yes,klepelen,5,limited data,relatively suitable
+tt220,TT09/022,137824.89,193369.129,6.075,0.011,0.006,137825.596,193369.83,yes,yes,yes,klepelen,4,limited data,relatively suitable
+tt221,TT09/022,137826.302,193370.531,6.07,0.01,0.005,137825.596,193369.83,yes,yes,yes,klepelen,4,limited data,relatively suitable
+tt240,TT09/024,137422.366,192637.677,7.61,0.012,0.008,137422.012,192638.617,yes,yes,yes,klepelen,2,limited data,relatively suitable
+tt241,TT09/024,137421.657,192639.556,7.609,0.009,0.006,137422.012,192638.617,yes,yes,yes,klepelen,2,limited data,relatively suitable
+tt320,TT09/032,133201.262,192738.78,5.547,0.01,0.007,133200.844,192739.674,yes,yes,yes,schapen,2,limited data,relatively suitable
+tt321,TT09/032,133200.425,192740.568,5.56,0.018,0.013,133200.844,192739.674,yes,yes,yes,schapen,2,limited data,relatively suitable
+tt340,TT09/034,131906.93,191884.643,5.84,0.012,0.008,131907.87,191884.946,yes,yes,yes,schapen,1,limited data,relatively suitable
+tt341,TT09/034,131908.81,191885.248,5.835,0.013,0.008,131907.87,191884.946,yes,yes,yes,schapen,1,limited data,relatively suitable
+tt350,TT09/035,131724.737,191733.689,5.721,0.015,0.013,131725.353,191734.46,yes,yes,yes,schapen,2,limited data,relatively suitable
+tt351,TT09/035,131725.969,191735.23,5.716,0.014,0.012,131725.353,191734.46,yes,yes,yes,schapen,2,limited data,relatively suitable
+tt360,TT09/036,130098.855,193129.633,7.783,0.015,0.015,130099.511,193128.92,yes,yes,yes,maaien,1,limited data,relatively suitable
+tt361,TT09/036,130100.166,193128.206,7.78,0.013,0.013,130099.511,193128.92,yes,yes,yes,maaien,1,limited data,relatively suitable
+tt370,TT09/037,129116.769,193147.625,4.766,0.017,0.012,129117.562,193148.246,yes,yes,yes,klepelen,5,limited data,relatively suitable
+tt371,TT09/037,129118.355,193148.867,4.69,0.012,0.009,129117.562,193148.246,yes,yes,yes,klepelen,5,limited data,relatively suitable
+tt390,TT09/039,127464.81,192348.722,5.87,0.013,0.009,127465.333,192349.555,yes,yes,yes,schapen,1,limited data,relatively suitable
+tt391,TT09/039,127465.856,192350.387,5.928,0.01,0.008,127465.333,192349.555,yes,yes,yes,schapen,1,limited data,relatively suitable
+tt400,TT09/040,127363.501,192062.96,5.569,0.011,0.008,127363.707,192063.931,yes,yes,yes,schapen,1,limited data,relatively suitable
+tt401,TT09/040,127363.913,192064.902,5.572,0.012,0.008,127363.707,192063.931,yes,yes,yes,schapen,1,limited data,relatively suitable
+tt460,TT09/046,127242.753,192212.887,5.405,0.018,0.011,127242.62,192211.902,yes,yes,yes,klepelen,4,limited data,relatively suitable
+tt461,TT09/046,127242.487,192210.917,5.372,0.01,0.007,127242.62,192211.902,yes,yes,yes,klepelen,4,limited data,relatively suitable
+tt470,TT09/047,127746.077,192975.041,7.094,0.012,0.009,127745.599,192974.203,yes,yes,yes,schapen,2,limited data,relatively suitable
+tt471,TT09/047,127745.12,192973.365,7.11,0.012,0.009,127745.599,192974.203,yes,yes,yes,schapen,2,limited data,relatively suitable
+tt550,TT09/055,135397.247,193075.058,6.127,0.011,0.007,135396.676,193075.895,yes,yes,yes,schapen,1,limited data,relatively suitable
+tt551,TT09/055,135396.104,193076.731,6.128,0.009,0.006,135396.676,193075.895,yes,yes,yes,schapen,1,limited data,relatively suitable
+tt560,TT09/056,136111.251,191974.724,6.786,0.014,0.006,136111.634,191975.624,yes,yes,yes,schapen,5,limited data,relatively suitable
+tt561,TT09/056,136112.017,191976.524,6.787,0.023,0.015,136111.634,191975.624,yes,yes,yes,schapen,5,limited data,relatively suitable
+tt570,TT09/057,136714.64,191738.923,6.953,0.01,0.008,136713.706,191738.662,yes,yes,yes,schapen,4,limited data,relatively suitable
+tt571,TT09/057,136712.771,191738.401,6.891,0.012,0.009,136713.706,191738.662,yes,yes,yes,schapen,4,limited data,relatively suitable
+tt590,TT09/059,137021.336,192461.101,5.318,0.016,0.013,137021.245,192460.135,yes,yes,yes,schapen,3,limited data,relatively suitable
+tt591,TT09/059,137021.154,192459.168,5.335,0.013,0.011,137021.245,192460.135,yes,yes,yes,schapen,3,limited data,relatively suitable
+tt620,TT09/062,137499.174,194170.66,5.979,0.014,0.014,137500.101,194170.317,yes,yes,yes,schapen,3,limited data,relatively suitable
+tt621,TT09/062,137501.027,194169.973,6.003,0.01,0.01,137500.101,194170.317,yes,yes,yes,schapen,3,limited data,relatively suitable
+tt640,TT09/064,137155.71,195709.468,5.904,0.01,0.008,137155.607,195708.505,yes,yes,yes,klepelen,4,limited data,relatively suitable
+tt641,TT09/064,137155.504,195707.541,5.829,0.01,0.007,137155.607,195708.505,yes,yes,yes,klepelen,4,limited data,relatively suitable
+tt650,TT09/065,137115.51,196890.742,7.853,0.01,0.007,137115.92,196889.829,yes,yes,yes,klepelen,1,limited data,relatively suitable
+tt651,TT09/065,137116.33,196888.915,7.876,0.014,0.01,137115.92,196889.829,yes,yes,yes,klepelen,1,limited data,relatively suitable
+tt780,TT09/078,135998.935,199765.866,5.894,0.015,0.011,135998.25,199766.638,yes,yes,yes,klepelen,4,limited data,relatively suitable
+tt781,TT09/078,135997.565,199767.41,5.989,0.013,0.01,135998.25,199766.638,yes,yes,yes,klepelen,4,limited data,relatively suitable
+tt830,TT09/083,132274.129,199701.774,6.043,0.011,0.007,132273.198,199702.103,yes,yes,yes,schapen,3,limited data,relatively suitable
+tt831,TT09/083,132272.267,199702.431,6.036,0.011,0.007,132273.198,199702.103,yes,yes,yes,schapen,3,limited data,relatively suitable
+tt890,TT09/089,132521.739,199692.322,6.015,0.01,0.007,132520.891,199692.838,yes,yes,yes,klepelen,5,limited data,relatively suitable
+tt891,TT09/089,132520.043,199693.354,5.914,0.015,0.011,132520.891,199692.838,yes,yes,yes,klepelen,5,limited data,relatively suitable
+tt900,TT09/090,131829.915,199851.027,5.701,0.009,0.007,131828.932,199850.913,yes,yes,yes,klepelen,5,limited data,relatively suitable
+tt901,TT09/090,131827.949,199850.798,5.666,0.018,0.014,131828.932,199850.913,yes,yes,yes,klepelen,5,limited data,relatively suitable
+bv460,BV09/046,137486.672,195699.773,7.533,0.01,0.013,137486.872,195700.729,yes,yes,yes,maaien?,2,limited data,not really suitable
+bv461,BV09/046,137487.072,195701.684,7.552,0.008,0.009,137486.872,195700.729,yes,yes,yes,maaien?,2,limited data,not really suitable
+bv550,BV09/055,135408.9,192553.09,6.979,0.011,0.009,135409.556,192552.342,yes,yes,yes,begraasd en gemaaid,3,limited data,not really suitable
+bv551,BV09/055,135410.211,192551.593,6.963,0.013,0.012,135409.556,192552.342,yes,yes,yes,begraasd en gemaaid,3,limited data,not really suitable
+bv610,BV09/061,134856.125,193226.159,6.613,0.011,0.007,134857.098,193226.086,yes,yes,yes,begraasd en gemaaid,4,extensive data,not really suitable
+bv611,BV09/061,134858.07,193226.012,6.617,0.016,0.01,134857.098,193226.086,yes,yes,yes,begraasd en gemaaid,4,extensive data,not really suitable
+bv620,BV09/062,134855.836,193217.741,4.509,0.013,0.008,134856.824,193217.69,yes,yes,yes,begraasd en gemaaid,4,limited data,not really suitable
+bv621,BV09/062,134857.812,193217.639,4.539,0.014,0.009,134856.824,193217.69,yes,yes,yes,begraasd en gemaaid,4,limited data,not really suitable
+bv630,BV09/063,134609.068,193368.392,6.817,0.017,0.012,134609.605,193367.516,yes,yes,yes,begraasd en gemaaid,5,limited data,not really suitable
+bv631,BV09/063,134610.141,193366.639,6.852,0.015,0.008,134609.605,193367.516,yes,yes,yes,begraasd en gemaaid,5,limited data,not really suitable
+bv640,BV09/064,134602.901,193365.546,4.825,0.014,0.009,134603.343,193364.643,yes,yes,yes,begraasd en gemaaid,5,extensive data,not really suitable
+bv641,BV09/064,134603.785,193363.739,4.912,0.011,0.007,134603.343,193364.643,yes,yes,yes,begraasd en gemaaid,5,extensive data,not really suitable
+bv650,BV09/065,134746.508,194064.587,6.855,0.011,0.007,134747.42,194064.17,yes,yes,yes,begraasd en gemaaid,4,extensive data,not really suitable
+bv651,BV09/065,134748.332,194063.753,6.928,0.011,0.008,134747.42,194064.17,yes,yes,yes,begraasd en gemaaid,4,extensive data,not really suitable
+bv660,BV09/066,134744.099,194055.203,4.374,0.016,0.01,134743.208,194055.648,yes,yes,yes,begraasd en gemaaid,5,limited data,not really suitable
+bv661,BV09/066,134742.316,194056.093,4.367,0.017,0.01,134743.208,194055.648,yes,yes,yes,begraasd en gemaaid,5,limited data,not really suitable
+bv670,BV09/067,134214.891,193989.235,7.319,0.013,0.007,134215.879,193989.061,yes,yes,yes,begraasd en gemaaid,3,extensive data,not really suitable
+bv671,BV09/067,134216.867,193988.886,7.286,0.014,0.007,134215.879,193989.061,yes,yes,yes,begraasd en gemaaid,3,extensive data,not really suitable
+bv680,BV09/068,133686.613,194088.93,7.29,0.017,0.012,133687.5,194089.372,yes,yes,yes,begraasd en gemaaid,1,extensive data,not really suitable
+bv681,BV09/068,133688.387,194089.814,7.269,0.013,0.009,133687.5,194089.372,yes,yes,yes,begraasd en gemaaid,1,extensive data,not really suitable
+bv690,BV09/069,133528.453,193789.941,7.145,0.012,0.008,133528.365,193790.937,yes,yes,yes,begraasd en gemaaid,2,extensive data,not really suitable
+bv691,BV09/069,133528.277,193791.933,7.193,0.009,0.007,133528.365,193790.937,yes,yes,yes,begraasd en gemaaid,2,extensive data,not really suitable
+bv840,BV09/084,126969.241,189808.046,7.35,0.011,0.006,126969.912,189808.782,yes,yes,yes,klepelen/maaien,1,limited data,not really suitable
+bv841,BV09/084,126970.583,189809.517,7.366,0.012,0.007,126969.912,189808.782,yes,yes,yes,klepelen/maaien,1,limited data,not really suitable
+bv850,BV09/085,126508.36,189437.525,7.244,0.011,0.007,126509.052,189438.239,yes,yes,yes,klepelen/maaien,1,limited data,not really suitable
+bv851,BV09/085,126509.744,189438.953,7.298,0.013,0.008,126509.052,189438.239,yes,yes,yes,klepelen/maaien,1,limited data,not really suitable
+bv880,BV09/088,123870.104,188283.995,6.069,0.01,0.007,123869.113,188283.927,yes,yes,yes,maaien?,1,limited data,not really suitable
+bv881,BV09/088,123868.121,188283.858,6.061,0.012,0.008,123869.113,188283.927,yes,yes,yes,maaien?,1,limited data,not really suitable
+bv890,BV09/089,122728.58,188498.222,6.005,0.009,0.007,122727.851,188498.884,yes,yes,yes,maaien?,1,limited data,not really suitable
+bv891,BV09/089,122727.122,188499.545,6.02,0.009,0.008,122727.851,188498.884,yes,yes,yes,maaien?,1,limited data,not really suitable
+bv1040,BV09/104,137186.84,193117.788,6.74,0.009,0.008,137186.546,193116.849,yes,yes,yes,klepelen?,5,extensive data,not really suitable
+bv1041,BV09/104,137186.251,193115.909,6.679,0.014,0.012,137186.546,193116.849,yes,yes,yes,klepelen?,5,extensive data,not really suitable
+bv1050,BV09/105,137754.111,193765.501,7.514,0.014,0.012,137754.058,193764.526,yes,yes,yes,klepelen?,5,limited data,not really suitable
+bv1051,BV09/105,137754.004,193763.551,7.435,0.014,0.012,137754.058,193764.526,yes,yes,yes,klepelen?,5,limited data,not really suitable
+bv1190,BV09/119,136243.053,198811.31,7.532,0.014,0.01,136243.387,198812.239,yes,yes,yes,niets,3,extensive data,not really suitable
+bv1191,BV09/119,136243.721,198813.167,7.591,0.01,0.006,136243.387,198812.239,yes,yes,yes,niets,3,extensive data,not really suitable
+bv1270,BV09/127,132883.844,199113.975,7.743,0.013,0.008,132883.398,199114.87,yes,yes,yes,klepelen?,4,limited data,not really suitable
+bv1271,BV09/127,132882.952,199115.765,7.699,0.011,0.006,132883.398,199114.87,yes,yes,yes,klepelen?,4,limited data,not really suitable
+bv1320,BV09/132,126348.217,198506.291,7.503,0.069,0.042,126348.857,198505.568,yes,yes,yes,klepelen/niets,5,extensive data,not really suitable
+bv1321,BV09/132,126349.496,198504.844,7.491,0.036,0.02,126348.857,198505.568,yes,yes,yes,klepelen/niets,5,extensive data,not really suitable
+bv1330,BV09/133,125986.296,198528.969,7.511,0.011,0.008,125987.028,198529.612,yes,yes,yes,klepelen/niets,5,extensive data,not really suitable
+bv1331,BV09/133,125987.76,198530.255,7.44,0.016,0.011,125987.028,198529.612,yes,yes,yes,klepelen/niets,5,extensive data,not really suitable
+bv1390,BV09/139,126486.415,198430.226,7.261,0.009,0.013,126485.598,198430.776,yes,yes,yes,niets,5,limited data,not really suitable
+bv1391,BV09/139,126484.781,198431.326,7.336,0.013,0.013,126485.598,198430.776,yes,yes,yes,niets,5,limited data,not really suitable
+tt180,TT09/018,137484.603,195682.75,6.997,0.009,0.011,137484.836,195683.71,yes,yes,yes,maaien?,4,extensive data,not really suitable
+tt181,TT09/018,137485.068,195684.67,7.036,0.011,0.013,137484.836,195683.71,yes,yes,yes,maaien?,4,extensive data,not really suitable
+tt260,TT09/026,135403.918,192548.641,5.143,0.01,0.008,135404.6,192547.92,yes,yes,yes,begraasd en gemaaid,5,extensive data,not really suitable
+tt261,TT09/026,135405.281,192547.198,5.156,0.017,0.014,135404.6,192547.92,yes,yes,yes,begraasd en gemaaid,5,extensive data,not really suitable
+tt280,TT09/028,134213.779,193982.645,5.516,0.019,0.011,134214.787,193982.522,yes,yes,yes,begraasd en gemaaid,4,limited data,not really suitable
+tt281,TT09/028,134215.794,193982.398,5.595,0.02,0.013,134214.787,193982.522,yes,yes,yes,begraasd en gemaaid,4,limited data,not really suitable
+tt290,TT09/029,133690.084,194082.127,5.526,0.017,0.013,133690.964,194082.572,yes,yes,yes,begraasd en gemaaid,1,limited data,not really suitable
+tt291,TT09/029,133691.843,194083.017,5.447,0.016,0.012,133690.964,194082.572,yes,yes,yes,begraasd en gemaaid,1,limited data,not really suitable
+tt300,TT09/030,133536.232,193790.247,5.156,0.012,0.009,133536.207,193791.228,yes,yes,yes,begraasd en gemaaid,2,limited data,not really suitable
+tt301,TT09/030,133536.181,193792.209,5.151,0.018,0.013,133536.207,193791.228,yes,yes,yes,begraasd en gemaaid,2,limited data,not really suitable
+tt380,TT09/038,128623.548,193236.318,4.515,0.012,0.01,128624.529,193236.452,yes,yes,yes,niets,4,limited data,not really suitable
+tt381,TT09/038,128625.509,193236.586,4.556,0.008,0.007,128624.529,193236.452,yes,yes,yes,niets,4,limited data,not really suitable
+tt440,TT09/044,126957.972,189796.176,7.298,0.011,0.006,126958.626,189796.909,yes,yes,yes,klepelen/maaien,1,extensive data,not really suitable
+tt441,TT09/044,126959.279,189797.641,7.311,0.009,0.005,126958.626,189796.909,yes,yes,yes,klepelen/maaien,1,extensive data,not really suitable
+tt450,TT09/045,126564.612,189487.784,7.559,0.012,0.007,126565.353,189488.454,yes,yes,yes,klepelen/maaien,1,extensive data,not really suitable
+tt451,TT09/045,126566.093,189489.123,7.567,0.01,0.006,126565.353,189488.454,yes,yes,yes,klepelen/maaien,1,extensive data,not really suitable
+tt480,TT09/048,123824.082,188281.408,5.751,0.008,0.007,123823.097,188281.308,yes,yes,yes,maaien?,1,limited data,not really suitable
+tt481,TT09/048,123822.111,188281.207,5.742,0.009,0.007,123823.097,188281.308,yes,yes,yes,maaien?,1,limited data,not really suitable
+tt490,TT09/049,122336.506,189387.249,5.852,0.007,0.008,122336.832,189388.183,yes,yes,yes,maaien?,1,limited data,not really suitable
+tt491,TT09/049,122337.158,189389.116,5.874,0.008,0.009,122336.832,189388.183,yes,yes,yes,maaien?,1,limited data,not really suitable
+tt600,TT09/060,137182.778,193104.345,6.72,0.01,0.009,137182.427,193103.414,yes,yes,yes,klepelen?,5,extensive data,not really suitable
+tt601,TT09/060,137182.075,193102.482,6.656,0.008,0.007,137182.427,193103.414,yes,yes,yes,klepelen?,5,extensive data,not really suitable
+tt760,TT09/076,136154.261,198495.782,7.601,0.013,0.011,136154.428,198496.749,yes,yes,yes,klepelen?,5,extensive data,not really suitable
+tt761,TT09/076,136154.594,198497.715,7.631,0.016,0.014,136154.428,198496.749,yes,yes,yes,klepelen?,5,extensive data,not really suitable
+tt770,TT09/077,136217.177,198737.403,7.69,0.009,0.006,136217.423,198738.349,yes,yes,yes,niets,3,limited data,not really suitable
+tt771,TT09/077,136217.669,198739.294,7.653,0.01,0.007,136217.423,198738.349,yes,yes,yes,niets,3,limited data,not really suitable
+tt790,TT09/079,134810.103,199744.921,7.275,0.013,0.007,134809.109,199745.009,yes,yes,yes,maaien?,4,extensive data,not really suitable
+tt791,TT09/079,134808.114,199745.097,7.271,0.011,0.005,134809.109,199745.009,yes,yes,yes,maaien?,4,extensive data,not really suitable
+tt820,TT09/082,132880.513,199112.394,6.065,0.009,0.006,132880.092,199113.292,yes,yes,yes,klepelen?,4,limited data,not really suitable
+tt821,TT09/082,132879.67,199114.189,6.075,0.013,0.008,132880.092,199113.292,yes,yes,yes,klepelen?,4,limited data,not really suitable
+tt870,TT09/087,126390.441,198452.885,7.407,0.012,0.012,126389.813,198453.638,yes,yes,yes,klepelen/niets,5,extensive data,not really suitable
+tt871,TT09/087,126389.184,198454.39,7.44,0.015,0.012,126389.813,198453.638,yes,yes,yes,klepelen/niets,5,extensive data,not really suitable
+tt940,TT09/094,126309.886,198655.919,7.54,0.011,0.011,126309.745,198656.897,yes,yes,yes,niets,5,extensive data,not really suitable
+tt941,TT09/094,126309.603,198657.874,7.565,0.008,0.008,126309.745,198656.897,yes,yes,yes,niets,5,extensive data,not really suitable
+bv011,BV09/001,125135.466,188535.516,7.048,0.01,0.007,125134.077,188534.972,yes,no,yes,schapen?,2,extensive data,definitely not suitable
+bv012,BV09/001,125132.688,188534.428,7.15,0.011,0.008,125134.077,188534.972,yes,no,yes,schapen?,2,extensive data,definitely not suitable
+bv470,BV09/047,137397.37,195012.975,7.831,0.009,0.007,137397.477,195014.965,yes,no,yes,maaien?,1,limited data,definitely not suitable
+bv471,BV09/047,137397.584,195016.955,7.794,0.016,0.013,137397.477,195014.965,yes,no,yes,maaien?,1,limited data,definitely not suitable
+bv820,BV09/082,127042.416,191564.837,7.569,0.01,0.006,127042.498,191565.382,yes,no,yes,maaien,1,limited data,definitely not suitable
+bv821,BV09/082,127042.579,191565.926,7.617,0.011,0.007,127042.498,191565.382,yes,no,yes,maaien,1,limited data,definitely not suitable
+bv1100,BV09/110,145750.525,218613.601,10.167,0.014,0.01,145750.244,218612.664,no,yes,no,maaien,3,extensive data,definitely not suitable
+bv1101,BV09/110,145749.963,218611.726,10.123,0.012,0.009,145750.244,218612.664,no,yes,no,maaien,3,extensive data,definitely not suitable
+bv1110,BV09/111,145935.664,219489.025,9.694,0.01,0.009,145936.002,219488.073,no,yes,no,maaien,1,limited data,definitely not suitable
+bv1111,BV09/111,145936.34,219487.121,9.669,0.01,0.008,145936.002,219488.073,no,yes,no,maaien,1,limited data,definitely not suitable
+bv1120,BV09/112,144885.893,220216.039,9.925,0.013,0.011,144886.842,220215.714,no,yes,no,maaien,3,extensive data,definitely not suitable
+bv1121,BV09/112,144887.79,220215.389,9.89,0.015,0.012,144886.842,220215.714,no,yes,no,maaien,3,extensive data,definitely not suitable
+bv1130,BV09/113,142737.95,222838.698,6.225,0.016,0.012,142737.66,222839.634,no,yes,yes,klepelen,4,limited data,definitely not suitable
+bv1131,BV09/113,142737.37,222840.57,6.161,0.013,0.01,142737.66,222839.634,no,yes,yes,klepelen,4,limited data,definitely not suitable
+bv1140,BV09/114,141730.613,224943.206,11.123,0.014,0.01,141729.957,224943.948,no,yes,yes,niets,1,extensive data,definitely not suitable
+bv1141,BV09/114,141729.3,224944.689,11.054,0.013,0.01,141729.957,224943.948,no,yes,yes,niets,1,extensive data,definitely not suitable
+bv1150,BV09/115,141559.763,225122.769,10.939,0.011,0.007,141559.045,225123.477,no,yes,yes,niets,3,extensive data,definitely not suitable
+bv1151,BV09/115,141558.326,225124.184,10.958,0.012,0.007,141559.045,225123.477,no,yes,yes,niets,3,extensive data,definitely not suitable
+bv1160,BV09/116,141935.053,224724.451,10.317,0.019,0.014,141934.344,224725.141,no,yes,yes,niets,3,limited data,definitely not suitable
+bv1161,BV09/116,141933.634,224725.83,10.231,0.013,0.01,141934.344,224725.141,no,yes,yes,niets,3,limited data,definitely not suitable
+bv1380,BV09/138,127956.059,199152.967,6.452,0.009,0.008,127957.062,199152.834,yes,yes,no,klepelen,5,limited data,definitely not suitable
+bv1381,BV09/138,127958.065,199152.7,6.456,0.015,0.012,127957.062,199152.834,yes,yes,no,klepelen,5,limited data,definitely not suitable
+tt190,TT09/019,137396.178,194991.319,7.605,0.009,0.008,137396.369,194993.288,yes,no,yes,maaien?,1,limited data,definitely not suitable
+tt191,TT09/019,137396.559,194995.257,7.547,0.008,0.007,137396.369,194993.288,yes,no,yes,maaien?,1,limited data,definitely not suitable
+tt660,TT09/066,145510.557,218173.736,9.718,0.012,0.008,145510.064,218172.88,no,yes,no,maaien,3,extensive data,definitely not suitable
+tt661,TT09/066,145509.571,218172.023,9.663,0.014,0.009,145510.064,218172.88,no,yes,no,maaien,3,extensive data,definitely not suitable
+tt670,TT09/067,145885.849,219011.421,9.725,0.008,0.007,145885.559,219010.451,no,yes,no,maaien,3,extensive data,definitely not suitable
+tt671,TT09/067,145885.268,219009.481,9.719,0.012,0.009,145885.559,219010.451,no,yes,no,maaien,3,extensive data,definitely not suitable
+tt680,TT09/068,145548.803,219930.664,9.741,0.013,0.009,145549.713,219930.282,no,yes,no,maaien,3,limited data,definitely not suitable
+tt681,TT09/068,145550.622,219929.9,9.742,0.009,0.007,145549.713,219930.282,no,yes,no,maaien,3,limited data,definitely not suitable
+tt690,TT09/069,142742.936,222839.954,8.721,0.015,0.011,142742.637,222840.885,no,yes,yes,klepelen,4,extensive data,definitely not suitable
+tt691,TT09/069,142742.337,222841.815,8.708,0.014,0.01,142742.637,222840.885,no,yes,yes,klepelen,4,extensive data,definitely not suitable
+tt700,TT09/070,141724.408,224937.551,8.308,0.016,0.012,141723.726,224938.274,no,yes,yes,niets,1,limited data,definitely not suitable
+tt701,TT09/070,141723.043,224938.996,8.3,0.012,0.009,141723.726,224938.274,no,yes,yes,niets,1,limited data,definitely not suitable
+tt710,TT09/071,141554.787,225118.088,8.688,0.017,0.01,141554.135,225118.821,no,yes,yes,niets,3,limited data,definitely not suitable
+tt711,TT09/071,141553.482,225119.553,8.727,0.019,0.012,141554.135,225118.821,no,yes,yes,niets,3,limited data,definitely not suitable
+tt720,TT09/072,141950.184,224709.281,10.37,0.016,0.012,141949.413,224709.934,no,yes,yes,niets,3,extensive data,definitely not suitable
+tt721,TT09/072,141948.641,224710.587,10.369,0.018,0.014,141949.413,224709.934,no,yes,yes,niets,3,extensive data,definitely not suitable
+tt800,TT09/080,120073.867,188643.55,5.577,0.013,0.01,120072.394,188644.877,yes,no,yes,maaien,2,limited data,definitely not suitable
+tt801,TT09/080,120070.92,188646.203,5.654,0.012,0.009,120072.394,188644.877,yes,no,yes,maaien,2,limited data,definitely not suitable
+tt920,TT09/092,128529.979,199527.284,7.57,0.009,0.01,128530.394,199528.204,yes,yes,no,klepelen,5,extensive data,definitely not suitable
+tt921,TT09/092,128530.809,199529.124,7.593,0.013,0.014,128530.394,199528.204,yes,yes,no,klepelen,5,extensive data,definitely not suitable
+tt930,TT09/093,127870.906,199128.494,7.052,0.01,0.012,127871.721,199129.03,yes,yes,no,klepelen,5,extensive data,definitely not suitable
+tt931,TT09/093,127872.536,199129.565,7.1,0.007,0.009,127871.721,199129.03,yes,yes,no,klepelen,5,extensive data,definitely not suitable
