@@ -335,41 +335,42 @@ residualPlots(fit1)
   #Minnows (MLMs) ----
 head(minnow)
 str(minnow)
-minnow$STRESS <- as.factor(minnow$STRESS)
-minnow$CONTAMINATION <- as.factor(minnow$CONTAMINATION)
+minnow$stress <- as.factor(minnow$stress)
+minnow$contaminant <- as.factor(minnow$contaminant)
 
 par(mfrow=c(1,2))
-plot(BODY.LENGTH ~ STRESS, data=minnow)
-plot(BODY.LENGTH ~ CONTAMINATION, data=minnow)
+plot(body_length ~ stress, data=minnow)
+plot(body_length ~ contaminant, data=minnow)
 par(mfrow=c(1,1))
 
-fit3 <- lm(BODY.LENGTH ~ STRESS+CONTAMINATION, data=minnow)
+fit3 <- lm(body_length ~ stress + contaminant, data=minnow)
 summary(fit3) #lead and sound are significant influences on body length
 Anova(fit3, type="III") #both stress and contamination have an effect on minnow body length
 plot(allEffects(fit3))
-levels(minnow$CONTAMINATION) #chrome = 0; lead = 1; manganese = 2
-levels(minnow$STRESS) #control = 0; predation = 1; sound = 2
+levels(minnow$contaminant) #chrome = 0; lead = 1; manganese = 2
+levels(minnow$stress) #control = 0; predation = 1; sound = 2
 
-fit4 <- lm(BODY.LENGTH ~STRESS*CONTAMINATION, data=minnow) #same model coded in a shorter way
-
+fit4 <- lm(body_length ~ stress * contaminant, data=minnow) #same model coded in a shorter way
+summary(fit4)
 Anova(fit4, type="III") #interaction also significant
 plot(allEffects(fit4))
 #you can make the visualisation different if you switch position of the predictors (is still the same fit)
-fit4b <- lm(BODY.LENGTH ~CONTAMINATION*STRESS, data=minnow)
+fit4b <- lm(body_length ~contaminant*stress, data=minnow)
 plot(allEffects(fit4b))
 
 AICc(fit3, fit4, fit4b) #interaction models = best
 
-contrast(emmeans(fit4, ~CONTAMINATION|STRESS), method="pairwise",adjust="tukey")
+contrast(emmeans(fit4, ~contaminant|stress), method="pairwise",adjust="tukey")
 #in the control and predation treatments, we see a difference in body length between
 #all pairwise combinations of the contamination treatments. However, in the sound
 #stress treatment, we do not see a difference between the chrome and lead treatments
 #(but we do see differences between the other pairs of contamination treatments).
 
-contrast(emmeans(fit4, ~STRESS|CONTAMINATION), method="pairwise",adjust="tukey")
+contrast(emmeans(fit4, ~stress|contaminant), method="pairwise",adjust="tukey")
 #we can also test pairwise the other way around: is there difference between stress treatment within each contamination
 
 #Assumptions:
+spreadLevelPlot(fit4)
 ncvTest(fit4) #ok
 
 #Normality: 
@@ -392,6 +393,7 @@ inflobs=which(cd>1)
 inflobs # empty, so no outliers here
 influenceIndexPlot(fit4,vars="Cook")
 
+vif(fit4)
 
 # We conclude that contamination type and type of stress have significant effects 
 # on the adult body length in minnows. On top of that, there is a significant interaction: the effects
@@ -680,7 +682,6 @@ set_sum_contrasts()
   summary(fit1) # there is no significant effect of clutch size
   Anova(fit1, type="III") #same results for single continuous variable, but the summary gives you the estimates
   plot(allEffects(fit1))
-  
   residualPlots(fit1) #it looks like there is a strong curvilinear effect
   
   fit2=lm(Clutch_weight~poly(Length,2),data=tortoises) # include a second order polynomial term
@@ -729,9 +730,10 @@ set_sum_contrasts()
   #Isolation (GLMs) ----  
   head(isolation)
   str(isolation)
-  
+  par(mfrow = c(1,2))
   plot(presence ~ area, data=isolation)
   plot(presence ~ distance, data=isolation)
+  par(mfrow = c(1,1))
   
   #another way is with 'xyplot' from the library 'lattice'. This allows us to also draw a quick-and-dirty linear
   #fit in the plot to get an idea (by including type=c("p","r") we include both points ("p") and a linear regression line
@@ -775,7 +777,8 @@ set_sum_contrasts()
   #overdispersion: make a quasibinomial fit and check the dispersion parameter
   fitb <- glm(presence ~ area + distance, family=quasibinomial(link=logit), data=isolation)
   summary(fitb) #dispersion parameter <1, so no overdispersion. We can interpret the original model (not the quasibinomial)
-  
+  testDispersion(fit)
+  dispersion_ratio <- deviance(fit) / df.residual(fit) #<1; all good
   outlierTest(fit) #no significant outliers
   max(cooks.distance(fit)) #largest cook's distance is 0.2 (<1, so no influential observations)
   
@@ -797,10 +800,12 @@ set_sum_contrasts()
   blood <- mutate_if(blood, is.character, as.factor)
   #but we can of course also just code each of them as factor separately using as.factor
   
+  par(mfrow = c(1, 3))
   plot(cells~smoker, data=blood)
   plot(cells~sex, data=blood)
   plot(cells~weight, data=blood)
-
+  par(mfrow = c(1, 1))
+  
   # The dependent variable (cells) contains count data, so we need to construct a generalized linear model with 
   # a poisson error distribution and a log link function. 
   
@@ -821,7 +826,7 @@ set_sum_contrasts()
   plot(allEffects(fit),ylab="Number of damaged cells")
   #use type="response" to plot on the linear scale:
   plot(allEffects(fit),ylab="Number of damaged cells",type="response")
-  
+
   fit2=glm(cells~smoker*weight+sex,family=poisson,data=blood)
   summary(fit2) # interaction is significant, so the effect of weight is different between smokers and non-smokers
   Anova(fit2, type="III")
@@ -866,12 +871,13 @@ set_sum_contrasts()
   Anova(fit7b, type="III")
   # this shows checking for overdispersion and correcting with residualcentering is important, as it (in this case at least) leads to different conclusions regarding
   # the significance(s) of the main effects
-  
+
   vif(fit7b) #variance inflation factors are ok now (<5)
   
   #overdisperion: construct a quasipoisson model and check if the dispersion parameter is not much larger than 1:
   fit7c <- glm(cells~smoker+weight+sex + sex:smoker + smoker:weight, family=quasipoisson,data=d3)
   summary(fit7c) #dispersion parameter is fine, keep original model (though WITH residualCentering)
+  testDispersion(fit7)
   
   outlierTest(fit7b) # no outliers
   max(cooks.distance(fit7b)) #maximum cook's distance is 0.11 - no influential observations
@@ -927,8 +933,6 @@ set_sum_contrasts()
   
   #glmulti came to the same conclusion as we did in c - the algorithm works! (though also here we still need to correct for overdispersion)
   
-#Mixed models ---
-  #
 
 #Advanced GLMs and Mixed models ----
   #Squirrels ----
@@ -943,10 +947,11 @@ set_sum_contrasts()
   squirrels$Outcome <- as.factor(squirrels$Outcome)
   
   #    a.  Start with some visual inspection of the data. 
+  par(mfrow = c(1,2))
   plot(squirrels)
   plot(squirrels$Outcome ~ squirrels$Age)
   plot(squirrels$Outcome ~ squirrels$Parasite_load)
-  
+  par(mfrow = c(1,1))
   #    b.  Fit multinomial models to investigate the influence of age and parasite load on disease outcomes.
   #        Fit a model with and without an interaction and pick the best one based on AICc.
   #        NOTE: in including your predictor variables, list 'Age' first. Otherwise the effect plot is hard to interpret.
@@ -1012,8 +1017,10 @@ set_sum_contrasts()
   babbler$GROUP_ID <- as.factor(babbler$GROUP_ID)
   
   babbler <- subset(babbler, babbler$SEX != "U")
+  par(mfrow = c(1,2))
   plot(GCP~SEX, data=babbler)
   plot(GCP~AGE, data=babbler)
+  par(mfrow = c(1,1))
   
   #   b.  First construct models to predict cognitive performance of the birds based on age and sex that WITHOUT
   #       including any random effects. Run models for each possible combination of predictors and choose the best.
@@ -1537,9 +1544,11 @@ set_sum_contrasts()
   screeplot(pca.aster, main = "Scree plot", type="lines") ##PC1 and PC2 important, rest not that important
   
   #
+  par(mfrow = c(1,3))
   plot(pca.aster$x[,c(1,2)],col ="black", cex=1) #pca.aster$x contains the scores --> position on graph per object (F=U*Yc)
   plot(pca.aster$x[,c(1,3)],col ="black", cex=1)
   plot(pca.aster$x[,c(2,3)],col ="black", cex=1)
+  par(mfrow = c(1,1))
   
   # Different color for each group: blue=diploid, green=hexaploid, red=tetraploid
   # use the Ploidy column of the asternew dataset, because pca.aster uses the dataset without the NA point 
@@ -1616,7 +1625,7 @@ set_sum_contrasts()
   
   
   ##plotting other PC's can be done by specifying the axes with x= and y= (default are PC1 and PC2):
-  biplot2b <- autoplot(pca.aster, x=3, y=4, data=asternew, colour='Ploidy', frame=TRUE, frame.type="convex",  loadings=TRUE, loadings.colour = 'darkred', loadings.label = TRUE, loadings.label.size=4, loadings.label.colour = "darkred", loadings.label.vjust = 1.3, size=2) +
+  biplot2b <- autoplot(pca.aster, x=1, y=2, data=asternew, colour='Ploidy', frame=TRUE, frame.type="convex",  loadings=TRUE, loadings.colour = 'darkred', loadings.label = TRUE, loadings.label.size=4, loadings.label.colour = "darkred", loadings.label.vjust = 1.3, size=2) +
     theme_bw() +
     theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
     theme(legend.position.inside= c(0.85, 0.15)) +
@@ -2012,7 +2021,7 @@ set_sum_contrasts()
   plot(p.dist.ward,main="Ward")
   #p.dist.ward$height <-sqrt(p.dist.ward$height);
   #plot(p.dist.ward)
-  
+  par(mfrow=c(1,1))
   
   ### Assessing which clustering method works best
   # Single linkage agglomerative clustering
@@ -2213,7 +2222,7 @@ set_sum_contrasts()
   rownames(silo2) <- row.names(plants)[attr(silo2,"iOrd")];
   plot(silo2, main="Silhouette plot - Complete", cex.names=0.8,col=silo2+1, nmax.lab=100)
   
-  cutg3 <- cutree(p.dist.UPGMA, k=7); #you can try different numbers of clusters (e.g the max k=7, or the intermediate k=5)
+  cutg3 <- cutree(p.dist.UPGMA, k=2); #you can try different numbers of clusters (e.g the max k=7, or the intermediate k=5)
   sil3 <- silhouette(cutg3, p.dist);
   silo3 <- sortSilhouette(sil3); ##orders the rows of sil by clusters and decreasing silhouette width
   rownames(silo3) <- row.names(plants)[attr(silo3,"iOrd")];#also order the plant numbers accordingly
@@ -2511,7 +2520,7 @@ set_sum_contrasts()
   # Exercise 3.1
   # Exercise 3.2
   m1 <- adonis2(OTU ~ species*location, data=id, permutations=1000, method="bray")
-  m1 #only gives an oveall p-value for the model
+  m1 #only gives an oveall p-value for the model (significant)
   m1 <- adonis2(OTU ~ species*location, data=id, permutations=1000, method="bray", by="terms")
   m1
   # There is a significant effect of location and a marginally significant (0.05<P<0.1) interaction effect 
@@ -2604,7 +2613,7 @@ set_sum_contrasts()
   
   summary(model_int)
   Anova(model_int, type = 3)
-  vif(model4) #GVIF < 5; no collinearity!
+  vif(model_int) #GVIF < 5; no collinearity!
   
   par(mfrow = c(1, 2))
   plot(residuals(model_int) ~ fitted(model_int), main = "Residuals vs. Fitted")
@@ -2640,14 +2649,17 @@ set_sum_contrasts()
   head(env) #env variables
   
   env_m <- env[,(2:25)]
+  head(env_m)
   #Abundances are not continuous variables, so I will use an NMDS
   str(comm)
   comm <- mutate_if(comm, is.character, as.factor)
   com_m = comm[,c(2:34)] #only selecting the numerical data to work with
+  head(com_m)
   
   #NMDS
-  nmds <- metaMDS(com_m, distance = "bray") #use original dataset as input, metaMDS calculates distance matrix
-  nmds #stress = 0.19; not ideal
+  nmds <- metaMDS(com_m, distance = "bray", k = 2, trymax = 100,
+                  autotransform = FALSE) #use original dataset as input, metaMDS calculates distance matrix
+  nmds #stress = 0.192; not ideal
   plot(nmds, type="text", main=paste("NMDS/Bray -Stress =", round(nmds$stress,3)))
   
   stressplot(nmds, main=paste("Shepard plot - Euclidean", round(nmds$stress,3)))
@@ -2655,57 +2667,136 @@ set_sum_contrasts()
   plot(nmds, type="t", main="goodness-of-fit")
   points(nmds, display="sites", cex=2*gof/mean(gof)) # Large values (large points in this case) represent poor fit
   
-  bray_dist <- vegdist(com_m, method = "bray") #0 = completely similar, 1 = completely different communities
-  hc <- hclust(bray_dist, method = "average") #UPGMA clustering, unless there is a reason not to use it, use this
+  bray_dist <- vegdist(com_m, method = "bray")
+  hc <- hclust(bray_dist, method = "average")  # this IS your UPGMA
+  clust_single <- hclust(bray_dist, method = "single")
+  clust_complete <- hclust(bray_dist, method ="complete")
+  clust_UPGMA <- hclust(bray_dist, method = "average")
+  clust_Ward <- hclust(bray_dist, method = "ward.D")
   
+  gutter.clust.single.coph <- cophenetic(clust_single)
+  cor(bray_dist, gutter.clust.single.coph) #0.6608
   
-  plot(hc,
-       labels = FALSE,
-       hang = -1,
-       main = "Hierarchical clustering of ponds (Bray–Curtis)",
-       xlab = "Ponds",
-       ylab = "Bray–Curtis dissimilarity")
+  gow.dist.single <- sum((bray_dist-gutter.clust.single.coph)^2)
+  gow.dist.single #933.9841
   
-  p.dist.UPGMA <- hclust(p.dist, method="average");
-  plot(p.dist.UPGMA, main="UPGMA")
+  gutter.clust.complete.coph <- cophenetic(clust_complete)
+  cor(bray_dist, gutter.clust.complete.coph) #0.7985
   
-  plot(p.dist.UPGMA$height, nrow(com_m):2, type="S", main="Fusion levels - UPGMA",
-       ylab="k (number of clusters)", xlab="h (node height)", col="grey")
-  text(p.dist.UPGMA$height, nrow(com_m):2, nrow(com_m):2, col="red", cex = 0.8)  
+  gow.dist.complete <- sum((bray_dist-gutter.clust.complete.coph)^2)
+  gow.dist.complete #216.5836
   
-  asw <- numeric(nrow(com_m));
+  gutter.clust.upgma.coph <- cophenetic(clust_UPGMA)
+  cor(bray_dist, gutter.clust.upgma.coph) #0.8759
+  
+  gow.dist.upgma <- sum((bray_dist-gutter.clust.upgma.coph)^2)
+  gow.dist.upgma #86.836
+  
+  gutter.clust.ward.coph <- cophenetic(clust_Ward)
+  cor(bray_dist, gutter.clust.ward.coph) #0.34697
+  
+  gow.dist.ward <- sum((bray_dist-gutter.clust.ward.coph)^2)
+  gow.dist.ward #546793.4
+  
+  #The rule of thumb: cophenetic > 0.75 = acceptable; > 0.80 = good. UPGMA at 0.88 is solid and is the standard recommendation for community ecology data — you're fine to proceed with it.
+  
+  asw <- numeric(nrow(com_m))
   for (k in 2:(nrow(com_m)-1)) {
-    sil <- silhouette(cutree(p.dist.UPGMA, k=k), p.dist)
+    sil <- silhouette(cutree(hc, k = k), bray_dist)
     asw[k] <- summary(sil)$avg.width
   }
-  k.best.single <- which.max(asw);
-  k.best.single
-  plot(1:nrow(plants), asw, type="h", main="Silhouette-optimal number of clusters, single",
-       xlab="k (number of groups)", ylab="Average silhouette width")
-  axis(1, k.best.single, paste("optimum",k.best.single,sep="\n"), col="red", font=2, col.axis="red")
-  points(k.best.single, max(asw), pch=16, col="red", cex=1.5)  
+  k_best <- which.max(asw)
+  cat("Optimal k:", k_best) #22 clusters is best
+  plot(1:nrow(com_m), asw, type = "h",
+       main = "Silhouette — optimal number of clusters",
+       xlab = "k (clusters)", ylab = "ASW")
+  axis(1, k_best, paste("optimum", k_best, sep="\n"), col="red", col.axis="red")
+  points(k_best, max(asw), pch = 16, col = "red")
   
-  #two clusters!
-  nmds 
-  plot(nmds, type="n", main=paste("NMDS/Chord - Stress =", round(nmds$stress,3)))
-  text(nmds,display=c("species")) 
+  clusters <- cutree(hc, k = k_best)
+  table(clusters) #22 clusters is too many
   
+  for (k in 2:8) {
+    cat("k =", k, ":", table(cutree(hc, k)), "\n")
+  }
   
-  library(vegan)
-  nmds <- metaMDS(comm = com_m, distance = "bray", trace = FALSE, autotransform = FALSE)
-  plot(nmds)    
-  nmds_xy <- data.frame(nmds$points)  
-  nmds_xy$pond <- comm$Pond_ID
-  ggplot(nmds_xy, aes(MDS1, MDS2)) +
-    geom_point() +
-    theme_classic()
+  plot(2:10, asw[2:10], type="b", pch=16,
+       xlab="k", ylab="ASW", main="ASW for k = 2 to 10") #4-5 seems ideal?
+  #"Inspection of hierarchical clustering across k=2–8 revealed that the dataset is dominated by a single large, homogeneous community type (n=114). Singletons peeled off sequentially with increasing k, with the first meaningful internal split occurring only at k=8 (n=100 vs n=8). We therefore selected k=2 as the most parsimonious partition, distinguishing the main pond community from a highly dissimilar outlier site. The ASW and cophenetic correlation (UPGMA: r=0.88) confirm UPGMA as the appropriate linkage method, but overall cluster structure was weak, suggesting a continuum of community composition rather than discrete groups."
   
+  plot(hc, hang=-1, labels=FALSE)
+  rect.hclust(hc, k=2, border="red")
+  rect.hclust(hc, k=4, border="blue")
   
-  nmds$stress  #acceptable
-  envfit_res <- envfit(nmds, env_m)
-  plot(nmds)
-  plot(envfit_res)
+  for (i in 2:(nrow(com_m)-1)){
+    gr <- cutree(p.dist.UPGMA, i)
+    distgr <- grpdist(gr)
+    mt <- cor(p.dist, distgr, method="pearson")
+    kt[i,2] <- mt}
+  k.best <- which.max(kt$r)
+  
+  # Chord distance (optional — valid alternative, but keep consistent with clustering)
+  p.dist <- vegdist(decostand(com_m, "norm"), method = "euclidean")
+  
+  # Silhouette — use hc (hclust object) and bray_dist (matches your clustering)
+  cutg2 <- cutree(hc, k = 2)
+  sil3  <- silhouette(cutg2, bray_dist)
+  silo3 <- sortSilhouette(sil3)
+  rownames(silo3) <- row.names(com_m)[attr(silo3, "iOrd")]
+  plot(silo3,
+       main      = "Silhouette plot - UPGMA",
+       cex.names = 0.8,
+       col       = silo3[, 1] + 1,
+       nmax.lab  = 100)
+  k_chosen <- 2
+  clusters <- cutree(hc, k = k_chosen)
+  table(clusters)
+  
+  nmds_xy <- as.data.frame(scores(nmds, display = "sites"))
+  nmds_xy$cluster <- as.factor(clusters)
+  
+  # 1. Run envfit BEFORE the plot
+  envfit_res <- envfit(nmds, env_m, permutations = 999)
+  
+  # 2. Extract significant arrows
+  arrow_df        <- as.data.frame(envfit_res$vectors$arrows * sqrt(envfit_res$vectors$r))
+  arrow_df$label  <- rownames(arrow_df)
+  arrow_df$pval   <- envfit_res$vectors$pvals
+  arrow_sig       <- arrow_df[arrow_df$pval <= 0.05, ]
+  arrow_sig       <- arrow_sig[!rownames(arrow_sig) %in% c("NMDS1","NMDS2"), ]
+  
+  # 3. Scale arrows to fit plot
+  mult            <- ordiArrowMul(envfit_res)
+  arrow_sig$x1    <- arrow_sig$NMDS1 * mult
+  arrow_sig$y1    <- arrow_sig$NMDS2 * mult
+  ggplot(nmds_xy, aes(NMDS1, NMDS2, shape = cluster, colour = cluster)) +
+    geom_point(size = 3, alpha = 0.8) +
+    theme_classic() +
+    labs(title = paste("NMDS — Stress =", round(nmds$stress, 3)))
+  
+  ggplot(nmds_xy, aes(NMDS1, NMDS2, shape = cluster, colour = cluster)) +
+    geom_point(size = 3, alpha = 0.8) +
+    geom_segment(data = arrow_sig,
+                 aes(x = 0, y = 0, xend = x1, yend = y1),
+                 arrow = arrow(length = unit(0.25, "cm"), type = "closed"),
+                 colour = "red", linewidth = 0.8,
+                 inherit.aes = FALSE) +
+    geom_text(data = arrow_sig,
+              aes(x = x1 * 1.15, y = y1 * 1.15, label = label),
+              colour = "red", size = 3.5,
+              inherit.aes = FALSE) +
+    theme_classic() +
+    labs(title = paste("NMDS — Stress =", round(nmds$stress, 3)),
+         subtitle = "Red arrows = significant envfit vectors (p ≤ 0.05)")
+  
+  envfit_res <- envfit(nmds, env_m, permutations = 999)
+  envfit_res    #mean water clarity, average pond depth, TN, and TP significant
+  #(Chla, STDV_pond_depth, debris, and bank-shallowness borderline)
 
+  plot(nmds, type = "n", main = "NMDS with environmental vectors")
+  points(nmds, display = "sites", pch = clusters + 14, col = clusters)
+  text(nmds, display = "species", cex = 0.6, col = "grey40")
+  plot(envfit_res, p.max = 0.05, col = "red", add = TRUE)  # only sig. vars
 #Practice exam 1 ----
   # ── PACKAGES ──────────────────────────────────────────────────────────────────
   library(vegan)     # metaMDS, vegdist, envfit, adonis2, scores
