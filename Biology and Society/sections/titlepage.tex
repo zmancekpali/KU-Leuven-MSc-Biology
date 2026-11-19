@@ -1,0 +1,25 @@
+% ---------- Title page ------------------------------------------------
+\begin{titlepage}
+\color{ink}
+\vspace*{1.5cm}
+
+{\color{muted}\large \University\ \textbullet\ \AcademicYear}\par
+\vspace{14pt}
+{\headingfont\fontsize{40}{46}\selectfont \CourseName\par}
+\vspace{6pt}
+{\fontsize{22}{28}\selectfont\color{muted} Portfolio\par}
+
+\vspace{1.2cm}
+\IfFileExists{\CoverImage}{%
+  \noindent\includegraphics[width=\linewidth, height=9.5cm, keepaspectratio]{\CoverImage}\par}{}
+
+\vfill
+\noindent\arrayrulecolor{rule}\renewcommand{\arraystretch}{1.6}%
+\begin{tabularx}{\linewidth}{>{\leavevmode\color{muted}}p{4cm} X}
+\hline
+Name           & \StudentName \\ \hline
+Student number & \StudentNumber \\ \hline
+Programme      & \Programme \\ \hline
+Submitted      & \SubmissionDate \\ \hline
+\end{tabularx}
+\end{titlepage}

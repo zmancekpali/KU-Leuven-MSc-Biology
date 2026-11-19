@@ -1,0 +1,185 @@
+% =====================================================================
+%  preamble.tex  —  all styling lives here (Notion-like look)
+%  Compile with XeLaTeX or LuaLaTeX (Overleaf: Menu → Compiler)
+% =====================================================================
+
+\usepackage[a4paper, margin=2.4cm, bottom=2.6cm]{geometry}
+\usepackage{iftex}
+
+% ---------- Font: Inter (bundled in fonts/) --------------------------
+\iftutex
+  \usepackage{fontspec}
+  \setmainfont{Inter}[
+    Path           = fonts/,
+    Extension      = .otf,
+    UprightFont    = *-Regular,
+    ItalicFont     = *-Italic,
+    BoldFont       = *-SemiBold,
+    BoldItalicFont = *-SemiBoldItalic,
+    Scale          = 0.95]
+  \newfontfamily\headingfont{Inter}[
+    Path = fonts/, Extension = .otf,
+    UprightFont = *-Bold, ItalicFont = *-BoldItalic]
+\else
+  % fallback if compiled with pdfLaTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[scaled]{helvet}
+  \renewcommand{\familydefault}{\sfdefault}
+  \newcommand{\headingfont}{\bfseries}
+\fi
+
+\usepackage[english]{babel}
+\usepackage{microtype}
+\linespread{1.15}
+
+% ---------- Packages ------------------------------------------------
+\usepackage{graphicx}
+\usepackage[table]{xcolor}
+\usepackage{tabularx, array}
+\usepackage{float}
+\usepackage{pdfpages}
+\usepackage{enumitem}
+\usepackage[skip=8pt plus 2pt]{parskip}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{tocloft}
+\usepackage[most]{tcolorbox}
+\usepackage[hidelinks]{hyperref}
+\usepackage{bookmark}
+\usepackage{needspace}
+\usepackage{ragged2e}
+\AtBeginDocument{\RaggedRight}   % left-aligned like Notion, no justified gaps
+
+% ---------- Colours ---------------------------------------------------
+\definecolor{ink}{HTML}{37352F}       % Notion text colour
+\definecolor{muted}{HTML}{787774}     % Notion grey
+\definecolor{rule}{HTML}{E9E9E7}      % Notion table lines
+\definecolor{shade}{HTML}{F7F6F3}     % Notion table header / callout
+\definecolor{linkc}{HTML}{37352F}
+\definecolor{checkbg}{HTML}{FBF3DB}   % Notion yellow highlight
+\color{ink}
+\hypersetup{colorlinks=true, linkcolor=ink, urlcolor=muted}
+
+% ---------- Headings --------------------------------------------------
+%  \chapter    = part of the portfolio (Seminars, Debates, ...)
+%  \section    = one seminar / debate          (1.1)
+%  \subsection = About, Notes, Reflection, ... (1.1.1)
+% Each seminar/debate starts on a new page (except the first one after a chapter title)
+\newcommand{\sectionbreak}{\ifnum\value{section}>0 \clearpage\fi}
+
+\titleformat{\chapter}[block]
+  {\headingfont\fontsize{30}{36}\selectfont}
+  {\thechapter.}{0.5em}{}
+\titlespacing*{\chapter}{0pt}{0pt}{24pt}
+
+\titleformat{\section}
+  {\headingfont\fontsize{19}{24}\selectfont}{\thesection.}{0.5em}{}
+\titlespacing*{\section}{0pt}{20pt}{8pt}
+
+\titleformat{\subsection}
+  {\headingfont\fontsize{14.5}{18}\selectfont}{\thesubsection.}{0.5em}{}
+\titlespacing*{\subsection}{0pt}{16pt}{4pt}
+
+\titleformat{\subsubsection}
+  {\headingfont\normalsize}{\thesubsubsection.}{0.5em}{}
+\titlespacing*{\subsubsection}{0pt}{12pt}{2pt}
+
+\setcounter{secnumdepth}{3}
+
+% ---------- Table of contents ----------------------------------------
+\setcounter{tocdepth}{1}   % 0 = parts only, 1 = + each seminar, 2 = + About/Notes/...
+\renewcommand{\cfttoctitlefont}{\headingfont\fontsize{30}{36}\selectfont}
+\renewcommand{\cftchapfont}{\bfseries}
+\renewcommand{\cftchappagefont}{\bfseries}
+\renewcommand{\cftchapleader}{\cftdotfill{\cftdotsep}}
+\renewcommand{\cftdotsep}{2.5}
+\setlength{\cftbeforechapskip}{10pt}
+
+% ---------- Header / footer ------------------------------------------
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot[L]{\footnotesize\color{muted}\PortfolioFooter}
+\fancyfoot[R]{\footnotesize\color{muted}\thepage}
+\fancypagestyle{plain}{\fancyhf{}\renewcommand{\headrulewidth}{0pt}%
+  \fancyfoot[L]{\footnotesize\color{muted}\PortfolioFooter}%
+  \fancyfoot[R]{\footnotesize\color{muted}\thepage}}
+
+% ---------- Lists (tight, like Notion) -------------------------------
+\setlist{itemsep=2pt, topsep=2pt, parsep=0pt}
+\setlist[itemize,2]{label=$\circ$}
+\setlist[itemize,3]{label=\tiny\raisebox{0.3ex}{\rule{0.5em}{0.5em}}}
+
+% =====================================================================
+%  Helper commands
+% =====================================================================
+
+% --- \img[width]{file} : an image; grey placeholder if file missing ---
+\newcommand{\img}[2][\linewidth]{%
+  \IfFileExists{#2}%
+    {\includegraphics[width=#1, height=0.42\textheight, keepaspectratio]{#2}}%
+    {\fcolorbox{rule}{shade}{\parbox[c][3cm][c]{\dimexpr#1-2\fboxsep-2\fboxrule}%
+      {\centering\footnotesize\color{muted}missing image:\\\texttt{\detokenize{#2}}}}}%
+}
+
+% --- Image rows ---------------------------------------------------------
+%   \begin{imagerow}
+%     \rowimg{0.3}{images/a.jpg}{Caption}  \hfill
+%     \rowimg{0.3}{images/b.jpg}{}         \hfill
+%     \rowimg{0.3}{images/c.jpg}{Caption}
+%   \end{imagerow}
+\newenvironment{imagerow}
+  {\par\medskip\noindent\begin{minipage}{\linewidth}}
+  {\end{minipage}\par\medskip}
+\newcommand{\rowimg}[3]{%
+  \begin{minipage}[t]{#1\linewidth}\centering
+    \img{#2}%
+    \ifx\relax#3\relax\else\\[2pt]{\footnotesize\color{muted}#3}\fi
+  \end{minipage}}
+
+% --- Text next to an image -----------------------------------------------
+%   \sidebyside{0.5}{text ...}{images/x.jpg}    (0.5 = width of the text)
+\newcommand{\sidebyside}[3]{%
+  \par\medskip\noindent
+  \begin{minipage}[c]{#1\linewidth}\RaggedRight #2\end{minipage}\hfill
+  \begin{minipage}[c]{\dimexpr0.96\linewidth-#1\linewidth\relax}\centering\img{#3}\end{minipage}
+  \par\medskip}
+
+% --- Info table (grey first column, like Notion) ------------------------
+%   \begin{infotable}
+%     Title & ... \\
+%     Speaker & ... \\
+%   \end{infotable}
+\newenvironment{infotable}
+  {\par\smallskip\noindent\arrayrulecolor{rule}\renewcommand{\arraystretch}{1.45}%
+   \tabularx{\linewidth}{|>{\columncolor{shade}\raggedright\arraybackslash}p{3.3cm}|>{\raggedright\arraybackslash}X|}\hline}
+  {\\\hline\endtabularx\par\smallskip}
+\newcommand{\row}{\\\hline}   % use \row between rows instead of \\
+
+% --- Callout box (for reflections) ---------------------------------------
+\newtcolorbox{callout}[1][]{enhanced, colback=shade, colframe=shade,
+  boxrule=0pt, arc=4pt, left=10pt, right=10pt, top=8pt, bottom=8pt, #1}
+
+% --- Highlight something to double-check before submitting -------------
+\newcommand{\tocheck}[1]{\colorbox{checkbg}{\parbox{\dimexpr\linewidth-2\fboxsep}{#1}}}
+
+% --- Insert a signed / scanned PDF as full pages ------------------------
+%   \attachpdf{TOC title}{pdfs/file.pdf}{toc level: chapter|section|subsection}
+%   The pages get a page number and a TOC entry; a placeholder page
+%   is printed if the file is not there yet.
+\newcommand{\attachpdf}[3]{%
+  \clearpage\phantomsection
+  \addcontentsline{toc}{#3}{#1}%
+  \IfFileExists{#2}%
+    {\includepdf[pages=-, scale=0.9, frame, pagecommand={\thispagestyle{fancy}}]{#2}}%
+    {\thispagestyle{fancy}\vspace*{\fill}
+     \begin{center}
+     \fcolorbox{rule}{shade}{\parbox[c][9cm][c]{0.8\linewidth}{\centering
+       {\large\headingfont #1}\\[10pt]
+       \color{muted}Placeholder — upload the PDF to\\[2pt]\texttt{\detokenize{#2}}}}
+     \end{center}
+     \vspace*{\fill}\clearpage}%
+}
+
+% --- Unnumbered chapter that still appears in the TOC -------------------
+\newcommand{\plainchapter}[1]{\chapter*{#1}\addcontentsline{toc}{chapter}{#1}\markboth{#1}{}}

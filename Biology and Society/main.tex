@@ -1,0 +1,64 @@
+% =====================================================================
+%  Biology and Society — Portfolio
+%  Zoja Manček Páli, KU Leuven, 2026–2027
+%
+%  Overleaf: Menu → Compiler → XeLaTeX (or LuaLaTeX) — needed for the Inter font
+%  Compile twice so the table of contents updates.
+% =====================================================================
+\documentclass[11pt, a4paper, openany]{report}
+
+% ---------- Your details (used on the title page and in the footer) --
+\newcommand{\StudentName}{Zoja Manček Páli}
+\newcommand{\StudentNumber}{r0000000}            % <-- fill in
+\newcommand{\Programme}{Master of Biology, Faculty of Science}
+\newcommand{\University}{KU Leuven}
+\newcommand{\CourseName}{Biology and Society}
+\newcommand{\AcademicYear}{2026--2027}
+\newcommand{\SubmissionDate}{1 June 2027}
+\newcommand{\CoverImage}{images/cover.jpg}       % or leave the file out
+\newcommand{\PortfolioFooter}{Biology and Society — Portfolio}
+
+\input{preamble}
+
+\begin{document}
+
+% ---------- Title page + contents ------------------------------------
+\input{sections/titlepage}
+
+\tableofcontents
+\clearpage
+
+% ---------- Signature sheet ------------------------------------------
+\attachpdf{Seminar and debate signature sheet}{pdfs/signature-sheet.pdf}{chapter}
+
+% ---------- 1. Seminars ----------------------------------------------
+\chapter{Seminars}
+\input{seminars/seminar01}
+\input{seminars/seminar02}
+\input{seminars/seminar03}
+\input{seminars/seminar04}
+\input{seminars/seminar05}
+\input{seminars/seminar06}
+\input{seminars/seminar07}
+\input{seminars/seminar08}
+
+% ---------- 2. Debates -----------------------------------------------
+\chapter{Debates}
+\input{debates/debate01}
+\input{debates/debate02}
+\input{debates/debate03}
+\input{debates/debate04}
+
+% ---------- 3. Thesis ------------------------------------------------
+\chapter{Preliminary thesis title}
+\input{sections/thesis}
+
+% ---------- 4. Company visit -----------------------------------------
+\chapter{Company visit}
+\input{sections/company-visit}
+
+% ---------- 5. Career days -------------------------------------------
+\chapter{Career days}
+\input{sections/career-days}
+
+\end{document}
